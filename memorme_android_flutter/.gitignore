@@ -23,12 +23,14 @@
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/
+pubspec.lock
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
 .pub-cache/
 .pub/
 /build/
+
 
 # Web related
 lib/generated_plugin_registrant.dart
