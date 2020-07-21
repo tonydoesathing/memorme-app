@@ -56,7 +56,9 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
       body: Container(
         child: Column(
           children: <Widget>[
+            //add the top part, which holds the carousel
             GestureDetector(
+              //only perform gesture when there aren't any images
               onTap: _images.length < 1
                   ? () => Navigator.push(
                       context,
@@ -72,10 +74,11 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                       ))
                   : () => {},
               child: Container(
-                //color: Colors.black,
+                //set height to be width (make a square)
                 height: MediaQuery.of(context).size.width,
                 child: Center(
                     //TODO set constraints on the size of the image
+                    //if there are images, build a carousel
                     child: (_images.length > 0)
                         ? CarouselSlider.builder(
                             itemCount: _images.length,
@@ -94,6 +97,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                                   child: Image.file(File(_images[index])));
                             },
                           )
+                        //otherwise, build an "add picture" button
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
@@ -113,6 +117,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                           )),
               ),
             ),
+            //only display toolbar row if there aren't any images
             _images.length > 0
                 ? Row(
                     children: <Widget>[
@@ -157,12 +162,14 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                     ],
                   )
                 : SizedBox.shrink(),
+            //display stories list
             Expanded(
               child: _buildStoriesList(),
             ),
           ],
         ),
       ),
+      //only show FAB if there are images
       floatingActionButton: (_images.length > 0)
           ? new FloatingActionButton(
               onPressed:

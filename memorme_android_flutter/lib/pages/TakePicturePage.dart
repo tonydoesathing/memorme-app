@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/pages/DisplayMemoryPage.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -28,9 +27,15 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   CameraController _controller;
   Future<void> _initializeControllerFuture;
 
+  void switchCamera() {
+    setState(() {
+      activeCamera = (activeCamera + 1) % cameras.length;
+      _initializeControllerFuture = initCameraController();
+    });
+  }
+
   initCameraController() async {
     cameras = await loadCameras();
-    print(cameras[activeCamera]);
     _controller = CameraController(
       cameras[activeCamera],
       ResolutionPreset.medium,
@@ -81,16 +86,20 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             await _controller.takePicture(path);
 
             widget.takePictureCallback(path);
-            /* Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DisplayMemoryPage(imagePath: path),
-                ));*/
           } catch (e) {
             print(e);
           }
         },
       ),
+      persistentFooterButtons: <Widget>[
+        RaisedButton(
+            onPressed: switchCamera,
+            color: Colors.black,
+            child: Icon(
+              Icons.switch_camera,
+              color: Colors.white,
+            ))
+      ],
     );
   }
 }

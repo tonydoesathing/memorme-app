@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/pages/DisplayMemoryPage.dart';
-import 'package:memorme_android_flutter/pages/TakePicturePage.dart';
 
 Future<void> main() async {
   runApp(MaterialApp(
