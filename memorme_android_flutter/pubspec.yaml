@@ -26,6 +26,7 @@ dependencies:
   camera: 
   path_provider:
   path:
+  carousel_slider: ^2.2.1
 
 
   # The following adds the Cupertino Icons font to your application.

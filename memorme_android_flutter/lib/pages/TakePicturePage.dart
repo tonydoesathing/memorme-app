@@ -4,31 +4,44 @@ import 'package:memorme_android_flutter/pages/DisplayMemoryPage.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-class TakePictureScreen extends StatefulWidget {
-  final CameraDescription camera;
+Future<List<CameraDescription>> loadCameras() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  const TakePictureScreen({
-    Key key,
-    @required this.camera,
-  }) : super(key: key);
+  final cameras = await availableCameras();
+
+  return cameras;
+}
+
+class TakePictureScreen extends StatefulWidget {
+  final void Function(String value) takePictureCallback;
+
+  const TakePictureScreen({Key key, this.takePictureCallback})
+      : super(key: key);
 
   @override
   TakePictureScreenState createState() => TakePictureScreenState();
 }
 
 class TakePictureScreenState extends State<TakePictureScreen> {
+  List<CameraDescription> cameras;
+  int activeCamera = 0;
   CameraController _controller;
   Future<void> _initializeControllerFuture;
+
+  initCameraController() async {
+    cameras = await loadCameras();
+    print(cameras[activeCamera]);
+    _controller = CameraController(
+      cameras[activeCamera],
+      ResolutionPreset.medium,
+    );
+    return _controller.initialize();
+  }
 
   @override
   void initState() {
     super.initState();
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.medium,
-    );
-
-    _initializeControllerFuture = _controller.initialize();
+    _initializeControllerFuture = initCameraController();
   }
 
   @override
@@ -67,11 +80,12 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
             await _controller.takePicture(path);
 
-            Navigator.push(
+            widget.takePictureCallback(path);
+            /* Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DisplayMemoryPage(imagePath: path),
-                ));
+                ));*/
           } catch (e) {
             print(e);
           }
