@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/pages/TakePicturePage.dart';
+import 'package:memorme_android_flutter/widgets/FullscreenTextField.dart';
+import 'package:memorme_android_flutter/widgets/StoryItem.dart';
 
 class DisplayMemoryPage extends StatefulWidget {
   final String memoryPath;
@@ -38,7 +40,24 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
 
   // a builder for a single story
   Widget _buildStoryItem(int storyIndex) {
-    return new ListTile(title: new Text(_stories[storyIndex]));
+    return StoryItem(
+      _stories[storyIndex],
+      editable: true,
+      onTap: () {
+        Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
+          return FullscreenTextField(
+            text: _stories[storyIndex],
+            onSave: (val) {
+              if (_stories[storyIndex] != val) {
+                setState(() {
+                  _stories[storyIndex] = val;
+                });
+              }
+            },
+          );
+        }));
+      },
+    );
   }
 
   // call to add a story to the list
@@ -49,6 +68,113 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     }
   }
 
+  Widget _createCarousel() {
+    return GestureDetector(
+      //only perform gesture when there aren't any images
+      onTap: _images.length < 1
+          ? () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TakePictureScreen(
+                  takePictureCallback: (path) => {
+                    this.setState(() {
+                      _images.add(path);
+                      Navigator.pop(context);
+                    })
+                  },
+                ),
+              ))
+          : () => {},
+      child: Container(
+        //set height to be width (make a square)
+        height: MediaQuery.of(context).size.width,
+        child: Center(
+            //TODO set constraints on the size of the image
+            //if there are images, build a carousel
+            child: (_images.length > 0)
+                ? CarouselSlider.builder(
+                    itemCount: _images.length,
+                    options: CarouselOptions(
+                      aspectRatio: 1.0,
+                      enlargeCenterPage: true,
+                      autoPlay: false,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          currentImage = index + 1;
+                        });
+                      },
+                    ),
+                    itemBuilder: (ctx, index) {
+                      return Container(child: Image.file(File(_images[index])));
+                    },
+                  )
+                //otherwise, build an "add picture" button
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.add_circle,
+                        size: 150,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      Text(
+                        "Take a photo!",
+                        style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor),
+                      ),
+                    ],
+                  )),
+      ),
+    );
+  }
+
+  Widget _createToolBar() {
+    return _images.length > 0
+        ? Row(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+              Expanded(
+                  child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  currentImage.toString() + "/" + _images.length.toString(),
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+              )),
+              Padding(
+                  padding: EdgeInsets.all(8),
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TakePictureScreen(
+                            takePictureCallback: (path) => {
+                              this.setState(() {
+                                _images.add(path);
+                                Navigator.pop(context);
+                              })
+                            },
+                          ),
+                        )),
+                    child: Icon(
+                      Icons.add_photo_alternate,
+                      color: Theme.of(context).primaryColor,
+                      size: 30,
+                    ),
+                  )),
+            ],
+          )
+        : SizedBox.shrink();
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -57,111 +183,9 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         child: Column(
           children: <Widget>[
             //add the top part, which holds the carousel
-            GestureDetector(
-              //only perform gesture when there aren't any images
-              onTap: _images.length < 1
-                  ? () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TakePictureScreen(
-                          takePictureCallback: (path) => {
-                            this.setState(() {
-                              _images.add(path);
-                              Navigator.pop(context);
-                            })
-                          },
-                        ),
-                      ))
-                  : () => {},
-              child: Container(
-                //set height to be width (make a square)
-                height: MediaQuery.of(context).size.width,
-                child: Center(
-                    //TODO set constraints on the size of the image
-                    //if there are images, build a carousel
-                    child: (_images.length > 0)
-                        ? CarouselSlider.builder(
-                            itemCount: _images.length,
-                            options: CarouselOptions(
-                              aspectRatio: 1.0,
-                              enlargeCenterPage: true,
-                              autoPlay: false,
-                              onPageChanged: (index, reason) {
-                                setState(() {
-                                  currentImage = index + 1;
-                                });
-                              },
-                            ),
-                            itemBuilder: (ctx, index) {
-                              return Container(
-                                  child: Image.file(File(_images[index])));
-                            },
-                          )
-                        //otherwise, build an "add picture" button
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(
-                                Icons.add_circle,
-                                size: 150,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              Text(
-                                "Take a photo!",
-                                style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w500,
-                                    color: Theme.of(context).primaryColor),
-                              ),
-                            ],
-                          )),
-              ),
-            ),
+            _createCarousel(),
             //only display toolbar row if there aren't any images
-            _images.length > 0
-                ? Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                        ),
-                      ),
-                      Expanded(
-                          child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          currentImage.toString() +
-                              "/" +
-                              _images.length.toString(),
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      )),
-                      Padding(
-                          padding: EdgeInsets.all(8),
-                          child: GestureDetector(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TakePictureScreen(
-                                    takePictureCallback: (path) => {
-                                      this.setState(() {
-                                        _images.add(path);
-                                        Navigator.pop(context);
-                                      })
-                                    },
-                                  ),
-                                )),
-                            child: Icon(
-                              Icons.add_photo_alternate,
-                              color: Theme.of(context).primaryColor,
-                              size: 30,
-                            ),
-                          )),
-                    ],
-                  )
-                : SizedBox.shrink(),
+            _createToolBar(),
             //display stories list
             Expanded(
               child: _buildStoriesList(),
@@ -180,27 +204,15 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     );
   }
 
-  void _pushAddStoryScreen() {
+  void _pushAddStoryScreen({String text}) {
     // Push this page onto the stack
     Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
-      return new Scaffold(
-          appBar: new AppBar(title: new Text('Add a new story')),
-          body: Column(
-            children: <Widget>[
-              Expanded(
-                child: TextField(
-                  autofocus: true,
-                  onSubmitted: (val) {
-                    _addStory(val);
-                    Navigator.pop(context); // Close the add todo screen
-                  },
-                  decoration: new InputDecoration(
-                      hintText: 'Enter a story about the memory...',
-                      contentPadding: const EdgeInsets.all(16.0)),
-                ),
-              )
-            ],
-          ));
+      return FullscreenTextField(
+        text: text,
+        onSave: (val) {
+          _addStory(val);
+        },
+      );
     }));
   }
 }
