@@ -92,26 +92,38 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
             //TODO set constraints on the size of the image
             //if there are images, build a carousel
             child: (_images.length > 0)
-                ? CarouselSlider.builder(
-                    itemCount: _images.length,
-                    options: CarouselOptions(
-                      aspectRatio: 1.0,
-                      enlargeCenterPage: true,
-                      autoPlay: false,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          currentImage = index + 1;
-                        });
-                      },
-                    ),
-                    itemBuilder: (ctx, index) {
-                      return Container(
-                          child: Image.file(
-                        File(_images[index]),
-                        fit: BoxFit.contain,
-                      ));
-                    },
-                  )
+                ? (_images.length > 1)
+                    ? CarouselSlider.builder(
+                        itemCount: _images.length,
+                        options: CarouselOptions(
+                          aspectRatio: 1.0,
+                          enlargeCenterPage: true,
+                          autoPlay: false,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              currentImage = index + 1;
+                            });
+                          },
+                        ),
+                        itemBuilder: (ctx, index) {
+                          return Container(
+                              child: Image.file(
+                            File(_images[index]),
+                            fit: BoxFit.contain,
+                          ));
+                        },
+                      )
+                    : Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Image.file(
+                              File(_images[0]),
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        ],
+                      )
+
                 //otherwise, build an "add picture" button
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
