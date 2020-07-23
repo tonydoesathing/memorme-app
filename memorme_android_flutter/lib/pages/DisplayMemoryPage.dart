@@ -134,7 +134,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                         color: Theme.of(context).primaryColor,
                       ),
                       Text(
-                        "Take a photo!",
+                        "Add a photo!",
                         style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w500,

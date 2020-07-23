@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+
+
 
 Future<List<CameraDescription>> loadCameras() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +31,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   int activeCamera = 0;
   CameraController _controller;
   Future<void> _initializeControllerFuture;
+
+  final picker = ImagePicker();
 
   void switchCamera() {
     setState(() {
@@ -93,12 +100,24 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ),
       persistentFooterButtons: <Widget>[
         RaisedButton(
+          onPressed: () async {
+            final pickedFile = await picker.getImage(source: ImageSource.gallery);
+            widget.takePictureCallback(pickedFile.path);
+          },
+          color: Colors.white,
+          child: Icon(
+            Icons.photo_library,
+            color: Colors.blueAccent
+          )
+        ),
+        RaisedButton(
             onPressed: switchCamera,
             color: Colors.black,
             child: Icon(
               Icons.switch_camera,
               color: Colors.white,
-            ))
+            )
+        )
       ],
     );
   }
