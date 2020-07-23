@@ -105,7 +105,11 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                       },
                     ),
                     itemBuilder: (ctx, index) {
-                      return Container(child: Image.file(File(_images[index])));
+                      return Container(
+                          child: Image.file(
+                        File(_images[index]),
+                        fit: BoxFit.contain,
+                      ));
                     },
                   )
                 //otherwise, build an "add picture" button
