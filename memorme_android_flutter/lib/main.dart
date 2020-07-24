@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/pages/DisplayMemoryPage.dart';
 
-Future<void> main() async {
+main() {
   runApp(MaterialApp(
     theme: ThemeData.light(),
-    //home: TakePictureScreen(takePictureCallback: (path) => print(path)),
     home: DisplayMemoryPage(),
     debugShowCheckedModeBanner: false,
   ));
