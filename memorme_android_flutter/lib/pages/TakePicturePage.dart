@@ -101,8 +101,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       persistentFooterButtons: <Widget>[
         RaisedButton(
           onPressed: () async {
-            final pickedFile = await picker.getImage(source: ImageSource.gallery);
-            widget.takePictureCallback(pickedFile.path);
+            try{
+              final pickedFile = await picker.getImage(source: ImageSource.gallery);
+              widget.takePictureCallback(pickedFile.path);
+            } catch (e){
+              print(e);
+            }
+            
           },
           color: Colors.white,
           child: Icon(
