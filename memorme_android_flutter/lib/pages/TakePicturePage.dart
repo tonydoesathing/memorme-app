@@ -6,8 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-
-
 Future<List<CameraDescription>> loadCameras() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -79,6 +77,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        key: Key("TakePictureButton"),
         child: Icon(Icons.camera_alt),
         onPressed: () async {
           //try and take the photo then go to the DisplayMemoryPage
@@ -100,29 +99,26 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ),
       persistentFooterButtons: <Widget>[
         RaisedButton(
-          onPressed: () async {
-            try{
-              final pickedFile = await picker.getImage(source: ImageSource.gallery);
-              widget.takePictureCallback(pickedFile.path);
-            } catch (e){
-              print(e);
-            }
-            
-          },
-          color: Colors.white,
-          child: Icon(
-            Icons.photo_library,
-            color: Colors.blueAccent
-          )
-        ),
+            key: Key("GalleryButton"),
+            onPressed: () async {
+              try {
+                final pickedFile =
+                    await picker.getImage(source: ImageSource.gallery);
+                widget.takePictureCallback(pickedFile.path);
+              } catch (e) {
+                print(e);
+              }
+            },
+            color: Colors.white,
+            child: Icon(Icons.photo_library, color: Colors.blueAccent)),
         RaisedButton(
+            key: Key("SwitchCameraButton"),
             onPressed: switchCamera,
             color: Colors.black,
             child: Icon(
               Icons.switch_camera,
               color: Colors.white,
-            )
-        )
+            ))
       ],
     );
   }
