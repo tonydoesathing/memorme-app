@@ -2,26 +2,28 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:memorme_android_flutter/models/memory.dart';
 import 'package:memorme_android_flutter/pages/TakePicturePage.dart';
 import 'package:memorme_android_flutter/widgets/FullscreenTextField.dart';
 import 'package:memorme_android_flutter/widgets/StoryItem.dart';
 
 class DisplayMemoryPage extends StatefulWidget {
   final String memoryPath;
-  DisplayMemoryPage({Key key, this.memoryPath}) : super(key: key);
+  final void Function(Memory value) onSave;
+  DisplayMemoryPage({Key key, this.memoryPath, this.onSave}) : super(key: key);
 
   @override
   _DisplayMemoryPageState createState() => _DisplayMemoryPageState();
 }
 
 class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
-  List<String> _images = [];
-  List<String> _stories = [];
+  Memory _memory;
   int currentImage = 1;
 
   @override
   void initState() {
     super.initState();
+    _memory = Memory();
   }
 
   // a builder for the list of stories
@@ -33,7 +35,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         // itemBuilder will be automatically be called as many times as it takes for the
         // list to fill up its available space, which is most likely more than the
         // number of story items we have. So, we need to check the index is OK.
-        if (index < _stories.length) {
+        if (index < _memory.getAllStories().length) {
           return _buildStoryItem(index);
         }
       },
@@ -43,16 +45,16 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   // a builder for a single story
   Widget _buildStoryItem(int storyIndex) {
     return StoryItem(
-      _stories[storyIndex],
+      _memory.getStory(storyIndex),
       editable: true,
       onTap: () {
         Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
           return FullscreenTextField(
-            text: _stories[storyIndex],
+            text: _memory.getStory(storyIndex),
             onSave: (val) {
-              if (_stories[storyIndex] != val) {
+              if (_memory.getStory(storyIndex) != val) {
                 setState(() {
-                  _stories[storyIndex] = val;
+                  _memory.editStory(storyIndex, val);
                 });
               }
             },
@@ -66,7 +68,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   void _addStory(String story) {
     // Only add the story if the user actually entered something
     if (story.length > 0) {
-      setState(() => _stories.add(story));
+      setState(() => _memory.addStory(story));
     }
   }
 
@@ -80,7 +82,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
               builder: (context) => TakePictureScreen(
                 takePictureCallback: (path) => {
                   this.setState(() {
-                    _images.add(path);
+                    _memory.addMedia(path);
                     Navigator.pop(context);
                   })
                 },
@@ -113,7 +115,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
 
   Widget _createCarousel() {
     //if there aren't any images, offer a "Take Photo" button
-    if (_images.length < 1) {
+    if (_memory.getAllMedia().length < 1) {
       return _createTakePhotoButton();
     } else {
       //otherwise, display the image
@@ -122,9 +124,9 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         height: MediaQuery.of(context).size.width,
         child: Center(
             //if there are images, build a carousel
-            child: (_images.length > 1)
+            child: (_memory.getAllMedia().length > 1)
                 ? CarouselSlider.builder(
-                    itemCount: _images.length,
+                    itemCount: _memory.getAllMedia().length,
                     options: CarouselOptions(
                       aspectRatio: 1.0,
                       enlargeCenterPage: true,
@@ -138,7 +140,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                     itemBuilder: (ctx, index) {
                       return Container(
                           child: Image.file(
-                        File(_images[index]),
+                        File(_memory.getMedia(index)),
                         fit: BoxFit.contain,
                       ));
                     },
@@ -148,7 +150,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                     children: <Widget>[
                       Expanded(
                         child: Image.file(
-                          File(_images[0]),
+                          File(_memory.getMedia(0)),
                           fit: BoxFit.contain,
                         ),
                       )
@@ -160,7 +162,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
 
   Widget _createToolBar() {
     //check to see if there are images
-    return _images.length > 0
+    return _memory.getAllMedia().length > 0
         //if there are, create a toolbar with a button on the right
         //and a centered image display (so you can see what image you're on)
         ? Row(
@@ -176,7 +178,9 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                   child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  currentImage.toString() + "/" + _images.length.toString(),
+                  currentImage.toString() +
+                      "/" +
+                      _memory.getAllMedia().length.toString(),
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
               )),
@@ -189,7 +193,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                           builder: (context) => TakePictureScreen(
                             takePictureCallback: (path) => {
                               this.setState(() {
-                                _images.add(path);
+                                _memory.addMedia(path);
                                 Navigator.pop(context);
                               })
                             },
@@ -210,7 +214,20 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: new Text('Memory')),
+      appBar: new AppBar(
+        title: new Text('Memory'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.check),
+            onPressed: () {
+              if (widget.onSave != null) {
+                widget.onSave(_memory);
+              }
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
       //create a scrollable listview
       body: ListView(
         children: <Widget>[
@@ -223,7 +240,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         ],
       ),
       //only show FAB if there are images
-      floatingActionButton: (_images.length > 0)
+      floatingActionButton: (_memory.getAllMedia().length > 0)
           ? new FloatingActionButton(
               onPressed:
                   _pushAddStoryScreen, // pressing the + button opens the new story screen

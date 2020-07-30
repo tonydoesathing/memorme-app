@@ -24,20 +24,20 @@ void main() {
       }
     });
 
-    test('can take picture', () async {
-      await driver.tap(takePictureButton);
-      expect(1, 1);
-    });
+    // test('can take picture', () async {
+    //   await driver.tap(takePictureButton);
+    //   expect(1, 1);
+    // });
 
-    test('can open image from gallery', () async {
-      await driver.tap(galleryButton);
-      await Process.run(
-        'adb',
-        <String>['shell', 'input', 'keyevent', 'KEYCODE_BACK'],
-        runInShell: true,
-      );
-      expect(isPresent(galleryButton, driver), true);
-    });
+    // test('can open image from gallery', () async {
+    //   await driver.tap(galleryButton);
+    //   await Process.run(
+    //     'adb',
+    //     <String>['shell', 'input', 'keyevent', 'KEYCODE_BACK'],
+    //     runInShell: true,
+    //   );
+    //   expect(isPresent(galleryButton, driver), true);
+    // });
   });
 }
 
