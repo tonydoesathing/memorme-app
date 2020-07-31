@@ -39,6 +39,7 @@ class _FullscreenTextFieldState extends State<FullscreenTextField> {
         title: widget.text != null ? Text("Edit Story") : Text("New Story"),
         actions: <Widget>[
           IconButton(
+            key: Key('Check_icon'),
             icon: Icon(Icons.check),
             onPressed: () {
               if (widget.onSave != null) {
@@ -56,6 +57,7 @@ class _FullscreenTextFieldState extends State<FullscreenTextField> {
           Padding(
             padding: EdgeInsets.all(8),
             child: TextField(
+              key: Key('Textfield'),
               controller: _controller,
               autofocus: true,
               maxLines: null,
