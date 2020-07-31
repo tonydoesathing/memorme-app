@@ -1,22 +1,80 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/models/memory.dart';
 import 'package:memorme_android_flutter/pages/DisplayMemoryPage.dart';
+import 'package:memorme_android_flutter/widgets/memory_display.dart';
 
 class DisplayMemoriesPage extends StatefulWidget {
   final bool testing;
-  DisplayMemoriesPage({Key key, this.testing = false}) : super(key: key);
+  final bool listView;
+  final List<Memory> memories;
+  DisplayMemoriesPage(
+      {Key key, this.testing = false, this.listView = false, this.memories})
+      : super(key: key);
 
   @override
   _DisplayMemoriesPageState createState() => _DisplayMemoriesPageState();
 }
 
 class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
-  List<Memory> memories;
+  List<Memory> _memories;
 
   @override
   void initState() {
     super.initState();
-    memories = [];
+    if (widget.memories == null) {
+      _memories = [];
+    } else {
+      _memories = widget.memories;
+    }
+  }
+
+  Widget _memoriesGrid() {
+    return Padding(
+        padding: EdgeInsets.only(top: 3),
+        child: GridView.builder(
+            itemCount: _memories.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, mainAxisSpacing: 3, crossAxisSpacing: 3),
+            itemBuilder: (BuildContext context, int index) {
+              if (index < _memories.length) {
+                return GestureDetector(
+                  key: Key("MemoriesGridTile"),
+                  onTap: () {
+                    // Navigator.of(context).push(MaterialPageRoute(
+                    //     builder: (BuildContext buildContext) =>
+                    //         DisplayMemoriesPage(
+                    //           testing: widget.testing,
+                    //           listView: true,
+                    //           memories: _memories,
+                    //         )));
+                  },
+                  child: Container(
+                    color: Colors.blue,
+                    child: widget.testing
+                        ? Text("meow")
+                        : Image.file(
+                            File(_memories[index].getMedia(0)),
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                );
+              }
+            }));
+  }
+
+  Widget _memoriesList() {
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        if (index < _memories.length) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 50.0),
+            child: MemoryDisplay(_memories[index]),
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -32,7 +90,7 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
             setState(() {
               Memory memory = Memory();
               memory.addStory("story");
-              memories.add(memory);
+              _memories.add(memory);
             });
           } else {
             //display memory UI
@@ -42,7 +100,7 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
                     builder: (context) => DisplayMemoryPage(
                           onSave: (memory) {
                             setState(() {
-                              memories.add(memory);
+                              _memories.add(memory);
                             });
                           },
                         )));
@@ -50,17 +108,8 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
         },
         child: Icon(Icons.add),
       ),
-      body: ListView.builder(itemBuilder: (context, index) {
-        if (index < memories.length) {
-          return GestureDetector(
-            key: Key("MemoriesListTile"),
-            onTap: () {},
-            child: ListTile(
-              title: Text(memories[index].getStory(0)),
-            ),
-          );
-        }
-      }),
+      body: //widget.listView ? _memoriesList() : _memoriesGrid(),
+          _memoriesGrid(),
     );
   }
 }
