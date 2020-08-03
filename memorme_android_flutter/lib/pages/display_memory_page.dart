@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/models/memory.dart';
-import 'package:memorme_android_flutter/pages/TakePicturePage.dart';
-import 'package:memorme_android_flutter/widgets/FullscreenTextField.dart';
-import 'package:memorme_android_flutter/widgets/StoryItem.dart';
+import 'package:memorme_android_flutter/pages/take_picture_page.dart';
+import 'package:memorme_android_flutter/widgets/fullscreen_text_field.dart';
+import 'package:memorme_android_flutter/widgets/story_item.dart';
 
 class DisplayMemoryPage extends StatefulWidget {
   final String memoryPath;

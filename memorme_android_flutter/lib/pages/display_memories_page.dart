@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/models/memory.dart';
-import 'package:memorme_android_flutter/pages/DisplayMemoryPage.dart';
+import 'package:memorme_android_flutter/pages/display_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/memory_display.dart';
 
 class DisplayMemoriesPage extends StatefulWidget {

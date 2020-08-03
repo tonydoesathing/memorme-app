@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memorme_android_flutter/widgets/FullscreenTextField.dart';
+import 'package:memorme_android_flutter/widgets/fullscreen_text_field.dart';
 
 MaterialApp makeTestable(Widget w){
   return MaterialApp(home: w);
