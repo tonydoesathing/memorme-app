@@ -26,7 +26,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     _memory = Memory();
   }
 
-  // a builder for the list of stories
+  /// builds a list of story items
   Widget _buildStoriesList() {
     return new ListView.builder(
       shrinkWrap: true,
@@ -42,7 +42,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     );
   }
 
-  // a builder for a single story
+  /// builds a single story display using a [storyIndex] of [_memory]'s stories
   Widget _buildStoryItem(int storyIndex) {
     return StoryItem(
       _memory.getStory(storyIndex),
@@ -64,7 +64,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     );
   }
 
-  // call to add a story to the list
+  /// adds a [story] to [_memory]'s stories
   void _addStory(String story) {
     // Only add the story if the user actually entered something
     if (story.length > 0) {
@@ -72,6 +72,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     }
   }
 
+  ///creates a button to take a photo if there are not photos
   Widget _createTakePhotoButton() {
     return GestureDetector(
       //send to TakePictureScreen on tap
@@ -113,6 +114,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     );
   }
 
+  /// creates the carousel to display media
   Widget _createCarousel() {
     //if there aren't any images, offer a "Take Photo" button
     if (_memory.getAllMedia().length < 1) {
@@ -160,6 +162,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     }
   }
 
+  /// creates the toolbar below the carousel
   Widget _createToolBar() {
     //check to see if there are images
     return _memory.getAllMedia().length > 0
@@ -211,6 +214,42 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         : SizedBox.shrink();
   }
 
+  /// shows a dialog explaining to the user that they need a story and a photo
+  Future<void> _showDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('A memory must have at least one story and photo!'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// checks to see if [_memory] is fit to save,
+  /// specifically by checking to see if it has
+  /// a story and a media
+  void _checkCanSave() {
+    if (this._memory.getAllMedia().length < 1 ||
+        this._memory.getAllStories().length < 1) {
+      _showDialog();
+    } else {
+      if (widget.onSave != null) {
+        widget.onSave(_memory);
+      }
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -220,10 +259,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
-              if (widget.onSave != null) {
-                widget.onSave(_memory);
-              }
-              Navigator.pop(context);
+              _checkCanSave();
             },
           ),
         ],
@@ -250,6 +286,8 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
     );
   }
 
+  /// navigates to the [FullscreenTextField] page, filling in the
+  /// textbox with an optional [text] string
   void _pushAddStoryScreen({String text}) {
     // navigate to the fullscreen text field page
     Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
