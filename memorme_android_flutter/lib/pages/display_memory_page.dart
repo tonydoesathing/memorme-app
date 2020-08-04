@@ -44,23 +44,36 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
 
   /// builds a single story display using a [storyIndex] of [_memory]'s stories
   Widget _buildStoryItem(int storyIndex) {
-    return StoryItem(
-      _memory.getStory(storyIndex),
-      editable: true,
-      onTap: () {
-        Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
-          return FullscreenTextField(
-            text: _memory.getStory(storyIndex),
-            onSave: (val) {
-              if (_memory.getStory(storyIndex) != val) {
-                setState(() {
-                  _memory.editStory(storyIndex, val);
-                });
-              }
-            },
-          );
-        }));
-      },
+    return Column(
+      children: <Widget>[
+        // show a Divider when it's not the first story
+        if (storyIndex > 0)
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: Divider(
+              thickness: 1,
+            ),
+          ),
+        StoryItem(
+          _memory.getStory(storyIndex),
+          editable: true,
+          onTap: () {
+            Navigator.of(context)
+                .push(new MaterialPageRoute(builder: (context) {
+              return FullscreenTextField(
+                text: _memory.getStory(storyIndex),
+                onSave: (val) {
+                  if (_memory.getStory(storyIndex) != val) {
+                    setState(() {
+                      _memory.editStory(storyIndex, val);
+                    });
+                  }
+                },
+              );
+            }));
+          },
+        ),
+      ],
     );
   }
 
