@@ -32,6 +32,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   final picker = ImagePicker();
 
+  // Goes to the next camera
   void switchCamera() {
     setState(() {
       activeCamera = (activeCamera + 1) % cameras.length;
@@ -41,6 +42,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   initCameraController() async {
     cameras = await loadCameras();
+    // make sure we're loading on the back camera
+    int i = 0;
+    while (cameras[activeCamera].lensDirection != CameraLensDirection.back &&
+        i < cameras.length) {
+      print("Loading camera");
+      activeCamera = (activeCamera + 1) % cameras.length;
+      i++;
+    }
     _controller = CameraController(
       cameras[activeCamera],
       ResolutionPreset.medium,
