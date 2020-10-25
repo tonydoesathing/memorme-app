@@ -3,7 +3,28 @@ import 'package:memorme_android_flutter/models/memory.dart';
 
 import 'memory_display.dart';
 
-class MemoriesList extends StatefulWidget {
+class MemoriesList extends StatelessWidget {
+  final List<Memory> memories;
+  const MemoriesList({Key key, List<Memory> memories})
+      : memories = memories ?? const [],
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        if (index < memories.length) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 50.0),
+            child: MemoryDisplay(memories[index]),
+          );
+        }
+      },
+    );
+  }
+}
+
+/*class MemoriesList extends StatefulWidget {
   final List<Memory> memories;
 
   MemoriesList({
@@ -42,3 +63,4 @@ class _MemoriesListState extends State<MemoriesList> {
     );
   }
 }
+*/

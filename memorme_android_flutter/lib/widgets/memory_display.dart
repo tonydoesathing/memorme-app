@@ -36,16 +36,37 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
                     },
                   ),
                   itemBuilder: (ctx, index) {
-                    return Container(
-                        child: Image.file(
+                    /*child: Image.file(
                       File(widget.memory.getMedia(index)),
                       fit: BoxFit.contain,
-                    ));
+                    ) */
+                    /*
+                      child: Image.asset(
+                        "assets/graphics/InvalidImage.png",
+                        fit: BoxFit.contain,
+                      ),
+                    */
+                    return Container(
+                      child: Image.file(
+                        File(widget.memory.getMedia(0)),
+                        fit: BoxFit.contain,
+                      ),
+                    );
                   },
                 )
               //if there's just one image, just show the image
               : Column(
                   children: <Widget>[
+                    /*child: Image.file(
+                        File(widget.memory.getMedia(0)),
+                        fit: BoxFit.contain,
+                      ), */
+                    /*
+                      Image.asset(
+                        "assets/graphics/InvalidImage.png",
+                        fit: BoxFit.contain,
+                      ),
+                      */
                     Expanded(
                       child: Image.file(
                         File(widget.memory.getMedia(0)),
