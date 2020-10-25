@@ -39,12 +39,12 @@ class _MemoriesGridState extends State<MemoriesGrid> {
                 return GestureDetector(
                   key: Key("MemoriesGridTile"),
                   onTap: () {
-                    /*Navigator.of(context).push(MaterialPageRoute(
+                    Navigator.of(context).push(MaterialPageRoute(
                         builder: (BuildContext buildContext) =>
                             DisplayMemoriesPage(
                               listView: true,
                               memories: _memories,
-                            )));*/
+                            )));
                   },
                   child: Container(
                     color: Colors.blue,
