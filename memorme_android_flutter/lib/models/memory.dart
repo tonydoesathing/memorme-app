@@ -42,7 +42,7 @@ class Memory {
     }
   }
 
-  ///Remove a the story at index [i] from [_stories]
+  ///Remove the story at index [i] from [_stories]
   removeStory(int i) {
     if (i != null) {
       if (_stories.length > i && i >= 0) {
