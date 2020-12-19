@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memorme_android_flutter/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memory.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
 
 import '../utils/widget_test_utils.dart';
@@ -19,9 +19,8 @@ void main() {
         'Should start with number of grid squares equal to memories in list',
         (WidgetTester tester) async {
       List<Memory> memories = [];
-      memories.add(Memory(media: ["1", "2"], stories: ["story 1", "story 2"]));
-      memories.add(Memory(
-          media: ["1", "2", "3"], stories: ["story 1", "story 2", "story 3"]));
+      memories.add(Memory(["1", "2"], ["story 1", "story 2"]));
+      memories.add(Memory(["1", "2", "3"], ["story 1", "story 2", "story 3"]));
 
       await tester.pumpWidget(makeTestable(MemoriesGrid(
         memories: memories,

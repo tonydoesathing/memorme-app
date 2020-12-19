@@ -1,3 +1,5 @@
+import 'package:memorme_android_flutter/data/models/memory.dart' as NewMemory;
+
 class Memory {
   List<String> _media;
   List<String> _stories;
@@ -85,5 +87,9 @@ class Memory {
   ///Returns the list of [_media]
   List<String> getAllMedia() {
     return this._media;
+  }
+
+  factory Memory.fromNewMemory(NewMemory.Memory memory) {
+    return Memory(media: memory.media, stories: memory.stories);
   }
 }

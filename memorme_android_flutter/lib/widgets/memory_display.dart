@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memory.dart';
 import 'package:memorme_android_flutter/widgets/story_item.dart';
 
 class MemoryDisplay extends StatefulWidget {
@@ -22,9 +22,9 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
       height: MediaQuery.of(context).size.width,
       child: Center(
           //if there are images, build a carousel
-          child: (widget.memory.getAllMedia().length > 1)
+          child: (widget.memory.media.length > 1)
               ? CarouselSlider.builder(
-                  itemCount: widget.memory.getAllMedia().length,
+                  itemCount: widget.memory.media.length,
                   options: CarouselOptions(
                     aspectRatio: 1.0,
                     enlargeCenterPage: true,
@@ -48,7 +48,7 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
                     */
                     return Container(
                       child: Image.file(
-                        File(widget.memory.getMedia(0)),
+                        File(widget.memory.media[0]),
                         fit: BoxFit.contain,
                       ),
                     );
@@ -69,7 +69,7 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
                       */
                     Expanded(
                       child: Image.file(
-                        File(widget.memory.getMedia(0)),
+                        File(widget.memory.media[0]),
                         fit: BoxFit.contain,
                       ),
                     )
@@ -94,7 +94,7 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
           child: Text(
             _currentImage.toString() +
                 "/" +
-                widget.memory.getAllMedia().length.toString(),
+                widget.memory.media.length.toString(),
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
         )),
@@ -115,9 +115,7 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
 
   Widget _stories() {
     return Column(
-      children: <Widget>[
-        for (String s in widget.memory.getAllStories()) StoryItem(s)
-      ],
+      children: <Widget>[for (String s in widget.memory.stories) StoryItem(s)],
     );
   }
 

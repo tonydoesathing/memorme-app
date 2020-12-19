@@ -1,26 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memory.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'memory_display.dart';
 
 class MemoriesList extends StatelessWidget {
   final List<Memory> memories;
-  ItemScrollController scrollController;
-  MemoriesList({Key key, List<Memory> memories, ItemScrollController scrollController})
+  final ItemScrollController _scrollController = ItemScrollController();
+  final int focusedIndex;
+
+  MemoriesList(
+      {Key key,
+      List<Memory> memories,
+      ItemScrollController scrollController,
+      this.focusedIndex})
       : memories = memories ?? const [],
-        scrollController = scrollController,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    
-    return ScrollablePositionedList.builder(
-      itemCount: memories.length,
-      itemScrollController: scrollController,
-      itemBuilder: (context, index) => MemoryDisplay(memories[index])
-    );
+    //not sure if this is the best place for this function call
+    //but basically allows scrolling to widget
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _executeAfterWholeBuildProcess(context));
 
+    //create list
+    return ScrollablePositionedList.builder(
+        itemCount: memories.length,
+        itemScrollController: _scrollController,
+        itemBuilder: (context, index) => MemoryDisplay(memories[index]));
+  }
+
+  //to be called internally; scrolls to element if needed
+  _executeAfterWholeBuildProcess(BuildContext context) {
+    if (this.memories.length > 0 && focusedIndex != null) {
+      _scrollController.jumpTo(index: focusedIndex);
+    }
   }
 }
 

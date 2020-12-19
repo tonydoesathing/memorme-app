@@ -1,21 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/models/memory.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/logic/bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/display_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
 import 'package:memorme_android_flutter/widgets/memories_list.dart';
-import 'package:memorme_android_flutter/widgets/memory_display.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class DisplayMemoriesPage extends StatefulWidget {
-  final bool testing;
   final bool listView;
-  final List<Memory> memories;
   final int focusedIndex;
 
-  DisplayMemoriesPage(
-      {Key key, this.testing = false, this.listView = false, this.memories, this.focusedIndex = 0})
+  DisplayMemoriesPage({Key key, this.listView = false, this.focusedIndex = 0})
       : super(key: key);
 
   @override
@@ -23,62 +20,81 @@ class DisplayMemoriesPage extends StatefulWidget {
 }
 
 class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
-  List<Memory> _memories;
-  final ItemScrollController _scrollController = ItemScrollController();
+  MemoriesBloc memoriesBloc;
 
   @override
   void initState() {
     super.initState();
-    if (widget.memories == null) {
-      _memories = [];
-    } else {
-      _memories = widget.memories;
-    }
+    // load the memories
+    memoriesBloc = BlocProvider.of<MemoriesBloc>(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => executeAfterWholeBuildProcess(context));
-        return Scaffold(
-          appBar: AppBar(
-            title: Text("Memories"),
-          ),
-          floatingActionButton: FloatingActionButton(
-            key: Key("AddMemoryFAB"),
-            onPressed: () {
-              if (widget.testing) {
-                setState(() {
-                  Memory memory = Memory();
-                  memory.addStory("story");
-                  _memories.add(memory);
-                });
-              } else {
-                //display memory UI
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DisplayMemoryPage(
-                              onSave: (memory) {
-                                setState(() {
-                                  _memories.add(memory);
-                                });
-                              },
-                            )));
-              }
-            },
-            child: Icon(Icons.add),
-          ),
-          body: widget.listView
-              ? MemoriesList(memories: _memories, scrollController: _scrollController)
-              : MemoriesGrid(
-                  memories: _memories,
-                ),
-      
-        );
-      }
-      // jumps to correct index in list after build
-      executeAfterWholeBuildProcess(BuildContext context) {
-        _scrollController.jumpTo(index: widget.focusedIndex);
-
-      }
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Memories"),
+        ),
+        floatingActionButton: FloatingActionButton(
+          key: Key("AddMemoryFAB"),
+          onPressed: () {
+            //display memory UI
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (c) => DisplayMemoryPage(
+                          onSave: (memory) {
+                            memoriesBloc.add(MemoriesMemoryAdded(
+                                Memory.fromOldMemory(memory)));
+                          },
+                        )));
+          },
+          child: Icon(Icons.add),
+        ),
+        body: BlocConsumer<MemoriesBloc, MemoriesState>(
+          cubit: memoriesBloc,
+          builder: (context, state) {
+            //rebuild on state change
+            if (state is MemoriesLoadSuccess) {
+              //load successful
+              //check to see if we're rendering a listview or a gridview
+              return widget.listView
+                  ? MemoriesList(
+                      memories: state.memories,
+                      focusedIndex: widget.focusedIndex,
+                    )
+                  : MemoriesGrid(
+                      memories: state.memories,
+                      onTileTap: (memory, index) {
+                        //navigate to listview display
+                        //not sure if we should be doing this or just create a separate thing for it
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (BuildContext buildContext) =>
+                                  BlocProvider.value(
+                                      value: memoriesBloc,
+                                      child: DisplayMemoriesPage(
+                                        listView: true,
+                                        focusedIndex: index,
+                                      ))),
+                        );
+                      },
+                    );
+            } else {
+              //it's loading or it failed
+              //TODO: make an actual loading symbol
+              return Container(
+                child: Text("LOADING"),
+              );
+            }
+          },
+          listener: (BuildContext context, MemoriesState state) {
+            if (state is MemoriesSaveSuccess) {
+              //if saved correctly, load the memories
+              memoriesBloc.add(MemoriesLoaded());
+            }
+            //TODO: else give error
+          },
+        ));
+  }
 }
