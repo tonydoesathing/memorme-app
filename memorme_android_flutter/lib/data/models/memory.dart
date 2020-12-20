@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:memorme_android_flutter/models/memory.dart' as OldMemory;
 
 class Memory extends Equatable {
   final List<String> media;
@@ -10,8 +9,4 @@ class Memory extends Equatable {
 
   @override
   List<Object> get props => [media, stories];
-
-  factory Memory.fromOldMemory(OldMemory.Memory memory) {
-    return Memory(memory.getAllMedia(), memory.getAllStories());
-  }
 }

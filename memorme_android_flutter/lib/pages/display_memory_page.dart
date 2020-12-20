@@ -2,28 +2,29 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memory.dart';
 import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/widgets/fullscreen_text_field.dart';
 import 'package:memorme_android_flutter/widgets/story_item.dart';
 
 class DisplayMemoryPage extends StatefulWidget {
-  final String memoryPath;
   final void Function(Memory value) onSave;
-  DisplayMemoryPage({Key key, this.memoryPath, this.onSave}) : super(key: key);
+  DisplayMemoryPage({Key key, this.onSave}) : super(key: key);
 
   @override
   _DisplayMemoryPageState createState() => _DisplayMemoryPageState();
 }
 
 class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
-  Memory _memory;
-  int currentImage = 1;
+  List<String> _media;
+  List<String> _stories;
+  int _currentImage = 1;
 
   @override
   void initState() {
     super.initState();
-    _memory = Memory();
+    _media = [];
+    _stories = [];
   }
 
   /// builds a list of story items
@@ -35,7 +36,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         // itemBuilder will be automatically be called as many times as it takes for the
         // list to fill up its available space, which is most likely more than the
         // number of story items we have. So, we need to check the index is OK.
-        if (index < _memory.getAllStories().length) {
+        if (index < _stories.length) {
           return _buildStoryItem(index);
         }
       },
@@ -55,17 +56,17 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
             ),
           ),
         StoryItem(
-          _memory.getStory(storyIndex),
+          _stories[storyIndex],
           editable: true,
           onTap: () {
             Navigator.of(context)
                 .push(new MaterialPageRoute(builder: (context) {
               return FullscreenTextField(
-                text: _memory.getStory(storyIndex),
+                text: _stories[storyIndex],
                 onSave: (val) {
-                  if (_memory.getStory(storyIndex) != val) {
+                  if (_stories[storyIndex] != val) {
                     setState(() {
-                      _memory.editStory(storyIndex, val);
+                      _stories[storyIndex] = val;
                     });
                   }
                 },
@@ -81,7 +82,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   void _addStory(String story) {
     // Only add the story if the user actually entered something
     if (story.length > 0) {
-      setState(() => _memory.addStory(story));
+      setState(() => _stories.add(story));
     }
   }
 
@@ -96,7 +97,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
               builder: (context) => TakePictureScreen(
                 takePictureCallback: (path) => {
                   this.setState(() {
-                    _memory.addMedia(path);
+                    _media.add(path);
                     Navigator.pop(context);
                   })
                 },
@@ -130,7 +131,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   /// creates the carousel to display media
   Widget _createCarousel() {
     //if there aren't any images, offer a "Take Photo" button
-    if (_memory.getAllMedia().length < 1) {
+    if (_media.length < 1) {
       return _createTakePhotoButton();
     } else {
       //otherwise, display the image
@@ -139,23 +140,23 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         height: MediaQuery.of(context).size.width,
         child: Center(
             //if there are images, build a carousel
-            child: (_memory.getAllMedia().length > 1)
+            child: (_media.length > 1)
                 ? CarouselSlider.builder(
-                    itemCount: _memory.getAllMedia().length,
+                    itemCount: _media.length,
                     options: CarouselOptions(
                       aspectRatio: 1.0,
                       enlargeCenterPage: true,
                       autoPlay: false,
                       onPageChanged: (index, reason) {
                         setState(() {
-                          currentImage = index + 1;
+                          _currentImage = index + 1;
                         });
                       },
                     ),
                     itemBuilder: (ctx, index) {
                       return Container(
                           child: Image.file(
-                        File(_memory.getMedia(index)),
+                        File(_media[index]),
                         fit: BoxFit.contain,
                       ));
                     },
@@ -165,7 +166,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                     children: <Widget>[
                       Expanded(
                         child: Image.file(
-                          File(_memory.getMedia(0)),
+                          File(_media[0]),
                           fit: BoxFit.contain,
                         ),
                       )
@@ -178,7 +179,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   /// creates the toolbar below the carousel
   Widget _createToolBar() {
     //check to see if there are images
-    return _memory.getAllMedia().length > 0
+    return _media.length > 0
         //if there are, create a toolbar with a button on the right
         //and a centered image display (so you can see what image you're on)
         ? Row(
@@ -194,9 +195,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                   child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  currentImage.toString() +
-                      "/" +
-                      _memory.getAllMedia().length.toString(),
+                  _currentImage.toString() + "/" + _media.length.toString(),
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
               )),
@@ -209,7 +208,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
                           builder: (context) => TakePictureScreen(
                             takePictureCallback: (path) => {
                               this.setState(() {
-                                _memory.addMedia(path);
+                                _media.add(path);
                                 Navigator.pop(context);
                               })
                             },
@@ -252,12 +251,11 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   /// specifically by checking to see if it has
   /// a story and a media
   void _checkCanSave() {
-    if (this._memory.getAllMedia().length < 1 ||
-        this._memory.getAllStories().length < 1) {
+    if (this._media.length < 1 || this._stories.length < 1) {
       _showDialog();
     } else {
       if (widget.onSave != null) {
-        widget.onSave(_memory);
+        widget.onSave(Memory(_media, _stories));
       }
       Navigator.pop(context);
     }
@@ -289,7 +287,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
         ],
       ),
       //only show FAB if there are images
-      floatingActionButton: (_memory.getAllMedia().length > 0)
+      floatingActionButton: (_media.length > 0)
           ? new FloatingActionButton(
               onPressed:
                   _pushAddStoryScreen, // pressing the + button opens the new story screen

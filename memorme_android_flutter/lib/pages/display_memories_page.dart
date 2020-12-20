@@ -44,8 +44,7 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
                 MaterialPageRoute(
                     builder: (c) => DisplayMemoryPage(
                           onSave: (memory) {
-                            memoriesBloc.add(MemoriesMemoryAdded(
-                                Memory.fromOldMemory(memory)));
+                            memoriesBloc.add(MemoriesMemoryAdded(memory));
                           },
                         )));
           },
