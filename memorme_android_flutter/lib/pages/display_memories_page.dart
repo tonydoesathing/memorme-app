@@ -2,9 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
 import 'package:memorme_android_flutter/logic/bloc/memories_bloc.dart';
-import 'package:memorme_android_flutter/pages/display_memory_page.dart';
+import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
 import 'package:memorme_android_flutter/widgets/memories_list.dart';
 
@@ -42,7 +41,7 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (c) => DisplayMemoryPage(
+                    builder: (c) => EditMemoryPage(
                           onSave: (memory) {
                             memoriesBloc.add(MemoriesMemoryAdded(memory));
                           },

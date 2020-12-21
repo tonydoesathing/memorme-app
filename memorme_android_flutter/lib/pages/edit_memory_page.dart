@@ -7,15 +7,16 @@ import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/widgets/fullscreen_text_field.dart';
 import 'package:memorme_android_flutter/widgets/story_item.dart';
 
-class DisplayMemoryPage extends StatefulWidget {
+class EditMemoryPage extends StatefulWidget {
   final void Function(Memory value) onSave;
-  DisplayMemoryPage({Key key, this.onSave}) : super(key: key);
+  final Memory memory;
+  EditMemoryPage({Key key, this.onSave, this.memory}) : super(key: key);
 
   @override
-  _DisplayMemoryPageState createState() => _DisplayMemoryPageState();
+  _EditMemoryPageState createState() => _EditMemoryPageState();
 }
 
-class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
+class _EditMemoryPageState extends State<EditMemoryPage> {
   List<String> _media;
   List<String> _stories;
   int _currentImage = 1;
@@ -23,8 +24,13 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
   @override
   void initState() {
     super.initState();
-    _media = [];
-    _stories = [];
+    if (widget.memory == null) {
+      _media = [];
+      _stories = [];
+    } else {
+      _media = List<String>.from(widget.memory.media);
+      _stories = List<String>.from(widget.memory.stories);
+    }
   }
 
   /// builds a list of story items
@@ -255,6 +261,7 @@ class _DisplayMemoryPageState extends State<DisplayMemoryPage> {
       _showDialog();
     } else {
       if (widget.onSave != null) {
+        print(_media);
         widget.onSave(Memory(_media, _stories));
       }
       Navigator.pop(context);

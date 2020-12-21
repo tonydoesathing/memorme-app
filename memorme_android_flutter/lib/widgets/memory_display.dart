@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/story_item.dart';
 
 class MemoryDisplay extends StatefulWidget {
@@ -48,7 +49,7 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
                     */
                     return Container(
                       child: Image.file(
-                        File(widget.memory.media[0]),
+                        File(widget.memory.media[index]),
                         fit: BoxFit.contain,
                       ),
                     );
@@ -102,7 +103,15 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
             padding: EdgeInsets.all(8),
             child: GestureDetector(
               key: Key("EditMemoryButton"),
-              onTap: () => print("Edit"),
+              onTap: () {
+                print(widget.memory.media);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (c) => EditMemoryPage(
+                              memory: widget.memory,
+                            )));
+              },
               child: Icon(
                 Icons.edit,
                 color: Theme.of(context).primaryColor,
