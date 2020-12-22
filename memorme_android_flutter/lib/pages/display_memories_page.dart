@@ -38,14 +38,13 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
           key: Key("AddMemoryFAB"),
           onPressed: () {
             //display memory UI
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (c) => EditMemoryPage(
-                          onSave: (memory) {
-                            memoriesBloc.add(MemoriesMemoryAdded(memory));
-                          },
-                        )));
+            Navigator.pushNamed(context, '/edit_memory', 
+              arguments: EditMemoryArguments(
+                (memory){
+                  memoriesBloc.add(MemoriesMemoryAdded(memory));
+                }
+              )
+            );
           },
           child: Icon(Icons.add),
         ),

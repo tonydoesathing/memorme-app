@@ -7,6 +7,12 @@ import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/widgets/fullscreen_text_field.dart';
 import 'package:memorme_android_flutter/widgets/story_item.dart';
 
+class EditMemoryArguments{
+  final Function onSave;
+
+  EditMemoryArguments(this.onSave);
+}
+
 class EditMemoryPage extends StatefulWidget {
   final void Function(Memory value) onSave;
   final Memory memory;
@@ -97,18 +103,16 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
     return GestureDetector(
       //send to TakePictureScreen on tap
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TakePictureScreen(
-                takePictureCallback: (path) => {
-                  this.setState(() {
-                    _media.add(path);
-                    Navigator.pop(context);
-                  })
-                },
-              ),
-            ));
+        Navigator.pushNamed(context, '/take_picture', 
+          arguments: TakePictureArguments(
+            (path) => {
+              this.setState(() {
+                _media.add(path);
+                Navigator.pop(context);
+              })
+            }
+          )
+        );
       },
       //create a button with some text centered in the carousel space
       child: Container(
@@ -208,18 +212,18 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
               Padding(
                   padding: EdgeInsets.all(8),
                   child: GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TakePictureScreen(
-                            takePictureCallback: (path) => {
-                              this.setState(() {
-                                _media.add(path);
-                                Navigator.pop(context);
-                              })
-                            },
-                          ),
-                        )),
+                    onTap: () => {
+                      Navigator.pushNamed(context, '/take_picture', 
+                        arguments: TakePictureArguments(
+                          (path) => {
+                            this.setState(() {
+                              _media.add(path);
+                              Navigator.pop(context);
+                            })
+                          }
+                        )
+                      )
+                    },
                     child: Icon(
                       Icons.add_photo_alternate,
                       color: Theme.of(context).primaryColor,

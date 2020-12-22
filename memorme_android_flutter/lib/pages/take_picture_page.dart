@@ -14,6 +14,12 @@ Future<List<CameraDescription>> loadCameras() async {
   return cameras;
 }
 
+class TakePictureArguments{
+  final Function takePictureCallback;
+
+  TakePictureArguments(this.takePictureCallback);
+}
+
 class TakePictureScreen extends StatefulWidget {
   final void Function(String value) takePictureCallback;
 
