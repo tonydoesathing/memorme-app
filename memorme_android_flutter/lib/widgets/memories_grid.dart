@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 
 class MemoriesGrid extends StatelessWidget {
   final List<Memory> memories;
@@ -22,9 +22,10 @@ class MemoriesGrid extends StatelessWidget {
         },
         child: Container(
           color: Colors.blue,
+          // TODO: make separate story previews
           child: Image.file(
               File(
-                memories[i].media[0],
+                memories[i].stories[0].data,
               ),
               fit: BoxFit.cover),
         ),

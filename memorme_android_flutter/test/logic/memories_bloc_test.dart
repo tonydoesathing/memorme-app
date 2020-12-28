@@ -1,5 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/stories/story.dart';
+import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/logic/bloc/memories_bloc.dart';
@@ -26,9 +28,12 @@ main() {
     MemoriesBloc memoriesBloc;
     MemoryRepository memoryRepository;
     const List<Memory> memories = [
-      Memory(["Mem1.Media1", "Mem1.Media2"], ["Mem1.Story1", "Mem1.Story2"]),
-      Memory(["Mem2.Media1", "Mem2.Media2"], ["Mem2.Story1", "Mem2.Story2"]),
-      Memory(["Mem3.Media1", "Mem3.Media2"], ["Mem3.Story1", "Mem3.Story2"]),
+      Memory(1, 1, 1, 1, [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]),
+      Memory(2, 2, 2, 2, [Story(2, 2, 2, "Story 2", StoryType.TEXT_STORY)]),
+      Memory(3, 3, 3, 4, [
+        Story(3, 3, 3, "Story 3", StoryType.TEXT_STORY),
+        Story(4, 3, 3, "Story 4", StoryType.TEXT_STORY)
+      ]),
     ];
 
     /// initialize bloc with mocked repo that returns [memories] on .fetchMemories()
@@ -71,17 +76,19 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded())
-            ..add(MemoriesMemoryAdded(Memory(["Media 1"], ["Story 1"])));
+            ..add(MemoriesMemoryAdded(Memory(4, 4, 4, 5,
+                [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
           MemoriesLoadSuccess(memories),
           MemoriesSaveInProgress(),
-          MemoriesSaveSuccess(Memory(["Media 1"], ["Story 1"]))
+          MemoriesSaveSuccess(Memory(
+              4, 4, 4, 5, [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)]))
         ],
         verify: (_) {
-          verify(memoryRepository.saveMemory(Memory(["Media 1"], ["Story 1"])))
-              .called(1);
+          verify(memoryRepository.saveMemory(Memory(4, 4, 4, 5,
+              [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)]))).called(1);
         });
 
     /// make sure bloc removes memories
@@ -91,17 +98,19 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded())
-            ..add(MemoriesMemoryRemoved(Memory(["Media 1"], ["Story 1"])));
+            ..add(MemoriesMemoryRemoved(Memory(1, 1, 1, 1,
+                [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
           MemoriesLoadSuccess(memories),
           MemoriesSaveInProgress(),
-          MemoriesSaveSuccess(Memory(["Media 1"], ["Story 1"]))
+          MemoriesSaveSuccess(Memory(
+              1, 1, 1, 1, [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]))
         ],
         verify: (_) {
-          verify(memoryRepository
-              .removeMemory(Memory(["Media 1"], ["Story 1"]))).called(1);
+          verify(memoryRepository.removeMemory(Memory(1, 1, 1, 1,
+              [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]))).called(1);
         });
 
     /// make sure bloc updates memories
@@ -111,17 +120,25 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded())
-            ..add(MemoriesMemoryUpdated(Memory(["Media 1"], ["Story 1"])));
+            ..add(MemoriesMemoryUpdated(Memory(1, 1, 5, 1, [
+              Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
+              Story(5, 5, 5, "Story 5", StoryType.TEXT_STORY)
+            ])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
           MemoriesLoadSuccess(memories),
           MemoriesSaveInProgress(),
-          MemoriesSaveSuccess(Memory(["Media 1"], ["Story 1"]))
+          MemoriesSaveSuccess(Memory(1, 1, 5, 1, [
+            Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
+            Story(5, 5, 5, "Story 5", StoryType.TEXT_STORY)
+          ]))
         ],
         verify: (_) {
-          verify(memoryRepository.saveMemory(Memory(["Media 1"], ["Story 1"])))
-              .called(1);
+          verify(memoryRepository.saveMemory(Memory(1, 1, 5, 1, [
+            Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
+            Story(5, 5, 5, "Story 5", StoryType.TEXT_STORY)
+          ]))).called(1);
         });
 
     /// make sure bloc gives error on repo.fetchMemories() error
@@ -154,7 +171,8 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded())
-            ..add(MemoriesMemoryAdded(Memory(["Media 1"], ["Story 1"])));
+            ..add(MemoriesMemoryAdded(Memory(4, 4, 4, 5,
+                [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
@@ -163,8 +181,8 @@ main() {
           MemoriesSaveFailure(Exception("SaveError").toString())
         ],
         verify: (_) {
-          verify(memoryRepository.saveMemory(Memory(["Media 1"], ["Story 1"])))
-              .called(1);
+          verify(memoryRepository.saveMemory(Memory(4, 4, 4, 5,
+              [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)]))).called(1);
         });
 
     /// make sure bloc gives error on repo.removeMemories() error
@@ -178,7 +196,8 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded())
-            ..add(MemoriesMemoryRemoved(Memory(["Media 1"], ["Story 1"])));
+            ..add(MemoriesMemoryRemoved(Memory(1, 1, 1, 1,
+                [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
@@ -187,8 +206,8 @@ main() {
           MemoriesSaveFailure(Exception("RemoveError").toString())
         ],
         verify: (_) {
-          verify(memoryRepository
-              .removeMemory(Memory(["Media 1"], ["Story 1"]))).called(1);
+          verify(memoryRepository.removeMemory(Memory(1, 1, 1, 1,
+              [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]))).called(1);
         });
   });
 }

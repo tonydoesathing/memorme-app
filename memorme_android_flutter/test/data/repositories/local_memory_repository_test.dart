@@ -1,4 +1,4 @@
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:test/test.dart';
 
@@ -14,12 +14,13 @@ main() {
     });
     test("Should be able to save memories", () {
       repository.fetchMemories().then((memories) => expect(memories, []));
-      Memory memory1 = Memory(["media1"], ["story1"]);
+      int now = DateTime.now().millisecondsSinceEpoch;
+      Memory memory1 = Memory(1, now, now, 0, []);
       repository.saveMemory(memory1);
       repository
           .fetchMemories()
           .then((memories) => expect(memories[0], memory1));
-      Memory memory2 = Memory(["media2"], ["story2"]);
+      Memory memory2 = Memory(2, now, now, 0, []);
       repository.saveMemory(memory2);
       repository
           .fetchMemories()
@@ -30,12 +31,13 @@ main() {
       List<Memory> memories = await repository.fetchMemories();
       expect(memories, []);
 
-      Memory memory1 = Memory(["media1"], ["story1"]);
+      int now = DateTime.now().millisecondsSinceEpoch;
+      Memory memory1 = Memory(1, now, now, 0, []);
       await repository.saveMemory(memory1);
       memories = await repository.fetchMemories();
       expect(memories[0], memory1);
 
-      Memory memory2 = Memory(["media2"], ["story2"]);
+      Memory memory2 = Memory(2, now, now, 0, []);
       await repository.saveMemory(memory2);
       memories = await repository.fetchMemories();
       expect(memories[1], memory2);

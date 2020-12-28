@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'memory_display.dart';

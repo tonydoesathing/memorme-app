@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:memorme_android_flutter/data/models/stories/story.dart';
 
-
-class StoryItem extends StatelessWidget {
-  final String story;
+class TextStoryItem extends StatelessWidget {
+  final Story story;
   final bool editable;
   final VoidCallback onTap;
-  const StoryItem(this.story, {Key key, this.editable = false, this.onTap})
+  const TextStoryItem(this.story, {Key key, this.editable = false, this.onTap})
       : super(key: key);
 
   @override
@@ -19,9 +19,9 @@ class StoryItem extends StatelessWidget {
         child: editable
             ? ListTile(
                 title: new Text(
-                story,
+                story.data,
                 style: TextStyle(decoration: TextDecoration.underline),
               ))
-            : ListTile(title: new Text(story)));
+            : ListTile(title: new Text(story.data)));
   }
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 
 part 'memories_event.dart';

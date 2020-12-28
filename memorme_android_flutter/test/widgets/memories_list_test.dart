@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/stories/story.dart';
+import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/widgets/memories_list.dart';
 import 'package:memorme_android_flutter/widgets/memory_display.dart';
 
@@ -19,8 +21,12 @@ void main() {
         'Should start with number of memory widgets equal to memories in list',
         (WidgetTester tester) async {
       List<Memory> memories = [];
-      memories.add(Memory(["1", "2"], ["story 1", "story 2"]));
-      memories.add(Memory(["1", "2", "3"], ["story 1", "story 2", "story 3"]));
+      memories.add(Memory(null, 1, 1, 1, [
+        Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
+        Story(2, 1, 1, "Story 2", StoryType.TEXT_STORY)
+      ]));
+      memories.add(Memory(
+          null, 2, 2, 2, [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]));
 
       await tester.pumpWidget(makeTestable(MemoriesList(
         memories: memories,

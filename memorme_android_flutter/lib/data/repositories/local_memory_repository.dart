@@ -1,4 +1,4 @@
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 
 class LocalMemoryRepository extends MemoryRepository {
@@ -14,16 +14,18 @@ class LocalMemoryRepository extends MemoryRepository {
   }
 
   @override
-  Future<void> saveMemory(Memory memory) {
+  Future<Memory> saveMemory(Memory memory) {
     return Future(() {
       memories.add(memory);
+      return memory;
     });
   }
 
   @override
-  Future<void> removeMemory(Memory memory) {
+  Future<Memory> removeMemory(Memory memory) {
     return Future(() {
       memories.remove(memory);
+      return memory;
     });
   }
 }

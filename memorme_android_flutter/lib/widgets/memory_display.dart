@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/stories/story.dart';
+import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
-import 'package:memorme_android_flutter/widgets/story_item.dart';
+import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart';
 
 class MemoryDisplay extends StatefulWidget {
   final Memory memory;
@@ -16,6 +18,23 @@ class MemoryDisplay extends StatefulWidget {
 
 class _MemoryDisplayState extends State<MemoryDisplay> {
   int _currentImage = 1;
+  final List<Story> _media = [];
+  final List<Story> _textStories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    //go through all the stories
+    for (Story story in widget.memory.stories) {
+      if (story.type == StoryType.PICTURE_STORY) {
+        //add pictures to the [_media] list
+        _media.add(story);
+      } else if (story.type == StoryType.TEXT_STORY) {
+        // add text to the [_textStories] list
+        _textStories.add(story);
+      }
+    }
+  }
 
   Widget _carousel(BuildContext context) {
     return Container(
@@ -23,9 +42,9 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
       height: MediaQuery.of(context).size.width,
       child: Center(
           //if there are images, build a carousel
-          child: (widget.memory.media.length > 1)
+          child: (_media.length > 1)
               ? CarouselSlider.builder(
-                  itemCount: widget.memory.media.length,
+                  itemCount: _media.length,
                   options: CarouselOptions(
                     aspectRatio: 1.0,
                     enlargeCenterPage: true,
@@ -49,33 +68,36 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
                     */
                     return Container(
                       child: Image.file(
-                        File(widget.memory.media[index]),
+                        File(_media[index].data),
                         fit: BoxFit.contain,
                       ),
                     );
                   },
                 )
               //if there's just one image, just show the image
-              : Column(
-                  children: <Widget>[
-                    /*child: Image.file(
+              : (_media.length == 1)
+                  ? Column(
+                      children: <Widget>[
+                        /*child: Image.file(
                         File(widget.memory.getMedia(0)),
                         fit: BoxFit.contain,
                       ), */
-                    /*
+                        /*
                       Image.asset(
                         "assets/graphics/InvalidImage.png",
                         fit: BoxFit.contain,
                       ),
                       */
-                    Expanded(
-                      child: Image.file(
-                        File(widget.memory.media[0]),
-                        fit: BoxFit.contain,
-                      ),
+                        Expanded(
+                          child: Image.file(
+                            File(_media[0].data),
+                            fit: BoxFit.contain,
+                          ),
+                        )
+                      ],
                     )
-                  ],
-                )),
+                  // if there isn't, don't show anything
+                  : Container()),
     );
   }
 
@@ -93,9 +115,7 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
             child: Align(
           alignment: Alignment.center,
           child: Text(
-            _currentImage.toString() +
-                "/" +
-                widget.memory.media.length.toString(),
+            _currentImage.toString() + "/" + _media.length.toString(),
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
         )),
@@ -104,7 +124,6 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
             child: GestureDetector(
               key: Key("EditMemoryButton"),
               onTap: () {
-                print(widget.memory.media);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -124,7 +143,7 @@ class _MemoryDisplayState extends State<MemoryDisplay> {
 
   Widget _stories() {
     return Column(
-      children: <Widget>[for (String s in widget.memory.stories) StoryItem(s)],
+      children: <Widget>[for (Story s in _textStories) TextStoryItem(s)],
     );
   }
 

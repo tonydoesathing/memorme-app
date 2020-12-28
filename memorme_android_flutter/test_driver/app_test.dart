@@ -2,7 +2,7 @@
 import 'dart:io';
 
 import 'package:flutter_driver/flutter_driver.dart';
-import 'package:memorme_android_flutter/widgets/story_item.dart';
+import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart';
 import 'package:test/test.dart';
 import 'package:mockito/mockito.dart';
 //import 'package:flutter_test/flutter_test.dart';
@@ -41,8 +41,6 @@ void main() {
     //   expect(isPresent(galleryButton, driver), true);
     // });
   });
-
-
 }
 
 isPresent(SerializableFinder byValueKey, FlutterDriver driver,

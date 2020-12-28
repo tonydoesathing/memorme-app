@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:memorme_android_flutter/data/models/memory.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/stories/story.dart';
+import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/widgets/fullscreen_text_field.dart';
-import 'package:memorme_android_flutter/widgets/story_item.dart';
+import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart';
 
-class EditMemoryArguments{
+class EditMemoryArguments {
   final Function onSave;
 
   EditMemoryArguments(this.onSave);
@@ -23,19 +25,24 @@ class EditMemoryPage extends StatefulWidget {
 }
 
 class _EditMemoryPageState extends State<EditMemoryPage> {
-  List<String> _media;
-  List<String> _stories;
+  List<Story> _media = [];
+  List<Story> _stories = [];
   int _currentImage = 1;
 
   @override
   void initState() {
     super.initState();
-    if (widget.memory == null) {
-      _media = [];
-      _stories = [];
-    } else {
-      _media = List<String>.from(widget.memory.media);
-      _stories = List<String>.from(widget.memory.stories);
+    if (widget.memory != null) {
+      //if it's an old memory, populate _media and _stories lists
+      for (Story story in widget.memory.stories) {
+        if (story.type == StoryType.PICTURE_STORY) {
+          // if the story's a picture story, add it to _media
+          _media.add(story);
+        } else if (story.type == StoryType.TEXT_STORY) {
+          //if it's a text story, add it to _stories
+          _stories.add(story);
+        }
+      }
     }
   }
 
@@ -67,18 +74,22 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
               thickness: 1,
             ),
           ),
-        StoryItem(
+        TextStoryItem(
           _stories[storyIndex],
           editable: true,
           onTap: () {
             Navigator.of(context)
                 .push(new MaterialPageRoute(builder: (context) {
               return FullscreenTextField(
-                text: _stories[storyIndex],
+                text: _stories[storyIndex].data,
                 onSave: (val) {
-                  if (_stories[storyIndex] != val) {
+                  if (_stories[storyIndex].data != val) {
+                    //update the story if different
                     setState(() {
-                      _stories[storyIndex] = val;
+                      _stories[storyIndex] = Story.editStory(
+                          _stories[storyIndex],
+                          val,
+                          DateTime.now().millisecondsSinceEpoch);
                     });
                   }
                 },
@@ -94,7 +105,12 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
   void _addStory(String story) {
     // Only add the story if the user actually entered something
     if (story.length > 0) {
-      setState(() => _stories.add(story));
+      setState(() => _stories.add(Story(
+          null,
+          DateTime.now().millisecondsSinceEpoch,
+          DateTime.now().millisecondsSinceEpoch,
+          story,
+          StoryType.TEXT_STORY)));
     }
   }
 
@@ -103,16 +119,18 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
     return GestureDetector(
       //send to TakePictureScreen on tap
       onTap: () {
-        Navigator.pushNamed(context, '/take_picture', 
-          arguments: TakePictureArguments(
-            (path) => {
-              this.setState(() {
-                _media.add(path);
-                Navigator.pop(context);
-              })
-            }
-          )
-        );
+        Navigator.pushNamed(context, '/take_picture',
+            arguments: TakePictureArguments((path) => {
+                  this.setState(() {
+                    _media.add(Story(
+                        null,
+                        DateTime.now().millisecondsSinceEpoch,
+                        DateTime.now().millisecondsSinceEpoch,
+                        path,
+                        StoryType.PICTURE_STORY));
+                    Navigator.pop(context);
+                  })
+                }));
       },
       //create a button with some text centered in the carousel space
       child: Container(
@@ -166,7 +184,7 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                     itemBuilder: (ctx, index) {
                       return Container(
                           child: Image.file(
-                        File(_media[index]),
+                        File(_media[index].data),
                         fit: BoxFit.contain,
                       ));
                     },
@@ -176,7 +194,7 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                     children: <Widget>[
                       Expanded(
                         child: Image.file(
-                          File(_media[0]),
+                          File(_media[0].data),
                           fit: BoxFit.contain,
                         ),
                       )
@@ -213,16 +231,18 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                   padding: EdgeInsets.all(8),
                   child: GestureDetector(
                     onTap: () => {
-                      Navigator.pushNamed(context, '/take_picture', 
-                        arguments: TakePictureArguments(
-                          (path) => {
-                            this.setState(() {
-                              _media.add(path);
-                              Navigator.pop(context);
-                            })
-                          }
-                        )
-                      )
+                      Navigator.pushNamed(context, '/take_picture',
+                          arguments: TakePictureArguments((path) => {
+                                this.setState(() {
+                                  _media.add(Story(
+                                      null,
+                                      DateTime.now().millisecondsSinceEpoch,
+                                      DateTime.now().millisecondsSinceEpoch,
+                                      path,
+                                      StoryType.PICTURE_STORY));
+                                  Navigator.pop(context);
+                                })
+                              }))
                     },
                     child: Icon(
                       Icons.add_photo_alternate,
@@ -266,7 +286,24 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
     } else {
       if (widget.onSave != null) {
         print(_media);
-        widget.onSave(Memory(_media, _stories));
+        // if we're editing a memory
+        if (widget.memory != null) {
+          widget.onSave(Memory(
+              widget.memory.id,
+              widget.memory.dateCreated,
+              DateTime.now().millisecondsSinceEpoch,
+              widget.memory.storyPreviewId,
+              [..._media, ..._stories]));
+        } else {
+          // if it's a new memory
+          // TODO: figure out how to give it a story preview id
+          widget.onSave(Memory(
+              null,
+              DateTime.now().millisecondsSinceEpoch,
+              DateTime.now().millisecondsSinceEpoch,
+              1,
+              [..._media, ..._stories]));
+        }
       }
       Navigator.pop(context);
     }
