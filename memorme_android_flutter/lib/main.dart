@@ -23,15 +23,6 @@ class MemorMe extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData.light(),
-        home: BlocProvider(
-          create: (context) {
-            MemoriesBloc memoriesBloc = MemoriesBloc(SQLiteMemoryRepository(
-                SQLiteDBProvider.memorMeSQLiteDBProvider()));
-            memoriesBloc.add(MemoriesLoaded());
-            return memoriesBloc;
-          },
-          child: DisplayMemoriesPage(),
-        ),
         debugShowCheckedModeBanner: false,
         onGenerateRoute: _appRouter.onGenerateRoute);
   }
