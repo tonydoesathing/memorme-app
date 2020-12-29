@@ -17,11 +17,11 @@ class TextStoryItem extends StatelessWidget {
           }
         },
         child: editable
-            ? ListTile(
-                title: new Text(
-                story.data,
-                style: TextStyle(decoration: TextDecoration.underline),
-              ))
-            : ListTile(title: new Text(story.data)));
+          ? ListTile(
+              title: new Text(
+              story.data,
+              style: TextStyle(decoration: TextDecoration.underline),
+            ))
+          : ListTile(title: new Text(story.data)));
   }
 }
