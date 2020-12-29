@@ -285,7 +285,6 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
       _showDialog();
     } else {
       if (widget.onSave != null) {
-        print(_media);
         // if we're editing a memory
         if (widget.memory != null) {
           widget.onSave(Memory(

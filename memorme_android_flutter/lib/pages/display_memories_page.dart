@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/logic/bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
+import 'package:memorme_android_flutter/widgets/loading_indicator.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
 import 'package:memorme_android_flutter/widgets/memories_list.dart';
 
@@ -38,13 +39,10 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
           key: Key("AddMemoryFAB"),
           onPressed: () {
             //display memory UI
-            Navigator.pushNamed(context, '/edit_memory', 
-              arguments: EditMemoryArguments(
-                (memory){
-                  memoriesBloc.add(MemoriesMemoryAdded(memory));
-                }
-              )
-            );
+            Navigator.pushNamed(context, '/edit_memory',
+                arguments: EditMemoryArguments((memory) {
+              memoriesBloc.add(MemoriesMemoryAdded(memory));
+            }));
           },
           child: Icon(Icons.add),
         ),
@@ -79,9 +77,11 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
                     );
             } else {
               //it's loading or it failed
-              //TODO: make an actual loading symbol
-              return Container(
-                child: Text("LOADING"),
+              return Center(
+                child: LoadingIndicator(
+                  width: 100,
+                  height: 100,
+                ),
               );
             }
           },

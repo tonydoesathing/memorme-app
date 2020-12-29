@@ -14,7 +14,7 @@ Future<List<CameraDescription>> loadCameras() async {
   return cameras;
 }
 
-class TakePictureArguments{
+class TakePictureArguments {
   final Function takePictureCallback;
 
   TakePictureArguments(this.takePictureCallback);
@@ -52,7 +52,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     int i = 0;
     while (cameras[activeCamera].lensDirection != CameraLensDirection.back &&
         i < cameras.length) {
-      print("Loading camera");
       activeCamera = (activeCamera + 1) % cameras.length;
       i++;
     }
