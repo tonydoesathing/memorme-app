@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -97,13 +98,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           //try and take the photo then go to the DisplayMemoryPage
           try {
             await _initializeControllerFuture;
-
-            final path = join(
-              (await getTemporaryDirectory()).path,
-              '${DateTime.now()}.png',
-            );
-
-            await _controller.takePicture(path);
+            String path = await FileProvider().makeTempMediaPath(".png");
+            //try to save the picture
+            try {
+              await _controller.takePicture(path);
+            } catch (_) {
+              // just print an error; should actually handle it
+              print(_);
+            }
 
             widget.takePictureCallback(path);
           } catch (e) {

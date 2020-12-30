@@ -1,5 +1,7 @@
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
+import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
+import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:memorme_android_flutter/data/providers/sqlite_db_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:sqflite/sqflite.dart';
@@ -46,7 +48,7 @@ class SQLiteMemoryRepository extends MemoryRepository {
     return memoriesList;
   }
 
-  /// Saves a [memory] to the DB
+  /// Saves a [memory] to the DB and media to filesystem
   @override
   Future<Memory> saveMemory(Memory memory) async {
     Database db = await _memormeDBProvider.getDatabase();
@@ -57,13 +59,20 @@ class SQLiteMemoryRepository extends MemoryRepository {
     final List<Story> stories = [];
     // TODO: batch this
     for (Story story in memory.stories) {
+      // save media to documents directory
+      String data = story.data;
+      if (story.type == StoryType.PICTURE_STORY) {
+        data = await FileProvider().mediaToDocumentsDirectory(data);
+      }
+      Story temp = Story(
+          story.id, story.dateCreated, story.dateLastEdited, data, story.type);
       // save the story into the db
       int storyId = await db.insert(
-          storiesTable, story.toMapWithMemoryId(memoryId),
+          storiesTable, temp.toMapWithMemoryId(memoryId),
           conflictAlgorithm: ConflictAlgorithm.replace);
       // create a new Story with the ID and add it to the stories list
-      stories.add(Story(storyId, story.dateCreated, story.dateLastEdited,
-          story.data, story.type));
+      stories.add(Story(storyId, temp.dateCreated, temp.dateLastEdited,
+          temp.data, temp.type));
     }
     final Memory m = Memory(memoryId, memory.dateCreated, memory.dateLastEdited,
         memory.storyPreviewId, stories);
@@ -71,9 +80,11 @@ class SQLiteMemoryRepository extends MemoryRepository {
     return m;
   }
 
-  /// Removes a [memory] from the DB
+  /// Removes a [memory] from the DB and media from the filesystem
   @override
   Future<Memory> removeMemory(Memory memory) async {
+    //remove media from filesystem
+    //remove memory
     Database db = await _memormeDBProvider.getDatabase();
     int rowsDeleted = await db.delete(memoriesTable,
         where: "$memoryIdColumn = ?", whereArgs: [memory.id]);
