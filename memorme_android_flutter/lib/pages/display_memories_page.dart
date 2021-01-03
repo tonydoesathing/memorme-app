@@ -6,7 +6,8 @@ import 'package:memorme_android_flutter/logic/bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/loading_indicator.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
-import 'package:memorme_android_flutter/widgets/memories_list.dart';
+//import 'package:memorme_android_flutter/widgets/memories_list2.dart';
+import 'package:memorme_android_flutter/widgets/memories_list3.dart';
 
 class DisplayMemoriesPage extends StatefulWidget {
   final bool listView;
