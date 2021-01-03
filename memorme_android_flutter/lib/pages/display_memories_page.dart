@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/logic/bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/loading_indicator.dart';
@@ -53,14 +54,19 @@ class _DisplayMemoriesPageState extends State<DisplayMemoriesPage> {
             //rebuild on state change
             if (state is MemoriesLoadSuccess) {
               //load successful
+
+              //sort memories by date created before passing to list or grid widget
+              List<Memory> sortedMemories = state.memories;
+              sortedMemories.sort((a,b)=>b.dateCreated.compareTo(a.dateCreated));
+
               //check to see if we're rendering a listview or a gridview
               return widget.listView
                   ? MemoriesList(
-                      memories: state.memories,
+                      memories: sortedMemories,
                       focusedIndex: widget.focusedIndex,
                     )
                   : MemoriesGrid(
-                      memories: state.memories,
+                      memories: sortedMemories,
                       onTileTap: (memory, index) {
                         //navigate to listview display
                         //not sure if we should be doing this or just create a separate thing for it
