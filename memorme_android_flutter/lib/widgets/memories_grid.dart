@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/stories/story.dart';
+import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 
 class MemoriesGrid extends StatelessWidget {
   final List<Memory> memories;
@@ -9,6 +11,22 @@ class MemoriesGrid extends StatelessWidget {
   const MemoriesGrid({Key key, List<Memory> memories, this.onTileTap})
       : memories = memories ?? const [],
         super(key: key);
+
+  Widget _getPreview(int memoryIndex){
+    Story previewStory = memories[memoryIndex].stories[0];
+    if (previewStory.type == StoryType.TEXT_STORY){
+      return Container(
+        child: Text(previewStory.data, style: TextStyle(color: Colors.blue, fontSize: 20))
+      );
+    }
+    else if (previewStory.type == StoryType.PICTURE_STORY){
+      return Container(
+        color: Colors.blue,
+        child: Image.file(File(previewStory.data),fit: BoxFit.cover)
+      );
+    }
+    return Container(child: Text("Need to implement a preview for this story type"));
+  }
 
   // Return memories as grid tiles
   List<Widget> getMemoryTiles(BuildContext context) {
@@ -20,15 +38,7 @@ class MemoriesGrid extends StatelessWidget {
           //on tile tap, if callback passed in, call it
           this.onTileTap?.call(memories[i], i);
         },
-        child: Container(
-          color: Colors.blue,
-          // TODO: make separate story previews
-          child: Image.file(
-              File(
-                memories[i].stories[0].data,
-              ),
-              fit: BoxFit.cover),
-        ),
+        child: _getPreview(i)
       )));
     }
     return tiles;
