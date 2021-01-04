@@ -54,9 +54,7 @@ class MemoriesList extends StatelessWidget {
         ),
         _disposeDrag
       );
-      //currentIndex = pageController.page.toInt();
     }
-    //currentIndex = pageController.page.toInt();
     _drag?.update(details);
   }
 
@@ -79,11 +77,6 @@ class MemoriesList extends StatelessWidget {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _executeAfterWholeBuildProcess(context));
 
-    // return IndexedStack(
-    //   children: [for (Memory m in memories) MemoryDisplay(m)],
-    //   index: focusedIndex,
-    // );
-
     return RawGestureDetector(
       gestures: <Type, GestureRecognizerFactory>{
           VerticalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<VerticalDragGestureRecognizer>(
@@ -105,49 +98,10 @@ class MemoriesList extends StatelessWidget {
         children: [
 
           for (Memory m in memories) ListView(controller: listScrollController[currentIndex], physics: const NeverScrollableScrollPhysics(), children: [MemoryDisplay(m)],)
-
-
-          // ListView(
-          //   controller: listScrollController[currentIndex],
-          //   physics: const NeverScrollableScrollPhysics(),
-          //   children: [
-          //   ]
-          // ),
-          // Center(
-          //   child: Text('Page 2')
-          // )
         ],
       )
     );
-
-    // return PageView(
-    //   scrollDirection: Axis.vertical,
-    //   controller: pageController,
-    //   children: [
-    //     for (Memory m in memories) ListView(children: [MemoryDisplay(m)],)
-    //   ],
-    // );
-
-
-    // create list
-    // return PageView(
-    // controller: pageController,
-    // scrollDirection: Axis.vertical,
-    // clipBehavior: Clip.none,
-    // allowImplicitScrolling: true,
-    // children: [
-    //   for (Memory m in memories) MemoryDisplay(m)
-    // ]
-    // );
   }
-
-  // _onHardScrollUp(){
-    
-  // }
-
-  // _onHardScrollDown(){
-
-  // }
 
   //to be called internally; scrolls to element if needed
   _executeAfterWholeBuildProcess(BuildContext context) {

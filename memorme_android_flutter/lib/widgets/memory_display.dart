@@ -20,5 +20,4 @@ class MemoryDisplay extends StatelessWidget  {
       ],
     );
   }
-
 }

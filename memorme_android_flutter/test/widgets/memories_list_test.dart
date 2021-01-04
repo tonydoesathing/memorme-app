@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
-import 'package:memorme_android_flutter/widgets/memories_list.dart';
+import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 import 'package:memorme_android_flutter/widgets/memory_display.dart';
 
 import '../utils/widget_test_utils.dart';
