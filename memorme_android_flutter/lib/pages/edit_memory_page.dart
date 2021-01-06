@@ -236,7 +236,7 @@ class _EditMemoryPageState extends State<EditMemoryPage>{
           children: [
             Column(
               children: <Widget>[
-                for (Story s in stories) s.type == StoryType.TEXT_STORY ? TextStoryItem(s) : PictureStoryItem(s)
+                for (Story s in stories) s.type == StoryType.TEXT_STORY ? Padding(padding: EdgeInsets.all(10), child: TextStoryItem(s)) : Padding(padding: EdgeInsets.all(10), child: PictureStoryItem(s))
               ],
             ),
           ]

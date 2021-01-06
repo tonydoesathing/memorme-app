@@ -16,7 +16,7 @@ class MemoryDisplay extends StatelessWidget  {
   Widget build(BuildContext context){
     return Column(
       children: <Widget>[
-        for (Story s in memory.stories) s.type == StoryType.TEXT_STORY ? TextStoryItem(s) : PictureStoryItem(s)
+        for (Story s in memory.stories) s.type == StoryType.TEXT_STORY ? Padding(padding: EdgeInsets.all(10), child: TextStoryItem(s)) : Padding(padding: EdgeInsets.all(10), child: PictureStoryItem(s))
       ],
     );
   }
