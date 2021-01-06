@@ -12,16 +12,13 @@ import 'memory_display.dart';
 class MemoriesList extends StatelessWidget {
   final List<Memory> memories;
   final int focusedIndex;
-  PageController pageController = PageController();
-
-  int currentIndex;
-  ScrollController currentListScrollController;
+  final PageController pageController = PageController();
 
   MemoriesList(
       {Key key,
       List<Memory> memories,
       this.focusedIndex})
-      : memories = memories ?? const [], currentIndex = focusedIndex,
+      : memories = memories ?? const [],
         super(key: key);
 
   @override
