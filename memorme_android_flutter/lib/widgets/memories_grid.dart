@@ -1,9 +1,10 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
+import 'package:memorme_android_flutter/widgets/story_previews/picture_story_preview.dart';
+import 'package:memorme_android_flutter/widgets/story_previews/text_story_preview.dart';
 
 class MemoriesGrid extends StatelessWidget {
   final List<Memory> memories;
@@ -12,18 +13,14 @@ class MemoriesGrid extends StatelessWidget {
       : memories = memories ?? const [],
         super(key: key);
 
+  /// from the memory at [memoryIndex], return its preview
   Widget _getPreview(int memoryIndex){
-    Story previewStory = memories[memoryIndex].stories[0];
+    Story previewStory = memories[memoryIndex].stories[0]; // the default preview is currenly the first story in the memory
     if (previewStory.type == StoryType.TEXT_STORY){
-      return Container(
-        child: Text(previewStory.data, style: TextStyle(color: Colors.blue, fontSize: 20))
-      );
+      return TextStoryPreview(previewStory);
     }
     else if (previewStory.type == StoryType.PICTURE_STORY){
-      return Container(
-        color: Colors.blue,
-        child: Image.file(File(previewStory.data),fit: BoxFit.cover)
-      );
+      return PictureStoryPreview(previewStory);
     }
     return Container(child: Text("Need to implement a preview for this story type"));
   }
