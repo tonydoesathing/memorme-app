@@ -7,7 +7,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:test/test.dart';
 
-// TODO: make each test independent
 main() {
   //switch sqflite to be in FFI mode
   sqfliteFfiInit();
@@ -17,8 +16,7 @@ main() {
   SQLiteMemoryRepository repository;
   SQLiteDBProvider dbProvider;
 
-  //have a standard 'now' time
-  int now = DateTime.now().millisecondsSinceEpoch;
+  final int allPageSize = 30;
 
   group("Local Memory Data Repository Test >", () {
     setUp(() async {
@@ -36,7 +34,7 @@ main() {
     });
     test("On creations of repository should create Memories and Stories tables",
         () async {
-      await repository.fetchMemories();
+      await repository.fetchMemories(allPageSize, null);
       Database db = await dbProvider.getDatabase();
       // get all the tables in the database
       final tables = await db.rawQuery('SELECT name FROM sqlite_master');
@@ -46,19 +44,20 @@ main() {
       ]);
     });
     test("Should return empty initial memories list", () async {
-      List<Memory> memories = await repository.fetchMemories();
+      List<Memory> memories = await repository.fetchMemories(allPageSize, null);
       expect(memories, []);
     });
     test("Should be able to save new memories", () async {
-      List<Memory> memories = await repository.fetchMemories();
+      List<Memory> memories = await repository.fetchMemories(allPageSize, null);
       expect(memories, []);
       // by leaving id null, SQLite will assign an id
+      int now = DateTime.now().millisecondsSinceEpoch;
       Memory memory1 = Memory(null, now, now, 1,
           [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
       // save memory1
       Memory savedMem1 = await repository.saveMemory(memory1);
       // fetch the memories
-      memories = await repository.fetchMemories();
+      memories = await repository.fetchMemories(allPageSize, null);
       // the only memory in the db should be memory1 (primary keys start at 1 in SQLite)
       expect(memories[0], savedMem1);
 
@@ -67,102 +66,170 @@ main() {
         Story(null, now, now, "Story 3!", StoryType.TEXT_STORY)
       ]);
       Memory savedMem2 = await repository.saveMemory(memory2);
-      memories = await repository.fetchMemories();
+      memories = await repository.fetchMemories(allPageSize, null);
       expect(memories[1], savedMem2);
     });
 
     test("Should be able to update old memories with new stories", () async {
-      // There should be 2 memories in the DB
-      List<Memory> memories = await repository.fetchMemories();
-      Memory memory1 = Memory(1, now, now, 1,
-          [Story(1, now, now, "Story 1!", StoryType.TEXT_STORY)]);
-      Memory memory2 = Memory(2, now, now, 2, [
-        Story(2, now, now, "Story 2!", StoryType.TEXT_STORY),
-        Story(3, now, now, "Story 3!", StoryType.TEXT_STORY)
+      List<Memory> memories = await repository.fetchMemories(allPageSize, null);
+      //add memories to db
+      int now = DateTime.now().millisecondsSinceEpoch;
+      Memory memory1 = Memory(null, now, now, 1,
+          [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
+      // save memory1
+      Memory savedMem1 = await repository.saveMemory(memory1);
+
+      Memory memory2 = Memory(null, now, now, 2, [
+        Story(null, now, now, "Story 2!", StoryType.TEXT_STORY),
+        Story(null, now, now, "Story 3!", StoryType.TEXT_STORY)
       ]);
-      expect(memories, [memory1, memory2]);
-      // update memory 1
+      Memory savedMem2 = await repository.saveMemory(memory2);
+      memories = await repository.fetchMemories(allPageSize, null);
+
+      //new memories should be in there
+      expect(memories.contains(savedMem1), true);
+      expect(memories.contains(savedMem2), true);
+      // update memory 1 with a new story
+      now = DateTime.now().millisecondsSinceEpoch;
       final List<Story> stories = [
-        ...memory1.stories,
-        Story(null, now + 5, now + 5, "Story 4!", StoryType.TEXT_STORY)
+        ...savedMem1.stories,
+        Story(null, now, now, "Story 4!", StoryType.TEXT_STORY)
       ];
-      Memory updatedMemory1 = Memory(memory1.id, memory1.dateCreated,
-          memory1.dateLastEdited + 5, memory1.storyPreviewId, stories);
-      Memory savedMem1 = await repository.saveMemory(updatedMemory1);
-      memories = await repository.fetchMemories();
-      expect(memories[0], savedMem1);
+      Memory updatedMemory1 = Memory(savedMem1.id, savedMem1.dateCreated, now,
+          savedMem1.storyPreviewId, stories);
+      Memory savedUpdatedMem1 = await repository.saveMemory(updatedMemory1);
+      memories = await repository.fetchMemories(allPageSize, null);
+      expect(memories.contains(savedUpdatedMem1), true);
     });
 
     test("Should be able to update old memories by removing stories", () async {
-      // There should be 2 memories in the DB with 4 stories
-      List<Memory> memories = await repository.fetchMemories();
-      Memory memory1 = Memory(1, now, now + 5, 1, [
-        Story(1, now, now, "Story 1!", StoryType.TEXT_STORY),
-        Story(4, now + 5, now + 5, "Story 4!", StoryType.TEXT_STORY)
-      ]);
-      Memory memory2 = Memory(2, now, now, 2, [
-        Story(2, now, now, "Story 2!", StoryType.TEXT_STORY),
-        Story(3, now, now, "Story 3!", StoryType.TEXT_STORY)
-      ]);
-      expect(memories, [memory1, memory2]);
+      List<Memory> memories = await repository.fetchMemories(allPageSize, null);
+      //add memories to db
+      int now = DateTime.now().millisecondsSinceEpoch;
+      Memory memory1 = Memory(null, now, now, 1,
+          [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
+      // save memory1
+      Memory savedMem1 = await repository.saveMemory(memory1);
 
-      // there should be 1 story with the id of 1
+      Memory memory2 = Memory(null, now, now, 2, [
+        Story(null, now, now, "Story 2!", StoryType.TEXT_STORY),
+        Story(null, now, now, "Story 3!", StoryType.TEXT_STORY)
+      ]);
+      Memory savedMem2 = await repository.saveMemory(memory2);
+      memories = await repository.fetchMemories(allPageSize, null);
+
+      //new memories should be in there
+      expect(memories.contains(savedMem1), true);
+      expect(memories.contains(savedMem2), true);
+
+      // there should be 1 story with the id of memory2's 1st story id
       Database db = await dbProvider.getDatabase();
-      List<Map<String, dynamic>> stories = await db
-          .query(storiesTable, where: "$storyIdColumn = ?", whereArgs: [1]);
-      expect(stories, [memory1.stories[0].toMapWithMemoryId(memory1.id)]);
-      // there should be 4 stories
-      stories = await db.query(storiesTable);
-      expect(stories, [
-        memory1.stories[0].toMapWithMemoryId(memory1.id),
-        memory2.stories[0].toMapWithMemoryId(memory2.id),
-        memory2.stories[1].toMapWithMemoryId(memory2.id),
-        memory1.stories[1].toMapWithMemoryId(memory1.id),
-      ]);
+      List<Map<String, dynamic>> stories = await db.query(storiesTable,
+          where: "$storyIdColumn = ?", whereArgs: [savedMem2.stories[0].id]);
+      expect(stories, [savedMem2.stories[0].toMapWithMemoryId(savedMem2.id)]);
 
-      // update memory1 to no longer have the story with id 1
-      Memory updatedMemory1 = Memory(1, now, now + 5, 1,
-          [Story(4, now + 5, now + 5, "Story 4!", StoryType.TEXT_STORY)]);
-      // save the memory
-      Memory savedMem1 = await repository.saveMemory(updatedMemory1);
-      memories = await repository.fetchMemories();
-      expect(memories[0], savedMem1);
-      // story 1 should be deleted
-      stories = await db
-          .query(storiesTable, where: "$storyIdColumn = ?", whereArgs: [1]);
-      expect(stories, []);
-      // there should only be 3 stories now
+      // check number of stories
       stories = await db.query(storiesTable);
-      expect(stories, [
-        memory2.stories[0].toMapWithMemoryId(memory2.id),
-        memory2.stories[1].toMapWithMemoryId(memory2.id),
-        memory1.stories[1].toMapWithMemoryId(memory1.id),
-      ]);
+      int oldNumStories = stories.length;
+
+      // update memory2 to no longer have its first story
+      now = DateTime.now().millisecondsSinceEpoch;
+      Story deletedStory = savedMem2.stories.removeAt(0);
+      Memory updatedMemory2 = Memory.editMemory(savedMem2,
+          dateLastEdited: now, storyPreviewId: savedMem2.stories[0].id);
+      // save the memory
+      Memory savedUpdatedMem2 = await repository.saveMemory(updatedMemory2);
+      memories = await repository.fetchMemories(allPageSize, null);
+      expect(memories.contains(savedUpdatedMem2), true);
+      // story 1 should be deleted
+      stories = await db.query(storiesTable,
+          where: "$storyIdColumn = ?", whereArgs: [deletedStory.id]);
+      expect(stories, []);
+      // there should be 1 fewer story
+      stories = await db.query(storiesTable);
+      expect(stories.length, oldNumStories - 1);
     });
 
     test("Should be able to delete an existing memory", () async {
-      // There should be 2 memories in the DB with 4 stories
-      List<Memory> memories = await repository.fetchMemories();
-      Memory memory1 = Memory(1, now, now + 5, 1,
-          [Story(4, now + 5, now + 5, "Story 4!", StoryType.TEXT_STORY)]);
-      Memory memory2 = Memory(2, now, now, 2, [
-        Story(2, now, now, "Story 2!", StoryType.TEXT_STORY),
-        Story(3, now, now, "Story 3!", StoryType.TEXT_STORY)
-      ]);
-      expect(memories, [memory1, memory2]);
+      List<Memory> memories = await repository.fetchMemories(allPageSize, null);
+      //add memory to db
+      int now = DateTime.now().millisecondsSinceEpoch;
+      Memory memory1 = Memory(null, now, now, 1,
+          [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
+      // save memory1
+      Memory savedMem1 = await repository.saveMemory(memory1);
+      //new memory should be in there
+      memories = await repository.fetchMemories(allPageSize, null);
+      expect(memories.contains(savedMem1), true);
 
-      // delete memory1
-      Memory deletedMemory = await repository.removeMemory(memory1);
-      memories = await repository.fetchMemories();
-      expect(memories, [memory2]);
-
-      // story 4 should also be deleted
+      // get stories
       Database db = await dbProvider.getDatabase();
       List<Map<String, dynamic>> stories = await db.query(storiesTable);
-      expect(stories, [
-        memory2.stories[0].toMapWithMemoryId(memory2.id),
-        memory2.stories[1].toMapWithMemoryId(memory2.id)
-      ]);
+      int oldStoriesSize = stories.length;
+
+      // delete memory1
+      Memory deletedMemory = await repository.removeMemory(savedMem1);
+      memories = await repository.fetchMemories(allPageSize, null);
+      expect(memories.contains(deletedMemory), false);
+
+      // story should be deleted
+      stories = await db.query(storiesTable,
+          where: "$storyIdColumn = ?",
+          whereArgs: [deletedMemory.stories[0].id]);
+      expect(stories, []);
+      stories = await db.query(storiesTable);
+      // stories length should be 1 fewer than old stories length
+      expect(stories.length, oldStoriesSize - 1);
+    });
+
+    test("Should be able to pageinate memories", () async {
+      final pageSize = 3;
+      List<Memory> memories = await repository.fetchMemories(allPageSize, null);
+      //add a memory
+      int now = DateTime.now().millisecondsSinceEpoch;
+      Memory initialSavedMem = await repository.saveMemory(Memory(null, now,
+          now, 0, [Story(null, now, now, "Story1", StoryType.TEXT_STORY)]));
+
+      //get page with last memory being the one we just inserted
+      memories = await repository.fetchMemories(pageSize, initialSavedMem);
+      //it should be empty
+      expect(memories, []);
+
+      //add 7 memories
+      List<Memory> addedMems = [];
+      for (int i = 0; i < 7; i++) {
+        now = DateTime.now().millisecondsSinceEpoch;
+        Story story = Story(i, now, now, "Story #$i", StoryType.TEXT_STORY);
+        Memory memory = Memory(i, now, now, i, [story]);
+        memory = await repository.saveMemory(memory);
+        addedMems.add(memory);
+      }
+
+      //db should have added memories
+      memories = await repository.fetchMemories(allPageSize, null);
+      for (Memory mem in addedMems) {
+        expect(memories.contains(mem), true);
+      }
+
+      //fetch the first page of memories
+      memories = await repository.fetchMemories(3, initialSavedMem);
+      //should be the first 3
+      expect(memories, addedMems.sublist(0, 3));
+      //fetch the next page of memories
+      memories =
+          await repository.fetchMemories(3, memories[memories.length - 1]);
+      //should be the next 3
+      expect(memories, addedMems.sublist(3, 6));
+      //fetch the last page of memories
+      memories =
+          await repository.fetchMemories(3, memories[memories.length - 1]);
+      //should be the last memory
+      expect(memories, addedMems.sublist(6));
+      //fetch again
+      memories =
+          await repository.fetchMemories(3, memories[memories.length - 1]);
+      //should be an empty list
+      expect(memories, []);
     });
   });
 }

@@ -34,5 +34,9 @@ class MemoriesMemoryUpdated extends MemoriesEvent {
   List<Object> get props => [this.memory];
 }
 
-/// Fetch [memories]
-class MemoriesLoaded extends MemoriesEvent {}
+/// Fetch [memories] from optional [fromStart]
+class MemoriesLoaded extends MemoriesEvent {
+  final bool fromStart;
+
+  MemoriesLoaded(this.fromStart);
+}

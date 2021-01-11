@@ -4,7 +4,7 @@ import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
-import 'package:memorme_android_flutter/logic/bloc/memories_bloc.dart';
+import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -39,7 +39,7 @@ main() {
     /// initialize bloc with mocked repo that returns [memories] on .fetchMemories()
     setUp(() {
       memoryRepository = MockMemoryRepository();
-      when(memoryRepository.fetchMemories())
+      when(memoryRepository.fetchMemories(any, any))
           .thenAnswer((_) => Future.value(memories));
 
       memoriesBloc = MemoriesBloc(memoryRepository);
@@ -53,7 +53,7 @@ main() {
 
     /// making sure I set up the mock repo correctly
     test("Mock repository should return mock list of memories", () async {
-      List<Memory> mems = await memoryRepository.fetchMemories();
+      List<Memory> mems = await memoryRepository.fetchMemories(15, null);
       expect(mems, memories);
     });
 
@@ -62,7 +62,7 @@ main() {
         "On successful MemoriesLoaded, should return loaded memories in MemoriesLoadSuccess state",
         build: () => memoriesBloc,
         act: (MemoriesBloc bloc) async {
-          bloc.add(MemoriesLoaded());
+          bloc.add(MemoriesLoaded(null));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
@@ -75,7 +75,7 @@ main() {
         build: () => memoriesBloc,
         act: (MemoriesBloc bloc) async {
           bloc
-            ..add(MemoriesLoaded())
+            ..add(MemoriesLoaded(null))
             ..add(MemoriesMemoryAdded(Memory(4, 4, 4, 5,
                 [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)])));
         },
@@ -97,7 +97,7 @@ main() {
         build: () => memoriesBloc,
         act: (MemoriesBloc bloc) async {
           bloc
-            ..add(MemoriesLoaded())
+            ..add(MemoriesLoaded(null))
             ..add(MemoriesMemoryRemoved(Memory(1, 1, 1, 1,
                 [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)])));
         },
@@ -119,7 +119,7 @@ main() {
         build: () => memoriesBloc,
         act: (MemoriesBloc bloc) async {
           bloc
-            ..add(MemoriesLoaded())
+            ..add(MemoriesLoaded(null))
             ..add(MemoriesMemoryUpdated(Memory(1, 1, 5, 1, [
               Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
               Story(5, 5, 5, "Story 5", StoryType.TEXT_STORY)
@@ -145,19 +145,19 @@ main() {
     blocTest<MemoriesBloc, MemoriesState>(
         "On failure of repo.fetchMemories(), should return MemoriesLoadFailure with the error",
         build: () {
-          when(memoryRepository.fetchMemories())
+          when(memoryRepository.fetchMemories(any, any))
               .thenThrow(Exception("LoadError"));
           return memoriesBloc;
         },
         act: (MemoriesBloc bloc) async {
-          bloc..add(MemoriesLoaded());
+          bloc..add(MemoriesLoaded(null));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
           MemoriesLoadFailure(Exception("LoadError").toString())
         ],
         verify: (_) {
-          verify(memoryRepository.fetchMemories()).called(1);
+          verify(memoryRepository.fetchMemories(any, any)).called(1);
         });
 
     /// make sure bloc gives error on repo.saveMemory() error
@@ -170,7 +170,7 @@ main() {
         },
         act: (MemoriesBloc bloc) async {
           bloc
-            ..add(MemoriesLoaded())
+            ..add(MemoriesLoaded(null))
             ..add(MemoriesMemoryAdded(Memory(4, 4, 4, 5,
                 [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)])));
         },
@@ -195,7 +195,7 @@ main() {
         },
         act: (MemoriesBloc bloc) async {
           bloc
-            ..add(MemoriesLoaded())
+            ..add(MemoriesLoaded(null))
             ..add(MemoriesMemoryRemoved(Memory(1, 1, 1, 1,
                 [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)])));
         },

@@ -27,7 +27,7 @@ class Story extends Equatable {
   ///
   /// Different stories store different [data], and the [type] tells you how to read and write it
   const Story(
-      this.id, this.dateCreated, this.dateLastEdited, this.data, this.type);
+      {this.id, this.dateCreated, this.dateLastEdited, this.data, this.type});
 
   /// Creates a [Story] from an SQL [map]
   factory Story.fromMap(Map<String, dynamic> map) {
@@ -37,12 +37,22 @@ class Story extends Equatable {
     final String data = map[storyDataColumn];
     final int type = map[storyTypeColumn];
 
-    return Story(id, dateCreated, dateLastEdited, data, type);
+    return Story(
+        id: id,
+        dateCreated: dateCreated,
+        dateLastEdited: dateLastEdited,
+        data: data,
+        type: type);
   }
 
   /// Creates a [Story] from an old story
   factory Story.editStory(Story s, String data, int lastEditedTime) {
-    return Story(s.id, s.dateCreated, lastEditedTime, data, s.type);
+    return Story(
+        id: s.id,
+        dateCreated: s.dateCreated,
+        dateLastEdited: lastEditedTime,
+        data: data,
+        type: s.type);
   }
 
   /// Turns the [Story] into an SQL [map]

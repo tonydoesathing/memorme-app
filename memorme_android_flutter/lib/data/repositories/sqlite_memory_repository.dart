@@ -20,11 +20,23 @@ class SQLiteMemoryRepository extends MemoryRepository {
 
   /// Bulk method to get all memories in DB
   @override
-  Future<List<Memory>> fetchMemories() async {
+  Future<List<Memory>> fetchMemories(int pageSize, Memory lastMemory) async {
     // get the database
     Database db = await _memormeDBProvider.getDatabase();
-    // fetch all the memories
-    List<Map<String, dynamic>> memories = await db.query(memoriesTable);
+    // fetch the page of memories
+
+    // TODO: make descending
+    final List<Map<String, dynamic>> memories = lastMemory == null
+        // lastMemory is null; go from beginning
+        ? await db.query(memoriesTable,
+            orderBy: "$memoryDateLastEditedColumn,$memoryIdColumn",
+            limit: pageSize)
+        // lastMemory is not null; go from there
+        : await db.query(memoriesTable,
+            where: "($memoryDateLastEditedColumn,$memoryIdColumn) > (?,?)",
+            whereArgs: [lastMemory.dateLastEdited, lastMemory.id],
+            orderBy: "$memoryDateLastEditedColumn,$memoryIdColumn",
+            limit: pageSize);
     final List<Memory> memoriesList = [];
     // for each memory:
     for (Map<String, dynamic> memory in memories) {
@@ -58,6 +70,7 @@ class SQLiteMemoryRepository extends MemoryRepository {
     // save the stories into the db
     final List<Story> stories = [];
     // TODO: batch this
+    // TODO: properly save storyPreviewId
     for (Story story in memory.stories) {
       // save media to documents directory
       String data = story.data;
@@ -65,17 +78,29 @@ class SQLiteMemoryRepository extends MemoryRepository {
         data = await FileProvider().mediaToDocumentsDirectory(data);
       }
       Story temp = Story(
-          story.id, story.dateCreated, story.dateLastEdited, data, story.type);
+          id: story.id,
+          dateCreated: story.dateCreated,
+          dateLastEdited: story.dateLastEdited,
+          data: data,
+          type: story.type);
       // save the story into the db
       int storyId = await db.insert(
           storiesTable, temp.toMapWithMemoryId(memoryId),
           conflictAlgorithm: ConflictAlgorithm.replace);
       // create a new Story with the ID and add it to the stories list
-      stories.add(Story(storyId, temp.dateCreated, temp.dateLastEdited,
-          temp.data, temp.type));
+      stories.add(Story(
+          id: storyId,
+          dateCreated: temp.dateCreated,
+          dateLastEdited: temp.dateLastEdited,
+          data: temp.data,
+          type: temp.type));
     }
-    final Memory m = Memory(memoryId, memory.dateCreated, memory.dateLastEdited,
-        memory.storyPreviewId, stories);
+    final Memory m = Memory(
+        id: memoryId,
+        dateCreated: memory.dateCreated,
+        dateLastEdited: memory.dateLastEdited,
+        storyPreviewId: memory.storyPreviewId,
+        stories: stories);
     // return the new memory
     return m;
   }
@@ -83,11 +108,18 @@ class SQLiteMemoryRepository extends MemoryRepository {
   /// Removes a [memory] from the DB and media from the filesystem
   @override
   Future<Memory> removeMemory(Memory memory) async {
-    //remove media from filesystem
-    //remove memory
-    Database db = await _memormeDBProvider.getDatabase();
-    int rowsDeleted = await db.delete(memoriesTable,
-        where: "$memoryIdColumn = ?", whereArgs: [memory.id]);
+    // if memory has an id, try to remove it
+    if (memory.id != null) {
+      try {
+        //remove media from filesystem
+        //remove memory
+        Database db = await _memormeDBProvider.getDatabase();
+        int rowsDeleted = await db.delete(memoriesTable,
+            where: "$memoryIdColumn = ?", whereArgs: [memory.id]);
+      } catch (_) {
+        print(_.toString());
+      }
+    }
     return memory;
   }
 }

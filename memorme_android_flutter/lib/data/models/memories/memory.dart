@@ -18,8 +18,12 @@ class Memory extends Equatable {
   // final String uuid;
 
   /// takes an [id] for the memory, the [dateCreated], the [dateLastEdited], the [storyPreviewId], and a list of stories
-  const Memory(this.id, this.dateCreated, this.dateLastEdited,
-      this.storyPreviewId, this.stories);
+  const Memory(
+      {this.id,
+      this.dateCreated,
+      this.dateLastEdited,
+      this.storyPreviewId,
+      this.stories});
 
   /// creates a [Memory] from an SQL [map] with an empty list of [stories]
   factory Memory.fromMap(Map<String, dynamic> map) {
@@ -28,7 +32,12 @@ class Memory extends Equatable {
     final int dateLastEdited = map[memoryDateLastEditedColumn];
     final int storyPreviewId = map[memoryStoryPreviewIdColumn];
     final List<Story> stories = [];
-    return Memory(id, dateCreated, dateLastEdited, storyPreviewId, stories);
+    return Memory(
+        id: id,
+        dateCreated: dateCreated,
+        dateLastEdited: dateLastEdited,
+        storyPreviewId: storyPreviewId,
+        stories: stories);
   }
 
   /// creates a [Memory] from an SQL [map] and list of [stories]
@@ -37,7 +46,29 @@ class Memory extends Equatable {
     final int dateCreated = map[memoryDateCreatedColumn];
     final int dateLastEdited = map[memoryDateLastEditedColumn];
     final int storyPreviewId = map[memoryStoryPreviewIdColumn];
-    return Memory(id, dateCreated, dateLastEdited, storyPreviewId, stories);
+    return Memory(
+        id: id,
+        dateCreated: dateCreated,
+        dateLastEdited: dateLastEdited,
+        storyPreviewId: storyPreviewId,
+        stories: stories);
+  }
+
+  /// Create a new memory from an old memory and some new values
+  factory Memory.editMemory(Memory memory,
+      {int id,
+      int dateCreated,
+      int dateLastEdited,
+      int storyPreviewId,
+      List<Story> stories}) {
+    return Memory(
+        id: id == null ? memory.id : id,
+        dateCreated: dateCreated == null ? memory.dateCreated : dateCreated,
+        dateLastEdited:
+            dateLastEdited == null ? memory.dateLastEdited : dateLastEdited,
+        storyPreviewId:
+            storyPreviewId == null ? memory.storyPreviewId : storyPreviewId,
+        stories: stories == null ? memory.stories : stories);
   }
 
   /// gives an SQL [map] from the [Memory]
