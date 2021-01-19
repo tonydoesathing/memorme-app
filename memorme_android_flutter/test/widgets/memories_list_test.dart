@@ -7,6 +7,8 @@ import 'package:memorme_android_flutter/widgets/memory_display.dart';
 
 import '../utils/widget_test_utils.dart';
 
+//TODO: [MMA-107] Fix memories_list test
+
 void main() {
   group("Memories List test", () {
     testWidgets('Should start with zero memory widgets in empty list',
@@ -21,12 +23,12 @@ void main() {
         'Should start with number of memory widgets equal to memories in list',
         (WidgetTester tester) async {
       List<Memory> memories = [];
-      memories.add(Memory(null, 1, 1, 1, [
-        Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
-        Story(2, 1, 1, "Story 2", StoryType.TEXT_STORY)
+      memories.add(Memory(id: null, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: [
+        Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY),
+        Story(id: 2, dateCreated: 1, dateLastEdited: 1, data: "Story 2!", type: StoryType.TEXT_STORY)
       ]));
-      memories.add(Memory(
-          null, 2, 2, 2, [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]));
+      memories.add(Memory(id: null, dateCreated: 2, dateLastEdited: 2, storyPreviewId: 2, stories: 
+          [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)]));
 
       await tester.pumpWidget(makeTestable(MemoriesList(
         memories: memories,

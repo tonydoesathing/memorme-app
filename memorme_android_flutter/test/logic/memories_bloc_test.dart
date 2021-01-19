@@ -8,6 +8,8 @@ import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+//TODO: [MMA-106] Fix memories_bloc test
+
 class MockMemoryRepository extends Mock implements LocalMemoryRepository {}
 /*
       A note about testing BLoCs:
@@ -28,11 +30,11 @@ main() {
     MemoriesBloc memoriesBloc;
     MemoryRepository memoryRepository;
     const List<Memory> memories = [
-      Memory(1, 1, 1, 1, [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]),
-      Memory(2, 2, 2, 2, [Story(2, 2, 2, "Story 2", StoryType.TEXT_STORY)]),
-      Memory(3, 3, 3, 4, [
-        Story(3, 3, 3, "Story 3", StoryType.TEXT_STORY),
-        Story(4, 3, 3, "Story 4", StoryType.TEXT_STORY)
+      Memory(id: 1, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)]),
+      Memory(id: 2, dateCreated: 2, dateLastEdited: 2, storyPreviewId: 2, stories: [Story(id: 2, dateCreated: 2, dateLastEdited: 2, data: "Story 2!", type: StoryType.TEXT_STORY)]),
+      Memory(id: 3, dateCreated: 3, dateLastEdited: 3, storyPreviewId: 4, stories: [
+        Story(id: 3, dateCreated: 3, dateLastEdited: 3, data: "Story 3!", type: StoryType.TEXT_STORY),
+        Story(id: 4, dateCreated: 3, dateLastEdited: 3, data: "Story 4!", type: StoryType.TEXT_STORY)
       ]),
     ];
 
@@ -48,7 +50,7 @@ main() {
     /// making sure I set up Equatable correctly
     test("Equal states should be equal", () {
       expect(MemoriesLoadInProgress(), MemoriesLoadInProgress());
-      expect(MemoriesLoadSuccess(memories), MemoriesLoadSuccess(memories));
+      expect(MemoriesLoadSuccess(memories: memories), MemoriesLoadSuccess(memories: memories));
     });
 
     /// making sure I set up the mock repo correctly
@@ -66,7 +68,7 @@ main() {
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
-          MemoriesLoadSuccess(memories),
+          MemoriesLoadSuccess(memories: memories),
         ]);
 
     /// make sure bloc adds memories
@@ -76,19 +78,19 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded(null))
-            ..add(MemoriesMemoryAdded(Memory(4, 4, 4, 5,
-                [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)])));
+            ..add(MemoriesMemoryAdded(Memory(id: 4, dateCreated: 4, dateLastEdited: 4, storyPreviewId: 5, stories: 
+                [Story(id: 5, dateCreated: 4, dateLastEdited: 4, data: "Story 5!", type: StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
-          MemoriesLoadSuccess(memories),
+          MemoriesLoadSuccess(memories: memories),
           MemoriesSaveInProgress(),
-          MemoriesSaveSuccess(Memory(
-              4, 4, 4, 5, [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)]))
+          MemoriesSaveSuccess(Memory(id: 4, dateCreated: 4, dateLastEdited: 4, storyPreviewId: 5, stories: 
+              [Story(id: 5, dateCreated: 4, dateLastEdited: 4, data: "Story 5!", type: StoryType.TEXT_STORY)]))
         ],
         verify: (_) {
-          verify(memoryRepository.saveMemory(Memory(4, 4, 4, 5,
-              [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)]))).called(1);
+          verify(memoryRepository.saveMemory(Memory(id: 4, dateCreated: 4, dateLastEdited: 4, storyPreviewId: 5, stories: 
+              [Story(id: 5, dateCreated: 4, dateLastEdited: 4, data: "Story 5!", type: StoryType.TEXT_STORY)]))).called(1);
         });
 
     /// make sure bloc removes memories
@@ -98,19 +100,19 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded(null))
-            ..add(MemoriesMemoryRemoved(Memory(1, 1, 1, 1,
-                [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)])));
+            ..add(MemoriesMemoryRemoved(Memory(id: 1, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: 
+                [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
-          MemoriesLoadSuccess(memories),
+          MemoriesLoadSuccess(memories: memories),
           MemoriesSaveInProgress(),
-          MemoriesSaveSuccess(Memory(
-              1, 1, 1, 1, [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]))
+          MemoriesSaveSuccess(Memory(id: 1, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: 
+              [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)]))
         ],
         verify: (_) {
-          verify(memoryRepository.removeMemory(Memory(1, 1, 1, 1,
-              [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]))).called(1);
+          verify(memoryRepository.removeMemory(Memory(id: 1, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: 
+              [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)]))).called(1);
         });
 
     /// make sure bloc updates memories
@@ -120,24 +122,24 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded(null))
-            ..add(MemoriesMemoryUpdated(Memory(1, 1, 5, 1, [
-              Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
-              Story(5, 5, 5, "Story 5", StoryType.TEXT_STORY)
+            ..add(MemoriesMemoryUpdated(Memory(id: 1, dateCreated: 1, dateLastEdited: 5, storyPreviewId: 1, stories: [
+              Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY),
+              Story(id: 5, dateCreated: 5, dateLastEdited: 5, data: "Story 5!", type: StoryType.TEXT_STORY)
             ])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
-          MemoriesLoadSuccess(memories),
+          MemoriesLoadSuccess(memories: memories),
           MemoriesSaveInProgress(),
-          MemoriesSaveSuccess(Memory(1, 1, 5, 1, [
-            Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
-            Story(5, 5, 5, "Story 5", StoryType.TEXT_STORY)
+          MemoriesSaveSuccess(Memory(id: 1, dateCreated: 1, dateLastEdited: 5, storyPreviewId: 1, stories: [
+            Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY),
+            Story(id: 5, dateCreated: 5, dateLastEdited: 5, data: "Story 5!", type: StoryType.TEXT_STORY)
           ]))
         ],
         verify: (_) {
-          verify(memoryRepository.saveMemory(Memory(1, 1, 5, 1, [
-            Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY),
-            Story(5, 5, 5, "Story 5", StoryType.TEXT_STORY)
+          verify(memoryRepository.saveMemory(Memory(id: 1, dateCreated: 1, dateLastEdited: 5, storyPreviewId: 1, stories: [
+            Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY),
+            Story(id: 5, dateCreated: 5, dateLastEdited: 5, data: "Story 5!", type: StoryType.TEXT_STORY)
           ]))).called(1);
         });
 
@@ -171,18 +173,18 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded(null))
-            ..add(MemoriesMemoryAdded(Memory(4, 4, 4, 5,
-                [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)])));
+            ..add(MemoriesMemoryAdded(Memory(id: 4, dateCreated: 4, dateLastEdited: 4, storyPreviewId: 5, stories: 
+                [Story(id: 5, dateCreated: 4, dateLastEdited: 4, data: "Story 5!", type: StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
-          MemoriesLoadSuccess(memories),
+          MemoriesLoadSuccess(memories: memories),
           MemoriesSaveInProgress(),
           MemoriesSaveFailure(Exception("SaveError").toString())
         ],
         verify: (_) {
-          verify(memoryRepository.saveMemory(Memory(4, 4, 4, 5,
-              [Story(5, 4, 4, "Story 5", StoryType.TEXT_STORY)]))).called(1);
+          verify(memoryRepository.saveMemory(Memory(id: 4, dateCreated: 4, dateLastEdited: 4, storyPreviewId: 5, stories: 
+              [Story(id: 5, dateCreated: 4, dateLastEdited: 4, data: "Story 5!", type: StoryType.TEXT_STORY)]))).called(1);
         });
 
     /// make sure bloc gives error on repo.removeMemories() error
@@ -196,18 +198,18 @@ main() {
         act: (MemoriesBloc bloc) async {
           bloc
             ..add(MemoriesLoaded(null))
-            ..add(MemoriesMemoryRemoved(Memory(1, 1, 1, 1,
-                [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)])));
+            ..add(MemoriesMemoryRemoved(Memory(id: 1, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: 
+                [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)])));
         },
         expect: <MemoriesState>[
           MemoriesLoadInProgress(),
-          MemoriesLoadSuccess(memories),
+          MemoriesLoadSuccess(memories: memories),
           MemoriesSaveInProgress(),
           MemoriesSaveFailure(Exception("RemoveError").toString())
         ],
         verify: (_) {
-          verify(memoryRepository.removeMemory(Memory(1, 1, 1, 1,
-              [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]))).called(1);
+          verify(memoryRepository.removeMemory(Memory(id: 1, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: 
+              [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)]))).called(1);
         });
   });
 }

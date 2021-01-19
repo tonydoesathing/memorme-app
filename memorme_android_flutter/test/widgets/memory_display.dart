@@ -11,16 +11,16 @@ void main() {
   group("Memories List test", () {
 
     const List<Memory> memories = [
-      Memory(1, 1, 1, 1, [Story(1, 1, 1, "Story 1", StoryType.TEXT_STORY)]),
-      Memory(2, 2, 2, 2, [Story(2, 2, 2, "Story 2", StoryType.TEXT_STORY)]),
-      Memory(3, 3, 3, 4, [
-        Story(3, 3, 3, "Story 3", StoryType.TEXT_STORY),
-        Story(4, 3, 3, "Story 4", StoryType.TEXT_STORY)
+      Memory(id: 1, dateCreated: 1, dateLastEdited: 1, storyPreviewId: 1, stories: [Story(id: 1, dateCreated: 1, dateLastEdited: 1, data: "Story 1!", type: StoryType.TEXT_STORY)]),
+      Memory(id: 2, dateCreated: 2, dateLastEdited: 2, storyPreviewId: 2, stories: [Story(id: 2, dateCreated: 2, dateLastEdited: 2, data: "Story 2!", type: StoryType.TEXT_STORY)]),
+      Memory(id: 3, dateCreated: 3, dateLastEdited: 3, storyPreviewId: 4, stories: [
+        Story(id: 3, dateCreated: 3, dateLastEdited: 3, data: "Story 3!", type: StoryType.TEXT_STORY),
+        Story(id: 4, dateCreated: 3, dateLastEdited: 3, data: "Story 4!", type: StoryType.TEXT_STORY)
       ]),
     ];
 
 
-    testWidgets('Should start with zero memory widgets in empty list',
+    testWidgets('Should start with zero stories in empty memory',
         (WidgetTester tester) async {
       //await tester.pumpWidget(makeTestable(MemoryDisplay()));
 

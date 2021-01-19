@@ -7,6 +7,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:test/test.dart';
 
+//TODO: [MMA-108] Fix sqlite test
+
 main() {
   //switch sqflite to be in FFI mode
   sqfliteFfiInit();
@@ -52,8 +54,8 @@ main() {
       expect(memories, []);
       // by leaving id null, SQLite will assign an id
       int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(null, now, now, 1,
-          [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
+      Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+          [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
       // save memory1
       Memory savedMem1 = await repository.saveMemory(memory1);
       // fetch the memories
@@ -61,9 +63,9 @@ main() {
       // the only memory in the db should be memory1 (primary keys start at 1 in SQLite)
       expect(memories[0], savedMem1);
 
-      Memory memory2 = Memory(null, now, now, 2, [
-        Story(null, now, now, "Story 2!", StoryType.TEXT_STORY),
-        Story(null, now, now, "Story 3!", StoryType.TEXT_STORY)
+      Memory memory2 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 2, stories: [
+        Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 2!", type: StoryType.TEXT_STORY),
+        Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 3!", type: StoryType.TEXT_STORY)
       ]);
       Memory savedMem2 = await repository.saveMemory(memory2);
       memories = await repository.fetchMemories(allPageSize, null);
@@ -74,14 +76,14 @@ main() {
       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
       //add memories to db
       int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(null, now, now, 1,
-          [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
+      Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+          [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
       // save memory1
       Memory savedMem1 = await repository.saveMemory(memory1);
 
-      Memory memory2 = Memory(null, now, now, 2, [
-        Story(null, now, now, "Story 2!", StoryType.TEXT_STORY),
-        Story(null, now, now, "Story 3!", StoryType.TEXT_STORY)
+      Memory memory2 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 2, stories: [
+        Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 2!", type: StoryType.TEXT_STORY),
+        Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 3!", type: StoryType.TEXT_STORY)
       ]);
       Memory savedMem2 = await repository.saveMemory(memory2);
       memories = await repository.fetchMemories(allPageSize, null);
@@ -93,10 +95,9 @@ main() {
       now = DateTime.now().millisecondsSinceEpoch;
       final List<Story> stories = [
         ...savedMem1.stories,
-        Story(null, now, now, "Story 4!", StoryType.TEXT_STORY)
+        Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 4!", type: StoryType.TEXT_STORY)
       ];
-      Memory updatedMemory1 = Memory(savedMem1.id, savedMem1.dateCreated, now,
-          savedMem1.storyPreviewId, stories);
+      Memory updatedMemory1 = Memory(id: savedMem1.id, dateCreated: savedMem1.dateCreated, dateLastEdited: now, storyPreviewId: savedMem1.storyPreviewId, stories: stories);
       Memory savedUpdatedMem1 = await repository.saveMemory(updatedMemory1);
       memories = await repository.fetchMemories(allPageSize, null);
       expect(memories.contains(savedUpdatedMem1), true);
@@ -106,14 +107,14 @@ main() {
       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
       //add memories to db
       int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(null, now, now, 1,
-          [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
+      Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+          [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
       // save memory1
       Memory savedMem1 = await repository.saveMemory(memory1);
 
-      Memory memory2 = Memory(null, now, now, 2, [
-        Story(null, now, now, "Story 2!", StoryType.TEXT_STORY),
-        Story(null, now, now, "Story 3!", StoryType.TEXT_STORY)
+      Memory memory2 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 2, stories: [
+        Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 2!", type: StoryType.TEXT_STORY),
+        Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 3!", type: StoryType.TEXT_STORY)
       ]);
       Memory savedMem2 = await repository.saveMemory(memory2);
       memories = await repository.fetchMemories(allPageSize, null);
@@ -154,8 +155,8 @@ main() {
       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
       //add memory to db
       int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(null, now, now, 1,
-          [Story(null, now, now, "Story 1!", StoryType.TEXT_STORY)]);
+      Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+          [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
       // save memory1
       Memory savedMem1 = await repository.saveMemory(memory1);
       //new memory should be in there
@@ -187,8 +188,8 @@ main() {
       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
       //add a memory
       int now = DateTime.now().millisecondsSinceEpoch;
-      Memory initialSavedMem = await repository.saveMemory(Memory(null, now,
-          now, 0, [Story(null, now, now, "Story1", StoryType.TEXT_STORY)]));
+      Memory initialSavedMem = await repository.saveMemory(Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: 
+        [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]));
 
       //get page with last memory being the one we just inserted
       memories = await repository.fetchMemories(pageSize, initialSavedMem);
@@ -199,8 +200,8 @@ main() {
       List<Memory> addedMems = [];
       for (int i = 0; i < 7; i++) {
         now = DateTime.now().millisecondsSinceEpoch;
-        Story story = Story(i, now, now, "Story #$i", StoryType.TEXT_STORY);
-        Memory memory = Memory(i, now, now, i, [story]);
+        Story story = Story(id: i, dateCreated: now, dateLastEdited: now, data: "Story #$i", type: StoryType.TEXT_STORY);
+        Memory memory = Memory(id: i, dateCreated: now, dateLastEdited: now, storyPreviewId: i, stories: [story]);
         memory = await repository.saveMemory(memory);
         addedMems.add(memory);
       }

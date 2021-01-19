@@ -23,12 +23,12 @@ main() {
           .fetchMemories(15, null)
           .then((memories) => expect(memories, []));
       int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(1, now, now, 0, []);
+      Memory memory1 = Memory(id: 1, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
       repository.saveMemory(memory1);
       repository
           .fetchMemories(15, null)
           .then((memories) => expect(memories[0], memory1));
-      Memory memory2 = Memory(2, now, now, 0, []);
+      Memory memory2 = Memory(id: 2, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
       repository.saveMemory(memory2);
       repository
           .fetchMemories(15, null)
@@ -43,8 +43,8 @@ main() {
       List<Memory> addedMems = [];
       for (int i = 0; i < 7; i++) {
         int now = DateTime.now().millisecondsSinceEpoch;
-        Story story = Story(i, now, now, "Story #$i", StoryType.TEXT_STORY);
-        Memory memory = Memory(i, now, now, i, [story]);
+        Story story = Story(id: i, dateCreated: now, dateLastEdited: now, data: "Story #$i", type: StoryType.TEXT_STORY);
+        Memory memory = Memory(id: i, dateCreated: now, dateLastEdited: now, storyPreviewId: i, stories: [story]);
         addedMems.add(memory);
         await repository.saveMemory(memory);
       }
@@ -76,12 +76,12 @@ main() {
       expect(memories, []);
 
       int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(1, now, now, 0, []);
+      Memory memory1 = Memory(id: 1, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
       await repository.saveMemory(memory1);
       memories = await repository.fetchMemories(15, null);
       expect(memories[0], memory1);
 
-      Memory memory2 = Memory(2, now, now, 0, []);
+      Memory memory2 = Memory(id: 2, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
       await repository.saveMemory(memory2);
       memories = await repository.fetchMemories(15, null);
       expect(memories[1], memory2);
