@@ -90,4 +90,11 @@ class FileProvider {
     }
     return path;
   }
+
+  /// Removes a [File] from a provided [path]
+  Future<String> removeFileFromPath(String path) async {
+    File file = File(path);
+    await file.delete();
+    return path;
+  }
 }

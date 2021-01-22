@@ -12,27 +12,27 @@ import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart
 
 class EditMemoryArguments {
   final Function onSave;
+  final Memory memory;
 
-  EditMemoryArguments(this.onSave);
+  EditMemoryArguments({this.onSave, this.memory});
 }
 
 class EditMemoryPage extends StatefulWidget {
   final void Function(Memory value) onSave;
-  final Memory memory;
 
-  EditMemoryPage({Key key, this.onSave, this.memory}) : super(key: key);
+  EditMemoryPage({Key key, this.onSave}) : super(key: key);
 
   @override
   _EditMemoryPageState createState() => _EditMemoryPageState();
 }
 
 class _EditMemoryPageState extends State<EditMemoryPage> {
-  Memory memory;
+  EditMemoryBloc _editMemoryBloc;
 
   @override
   void initState() {
     super.initState();
-    memory = widget.memory ?? Memory(stories: []);
+    _editMemoryBloc = BlocProvider.of<EditMemoryBloc>(context);
   }
 
   /// let user know memory needs at least one story
@@ -59,189 +59,178 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
   /// checks to see if [_memory] is fit to save,
   /// specifically by checking to see if it has
   /// at least one story
-  void _checkCanSave() {
+  void _checkCanSave(Memory memory) {
     if (memory.stories.length == 0) {
       _showDialog();
     } else {
-      BlocProvider.of<MemoriesBloc>(context).add(MemoriesMemoryAdded(
-          Memory.editMemory(memory,
-              dateCreated: DateTime.now().millisecondsSinceEpoch,
-              dateLastEdited: DateTime.now().millisecondsSinceEpoch,
-              storyPreviewId: 1)));
+      _editMemoryBloc.add(EditMemoryBlocSaveMemory());
     }
   }
 
-  /// creates a button that pushes add story screen
-  Widget _createAddStoryButton() {
-    return GestureDetector(
-      //send to TakePictureScreen on tap
-      onTap: () {
-        _pushAddStoryScreen();
-      },
-      //create a button with some text centered in the carousel space
-      child: Container(
-        height: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              Icons.add_circle,
-              size: 150,
-              color: Theme.of(context).primaryColor,
-            ),
-            Text(
-              "Add a story!",
-              style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).primaryColor),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// navigates to the [FullscreenTextField] page, filling in the
-  /// textbox with an optional [text] string
-  void _pushAddText({String text}) {
-    Navigator.pop(context);
-    // navigate to the fullscreen text field page
-    Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
-      return FullscreenTextField(
-        text: text,
-        onSave: (val) {
-          _addStory(val);
-        },
-      );
-    }));
-  }
-
-  /// adds a [story] to [_memory]'s stories
-  void _addStory(String story) {
-    // Only add the story if the user actually entered something
-    if (story.length > 0) {
-      setState(() => memory.stories.add(Story(
-          dateCreated: DateTime.now().millisecondsSinceEpoch,
-          dateLastEdited: DateTime.now().millisecondsSinceEpoch,
-          data: story,
-          type: StoryType.TEXT_STORY)));
-    }
-  }
-
-  /// pushes take picture page, adding picture to stories
-  void _pushAddPicture() {
-    Navigator.pop(context);
-    Navigator.pushNamed(context, '/take_picture',
-        arguments: TakePictureArguments((path) => {
-              this.setState(() {
-                memory.stories.add(Story(
-                    dateCreated: DateTime.now().millisecondsSinceEpoch,
-                    dateLastEdited: DateTime.now().millisecondsSinceEpoch,
-                    data: path,
-                    type: StoryType.PICTURE_STORY));
-                Navigator.pop(context);
-              })
-            }));
-  }
-
-  /// pushes add story screen, which gives options of adding a picture or text
-  void _pushAddStoryScreen() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return Scaffold(
-          appBar: AppBar(
-            title: Text('Add a Story'),
-          ),
-          body: ListView(
-            children: [
-              // add picture option
-              GestureDetector(
-                  onTap: _pushAddPicture,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                        child: Text('Take a picture',
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).primaryColor,
-                            ))),
-                  )),
-              // add text option
-              GestureDetector(
-                  onTap: _pushAddText,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                        child: Text('Add some text',
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(context).primaryColor))),
-                  ))
+  Future<bool> _onPop(EditMemoryState state) {
+    // if we've modified the memory and user backs out
+    // check to see if user wants to discard it
+    if (state.memory != state.initialMemory) {
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Discard your changes?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Yes'),
+                onPressed: () {
+                  // discard the memory
+                  _editMemoryBloc.add(EditMemoryBlocDiscardMemory());
+                  // close the dialog and allow it to pop
+                  Navigator.pop(context, true);
+                },
+              ),
+              FlatButton(
+                child: Text('No'),
+                onPressed: () {
+                  Navigator.pop(context, false);
+                },
+              ),
             ],
-          ));
-    }));
+          );
+        },
+      ).then((value) => value ?? false);
+    } else {
+      return Future.value(true);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Make Memory'),
-          leading: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.check),
-              onPressed: () {
-                _checkCanSave();
-              },
-            ),
-          ],
-        ),
-        //prompt user to make first story, if stories already exist then show simple FAB
-        body: BlocConsumer<MemoriesBloc, MemoriesState>(
-          builder: (context, state) {
-            return memory.stories.length == 0
-                ? Center(child: _createAddStoryButton())
-                : ListView(children: [
-                    Column(
-                      children: <Widget>[
-                        for (Story s in memory.stories)
-                          s.type == StoryType.TEXT_STORY
-                              ? Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: TextStoryItem(s))
-                              : Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: PictureStoryItem(s))
-                      ],
-                    ),
-                  ]);
-          },
-          listener: (context, state) {
-            // check to see if we successfully removed the memory
-            // then pop
-            if (state is MemoriesSaveSuccess) {
-              if (widget.onSave != null) {
-                widget.onSave(memory);
-              }
-              Navigator.pop(context);
-            } else if (state is MemoriesSaveFailure) {
-              print("Failure: ${state.errorCode}");
-            }
-          },
-        ),
-        floatingActionButton: memory.stories.length != 0
-            ? FloatingActionButton(
-                onPressed:
-                    _pushAddStoryScreen, // pressing the + button opens the new story screen
-                tooltip: 'Add Memory',
-                child: new Icon(Icons.add))
-            : null);
+    return BlocConsumer<EditMemoryBloc, EditMemoryState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Make Memory'),
+            leading: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  // close
+                  _onPop(state).then((value) {
+                    if (value) Navigator.pop(context);
+                  });
+                }),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.check),
+                onPressed: () {
+                  // save
+                  _checkCanSave(state.memory);
+                },
+              ),
+            ],
+          ),
+          // check to see if user is going back and trying to discard
+          body: !(state is EditMemoryDiscarded)
+              ? WillPopScope(
+                  onWillPop: () async => await _onPop(state),
+                  child: Column(
+                    children: <Widget>[
+                      Expanded(
+                        // build list of stories
+                        child: ListView.builder(
+                          itemCount: state.memory.stories.length,
+                          itemBuilder: (context, index) {
+                            Story s = state.memory.stories[index];
+                            Widget w = Text("No preview for $s");
+                            if (s.type == StoryType.TEXT_STORY) {
+                              w = TextStoryItem(s);
+                            } else if (s.type == StoryType.PICTURE_STORY) {
+                              w = PictureStoryItem(s);
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: w,
+                            );
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            // add photo button
+                            RaisedButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/take_picture',
+                                    arguments: TakePictureArguments((path) {
+                                  _editMemoryBloc.add(EditMemoryBlocAddStory(
+                                      Story(
+                                          dateCreated: DateTime.now()
+                                              .millisecondsSinceEpoch,
+                                          dateLastEdited: DateTime.now()
+                                              .millisecondsSinceEpoch,
+                                          data: path,
+                                          type: StoryType.PICTURE_STORY)));
+                                  Navigator.pop(context);
+                                }));
+                              },
+                              padding: EdgeInsets.all(8),
+                              child: Column(
+                                children: <Widget>[
+                                  Icon(Icons.add_a_photo),
+                                  Text("Add Photo")
+                                ],
+                              ),
+                            ),
+                            // add text button
+                            RaisedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                    new MaterialPageRoute(builder: (context) {
+                                  return FullscreenTextField(
+                                    text: "",
+                                    onSave: (val) {
+                                      _editMemoryBloc.add(
+                                          EditMemoryBlocAddStory(Story(
+                                              dateCreated: DateTime.now()
+                                                  .millisecondsSinceEpoch,
+                                              dateLastEdited: DateTime.now()
+                                                  .millisecondsSinceEpoch,
+                                              data: val,
+                                              type: StoryType.TEXT_STORY)));
+                                    },
+                                  );
+                                }));
+                              },
+                              padding: EdgeInsets.all(8),
+                              child: Column(
+                                children: <Widget>[
+                                  Icon(Icons.add_comment),
+                                  Text("Add Text")
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Container(),
+        );
+      },
+      listener: (context, state) {
+        // we check to see if we've gotten the EditMemorySaved state
+        if (state is EditMemorySaved) {
+          // this means save was successful
+          if (widget.onSave != null) {
+            widget.onSave(state.memory);
+          }
+          Navigator.pop(context);
+        } else if (state is EditMemoryError) {
+          print(state.errorCode);
+        }
+      },
+    );
   }
 }

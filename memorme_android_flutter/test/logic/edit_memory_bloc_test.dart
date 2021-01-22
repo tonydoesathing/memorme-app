@@ -14,21 +14,7 @@ main() {
   group("EditMemoryBloc Test >", () {
     EditMemoryBloc editMemoryBloc;
     MemoryRepository memoryRepository;
-    const List<Memory> memories = [
-      Memory(
-          id: 1,
-          dateCreated: 1,
-          dateLastEdited: 1,
-          storyPreviewId: 1,
-          stories: [
-            Story(
-                id: 1,
-                dateCreated: 1,
-                dateLastEdited: 1,
-                data: "Story 1",
-                type: StoryType.TEXT_STORY)
-          ]),
-    ];
+
     const Memory memory = Memory(
         id: 5,
         dateCreated: 15,
@@ -50,7 +36,8 @@ main() {
     });
 
     test("Not passing in a memory should create an empty memory", () async {
-      expect(editMemoryBloc.state, EditMemoryInitial(Memory()));
+      expect(editMemoryBloc.state,
+          EditMemoryDisplayed(Memory(stories: []), Memory(stories: [])));
     });
 
     test("Passing in a memory should return an initial state with that memory",
@@ -71,19 +58,21 @@ main() {
               ]));
       expect(
           editMemoryBloc.state,
-          EditMemoryInitial(Memory(
-              id: 5,
-              dateCreated: 15,
-              dateLastEdited: 25,
-              storyPreviewId: 10,
-              stories: [
-                Story(
-                    id: 10,
-                    dateCreated: 15,
-                    dateLastEdited: 25,
-                    data: "Story 10",
-                    type: StoryType.TEXT_STORY)
-              ])));
+          EditMemoryDisplayed(
+              Memory(
+                  id: 5,
+                  dateCreated: 15,
+                  dateLastEdited: 25,
+                  storyPreviewId: 10,
+                  stories: [
+                    Story(
+                        id: 10,
+                        dateCreated: 15,
+                        dateLastEdited: 25,
+                        data: "Story 10",
+                        type: StoryType.TEXT_STORY)
+                  ]),
+              Memory(stories: [])));
     });
 
     test("Testing equality", () {
@@ -102,84 +91,186 @@ main() {
                     type: StoryType.TEXT_STORY)
               ]),
           memory);
-      expect(EditMemoryLoading(Memory()), EditMemoryLoading(Memory()));
+      expect(EditMemoryLoading(Memory(stories: []), Memory(stories: [])),
+          EditMemoryLoading(Memory(stories: []), Memory(stories: [])));
       expect(
-          EditMemoryLoaded(memory),
-          EditMemoryLoaded(Memory(
-              id: 5,
-              dateCreated: 15,
-              dateLastEdited: 25,
-              storyPreviewId: 10,
-              stories: [
-                Story(
-                    id: 10,
-                    dateCreated: 15,
-                    dateLastEdited: 25,
-                    data: "Story 10",
-                    type: StoryType.TEXT_STORY)
-              ])));
+          EditMemoryDisplayed(memory, Memory(stories: [])),
+          EditMemoryDisplayed(
+              Memory(
+                  id: 5,
+                  dateCreated: 15,
+                  dateLastEdited: 25,
+                  storyPreviewId: 10,
+                  stories: [
+                    Story(
+                        id: 10,
+                        dateCreated: 15,
+                        dateLastEdited: 25,
+                        data: "Story 10",
+                        type: StoryType.TEXT_STORY)
+                  ]),
+              Memory(stories: [])));
     });
 
+    // blocTest<EditMemoryBloc, EditMemoryState>("description",
+    //     build: () {}, act: (bloc) {}, expect: <EditMemoryState>[]);
     blocTest<EditMemoryBloc, EditMemoryState>(
-        "On successful save of new memory, should return EditMemoryLoaded state with the saved memory and new ID",
-        build: () {
-      when(memoryRepository.saveMemory(any))
-          .thenAnswer((_) => Future.value(memory));
-      return editMemoryBloc;
-    }, act: (bloc) {
-      Memory mem = Memory(
-          dateCreated: 15,
-          dateLastEdited: 25,
-          storyPreviewId: 10,
-          stories: [
-            Story(
-                id: 10,
-                dateCreated: 15,
-                dateLastEdited: 25,
-                data: "Story 10",
-                type: StoryType.TEXT_STORY)
-          ]);
-      bloc.add(EditMemoryBlocSaveMemory(mem));
-    }, expect: <EditMemoryState>[
-      EditMemoryLoading(Memory(
-          dateCreated: 15,
-          dateLastEdited: 25,
-          storyPreviewId: 10,
-          stories: [
-            Story(
-                id: 10,
-                dateCreated: 15,
-                dateLastEdited: 25,
-                data: "Story 10",
-                type: StoryType.TEXT_STORY)
-          ])),
-      EditMemoryLoaded(memory)
-    ]);
+      "On successful save, should save to repo and return saved state",
+      build: () {
+        when(memoryRepository.saveMemory(any))
+            .thenAnswer((_) => Future.value(memory));
+        return editMemoryBloc;
+      },
+      act: (bloc) {
+        bloc.add(EditMemoryBlocSaveMemory());
+      },
+      expect: <EditMemoryState>[
+        EditMemoryLoading(Memory(stories: []), Memory(stories: [])),
+        EditMemorySaved(memory, Memory(stories: []))
+      ],
+      verify: (cubit) {
+        verify(memoryRepository.saveMemory(Memory(stories: [])));
+      },
+    );
 
     blocTest<EditMemoryBloc, EditMemoryState>(
-        "On successful removal of memory, should return EditMemoryRemoved state with the removed memory",
-        build: () {
-      when(memoryRepository.removeMemory(any))
-          .thenAnswer((_) => Future.value(memory));
-      return editMemoryBloc;
-    }, act: (bloc) {
-      bloc.add(EditMemoryBlocRemoveMemory(memory));
-    }, expect: <EditMemoryState>[
-      EditMemoryLoading(memory),
-      EditMemoryRemoved(memory)
-    ]);
+      "On failed save, should return error",
+      build: () {
+        when(memoryRepository.saveMemory(any))
+            .thenThrow(Exception("Could not save"));
+        return editMemoryBloc;
+      },
+      act: (bloc) {
+        bloc.add(EditMemoryBlocSaveMemory());
+      },
+      expect: <EditMemoryState>[
+        EditMemoryLoading(Memory(stories: []), Memory(stories: [])),
+        EditMemoryError(
+            Memory(stories: []), Memory(stories: []), "Could not save")
+      ],
+      verify: (cubit) {
+        verify(memoryRepository.saveMemory(Memory(stories: [])));
+      },
+    );
+
+// TODO: figure out how to test this with the FileProvider in there
+
+/*    blocTest<EditMemoryBloc, EditMemoryState>(
+      "On successful discard, should return discarded state",
+      build: () {
+        when(memoryRepository.removeMemory(any))
+            .thenAnswer((_) => Future.value(memory));
+        return editMemoryBloc;
+      },
+      act: (bloc) {
+        bloc.add(EditMemoryBlocDiscardMemory());
+      },
+      expect: <EditMemoryState>[
+        EditMemoryLoading(Memory(stories: []), Memory(stories: [])),
+        EditMemoryDiscarded(memory, Memory(stories: []))
+      ],
+      verify: (cubit) {
+        verify(memoryRepository.removeMemory(Memory(stories: [])));
+      },
+    );
 
     blocTest<EditMemoryBloc, EditMemoryState>(
-        "On failed removal of memory, should return EditMemoryError state with the attempted memory and the error",
-        build: () {
-      when(memoryRepository.removeMemory(any))
-          .thenThrow(Exception("Could not remove memory"));
-      return editMemoryBloc;
-    }, act: (bloc) {
-      bloc.add(EditMemoryBlocRemoveMemory(memory));
-    }, expect: <EditMemoryState>[
-      EditMemoryLoading(memory),
-      EditMemoryError(memory, "Could not remove memory")
-    ]);
+      "On failed delete, should return error",
+      build: () {
+        when(memoryRepository.removeMemory(any))
+            .thenThrow(Exception("Could not remove memory"));
+        return editMemoryBloc;
+      },
+      act: (bloc) {
+        bloc.add(EditMemoryBlocDiscardMemory());
+      },
+      expect: <EditMemoryState>[
+        EditMemoryLoading(Memory(stories: []), Memory(stories: [])),
+        EditMemoryError(
+            Memory(stories: []), Memory(stories: []), "Could not remove memory")
+      ],
+      verify: (cubit) {
+        verify(memoryRepository.removeMemory(Memory(stories: [])));
+      },
+    ); */
+
+    blocTest<EditMemoryBloc, EditMemoryState>(
+      "On successful story add, should return memory display with the modified memory",
+      build: () {
+        return editMemoryBloc;
+      },
+      act: (bloc) {
+        bloc.add(EditMemoryBlocAddStory(
+            Story(data: "wow", type: StoryType.TEXT_STORY)));
+      },
+      expect: <EditMemoryState>[
+        EditMemoryLoading(Memory(stories: []), Memory(stories: [])),
+        EditMemoryDisplayed(
+            Memory(stories: [Story(data: "wow", type: StoryType.TEXT_STORY)]),
+            Memory(stories: []))
+      ],
+    );
+
+    // blocTest<EditMemoryBloc, EditMemoryState>(
+    //     "On successful save of new memory, should return EditMemoryLoaded state with the saved memory and new ID",
+    //     build: () {
+    //   when(memoryRepository.saveMemory(any))
+    //       .thenAnswer((_) => Future.value(memory));
+    //   return editMemoryBloc;
+    // }, act: (bloc) {
+    //   Memory mem = Memory(
+    //       dateCreated: 15,
+    //       dateLastEdited: 25,
+    //       storyPreviewId: 10,
+    //       stories: [
+    //         Story(
+    //             id: 10,
+    //             dateCreated: 15,
+    //             dateLastEdited: 25,
+    //             data: "Story 10",
+    //             type: StoryType.TEXT_STORY)
+    //       ]);
+    //   bloc.add(EditMemoryBlocSaveMemory(mem));
+    // }, expect: <EditMemoryState>[
+    //   EditMemoryLoading(Memory(
+    //       dateCreated: 15,
+    //       dateLastEdited: 25,
+    //       storyPreviewId: 10,
+    //       stories: [
+    //         Story(
+    //             id: 10,
+    //             dateCreated: 15,
+    //             dateLastEdited: 25,
+    //             data: "Story 10",
+    //             type: StoryType.TEXT_STORY)
+    //       ])),
+    //   EditMemoryLoaded(memory)
+    // ]);
+
+    // blocTest<EditMemoryBloc, EditMemoryState>(
+    //     "On successful removal of memory, should return EditMemoryRemoved state with the removed memory",
+    //     build: () {
+    //   when(memoryRepository.removeMemory(any))
+    //       .thenAnswer((_) => Future.value(memory));
+    //   return editMemoryBloc;
+    // }, act: (bloc) {
+    //   bloc.add(EditMemoryBlocRemoveMemory(memory));
+    // }, expect: <EditMemoryState>[
+    //   EditMemoryLoading(memory),
+    //   EditMemoryRemoved(memory)
+    // ]);
+
+    // blocTest<EditMemoryBloc, EditMemoryState>(
+    //     "On failed removal of memory, should return EditMemoryError state with the attempted memory and the error",
+    //     build: () {
+    //   when(memoryRepository.removeMemory(any))
+    //       .thenThrow(Exception("Could not remove memory"));
+    //   return editMemoryBloc;
+    // }, act: (bloc) {
+    //   bloc.add(EditMemoryBlocRemoveMemory(memory));
+    // }, expect: <EditMemoryState>[
+    //   EditMemoryLoading(memory),
+    //   EditMemoryError(memory, "Could not remove memory")
+    // ]);
   });
 }

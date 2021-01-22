@@ -67,7 +67,7 @@ class SQLiteDBProvider {
   /// if [_database] isn't null, return it
   /// otherwise, initialize it
   Future<Database> getDatabase() async {
-    return _database ?? _initDB();
+    return _database ??= await _initDB();
   }
 
   Future<Database> closeDatabase() async {
@@ -87,7 +87,6 @@ class SQLiteDBProvider {
       dbPath = join(directory, "MemorMe.db");
     }
     final db = await databaseFactory.openDatabase(dbPath, options: dbOptions);
-
     return db;
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memorme_android_flutter/pages/display_memories_page.dart';
 
 import '../utils/widget_test_utils.dart';
 

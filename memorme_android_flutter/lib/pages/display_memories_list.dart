@@ -25,7 +25,7 @@ class DisplayMemoriesList extends StatelessWidget {
           onPressed: () {
             //display memory UI
             Navigator.pushNamed(context, '/edit_memory',
-                arguments: EditMemoryArguments((memory) {
+                arguments: EditMemoryArguments(onSave: (memory) {
               BlocProvider.of<MemoriesBloc>(context).add(MemoriesLoaded(true));
             }));
           },

@@ -112,6 +112,12 @@ class SQLiteMemoryRepository extends MemoryRepository {
     if (memory.id != null) {
       try {
         //remove media from filesystem
+        // memory.stories.forEach((story) {
+        //   if (story.type == StoryType.PICTURE_STORY) {
+        //     // remove it
+        //     FileProvider().removeFileFromPath(story.data);
+        //   }
+        // });
         //remove memory
         Database db = await _memormeDBProvider.getDatabase();
         int rowsDeleted = await db.delete(memoriesTable,

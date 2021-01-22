@@ -47,9 +47,14 @@ class AppRouter {
       case '/edit_memory':
         EditMemoryArguments arguments = settings.arguments;
         return MaterialPageRoute(
-            builder: (_) => BlocProvider.value(
-                  value: _memoriesBloc,
-                  child: EditMemoryPage(onSave: arguments.onSave),
+            builder: (_) => BlocProvider(
+                  create: (context) => EditMemoryBloc(
+                      SQLiteMemoryRepository(
+                          SQLiteDBProvider.memorMeSQLiteDBProvider()),
+                      memory: arguments.memory),
+                  child: EditMemoryPage(
+                    onSave: arguments.onSave,
+                  ),
                 ));
     }
   }

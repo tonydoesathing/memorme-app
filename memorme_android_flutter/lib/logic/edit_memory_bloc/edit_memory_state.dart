@@ -1,30 +1,36 @@
 part of 'edit_memory_bloc.dart';
 
 abstract class EditMemoryState extends Equatable {
+  final Memory initialMemory;
   final Memory memory;
-  const EditMemoryState(this.memory);
+  const EditMemoryState(this.memory, this.initialMemory);
 
   @override
   List<Object> get props => [this.memory];
 }
 
-class EditMemoryInitial extends EditMemoryState {
-  EditMemoryInitial(Memory memory) : super(memory);
+class EditMemoryDisplayed extends EditMemoryState {
+  EditMemoryDisplayed(Memory memory, Memory initialMemory)
+      : super(memory, initialMemory);
 }
 
 class EditMemoryLoading extends EditMemoryState {
-  EditMemoryLoading(Memory memory) : super(memory);
+  EditMemoryLoading(Memory memory, Memory initialMemory)
+      : super(memory, initialMemory);
 }
 
-class EditMemoryLoaded extends EditMemoryState {
-  EditMemoryLoaded(Memory memory) : super(memory);
+class EditMemoryDiscarded extends EditMemoryState {
+  EditMemoryDiscarded(Memory memory, Memory initialMemory)
+      : super(memory, initialMemory);
 }
 
-class EditMemoryRemoved extends EditMemoryState {
-  EditMemoryRemoved(Memory memory) : super(memory);
+class EditMemorySaved extends EditMemoryState {
+  EditMemorySaved(Memory memory, Memory initialMemory)
+      : super(memory, initialMemory);
 }
 
 class EditMemoryError extends EditMemoryState {
   final errorCode;
-  EditMemoryError(Memory memory, this.errorCode) : super(memory);
+  EditMemoryError(Memory memory, Memory initialMemory, this.errorCode)
+      : super(memory, initialMemory);
 }
