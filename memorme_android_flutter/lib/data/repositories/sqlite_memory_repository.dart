@@ -29,13 +29,13 @@ class SQLiteMemoryRepository extends MemoryRepository {
     final List<Map<String, dynamic>> memories = lastMemory == null
         // lastMemory is null; go from beginning
         ? await db.query(memoriesTable,
-            orderBy: "$memoryDateLastEditedColumn,$memoryIdColumn",
+            orderBy: "$memoryDateLastEditedColumn DESC,$memoryIdColumn",
             limit: pageSize)
         // lastMemory is not null; go from there
         : await db.query(memoriesTable,
-            where: "($memoryDateLastEditedColumn,$memoryIdColumn) > (?,?)",
+            where: "($memoryDateLastEditedColumn,$memoryIdColumn) < (?,?)",
             whereArgs: [lastMemory.dateLastEdited, lastMemory.id],
-            orderBy: "$memoryDateLastEditedColumn,$memoryIdColumn",
+            orderBy: "$memoryDateLastEditedColumn DESC,$memoryIdColumn",
             limit: pageSize);
     final List<Memory> memoriesList = [];
     // for each memory:
