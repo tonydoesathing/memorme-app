@@ -16,7 +16,7 @@ class AppRouter {
       SQLiteMemoryRepository(SQLiteDBProvider.memorMeSQLiteDBProvider()));
 
   AppRouter() {
-    _memoriesBloc.add(MemoriesLoaded(true));
+    _memoriesBloc.add(MemoriesBlocLoadMemories(true));
   }
 
   Route onGenerateRoute(RouteSettings settings) {
@@ -51,6 +51,7 @@ class AppRouter {
                   create: (context) => EditMemoryBloc(
                       SQLiteMemoryRepository(
                           SQLiteDBProvider.memorMeSQLiteDBProvider()),
+                      _memoriesBloc,
                       memory: arguments.memory),
                   child: EditMemoryPage(
                     onSave: arguments.onSave,

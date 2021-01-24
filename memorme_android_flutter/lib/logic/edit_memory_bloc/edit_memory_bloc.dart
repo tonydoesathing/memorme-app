@@ -7,6 +7,7 @@ import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
+import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:path/path.dart';
 
 part 'edit_memory_event.dart';
@@ -14,7 +15,8 @@ part 'edit_memory_state.dart';
 
 class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
   final MemoryRepository repository;
-  EditMemoryBloc(this.repository, {Memory memory})
+  final MemoriesBloc _memoriesBloc;
+  EditMemoryBloc(this.repository, this._memoriesBloc, {Memory memory})
       : super(EditMemoryDisplayed(
             memory ?? Memory(stories: []), memory ?? Memory(stories: [])));
 
@@ -43,6 +45,8 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
           dateLastEdited: DateTime.now().millisecondsSinceEpoch,
           storyPreviewId: state.memory.storyPreviewId ?? 0);
       Memory savedMem = await this.repository.saveMemory(preparedMemory);
+      // update the memories bloc with the memory
+      _memoriesBloc.add(MemoriesBlocUpdateMemory(savedMem));
       yield EditMemorySaved(savedMem, state.initialMemory);
     } catch (_) {
       yield EditMemoryError(state.memory, state.initialMemory, _);

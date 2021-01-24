@@ -18,14 +18,10 @@ class MemoriesBloc extends Bloc<MemoriesEvent, MemoriesState> {
   Stream<MemoriesState> mapEventToState(
     MemoriesEvent event,
   ) async* {
-    if (event is MemoriesLoaded) {
+    if (event is MemoriesBlocLoadMemories) {
       yield* _mapMemoriesLoadedToState(event.fromStart);
-    } else if (event is MemoriesMemoryAdded) {
-      yield* _mapMemoriesSaveMemoryToState(event.memory);
-    } else if (event is MemoriesMemoryRemoved) {
-      yield* _mapMemoriesMemoryRemovedToState(event.memory);
-    } else if (event is MemoriesMemoryUpdated) {
-      yield* _mapMemoriesSaveMemoryToState(event.memory);
+    } else if (event is MemoriesBlocUpdateMemory) {
+      yield* _mapMemoriesUpdateToState(event.memory);
     }
   }
 
@@ -73,31 +69,16 @@ class MemoriesBloc extends Bloc<MemoriesEvent, MemoriesState> {
     }
   }
 
-  /// Try to save a new or existing memory to repository
-  ///
-  /// If successful, return [MemoriesSaveSuccess] state
-  /// If failure, return [MemoriesSaveFailure] state
-  Stream<MemoriesState> _mapMemoriesSaveMemoryToState(Memory memory) async* {
-    try {
-      yield MemoriesSaveInProgress();
-      await this.repository.saveMemory(memory);
-      yield MemoriesSaveSuccess(memory);
-    } catch (_) {
-      yield MemoriesSaveFailure(_.toString());
-    }
-  }
-
-  /// Try to remove a memory from repository
-  ///
-  /// If successful, return [MemoriesSaveSuccess] state
-  /// If failure, return [MemoriesSaveFailure] state
-  Stream<MemoriesState> _mapMemoriesMemoryRemovedToState(Memory memory) async* {
-    try {
-      yield MemoriesSaveInProgress();
-      await this.repository.removeMemory(memory);
-      yield MemoriesSaveSuccess(memory);
-    } catch (_) {
-      yield MemoriesSaveFailure(_.toString());
-    }
+  /// Update state with a new or existing memory
+  Stream<MemoriesState> _mapMemoriesUpdateToState(Memory memory) async* {
+    final currentState = state;
+    yield MemoriesLoadInProgress.fromMemoriesState(currentState);
+    // check to see if we edited a memory
+    int memToRemove =
+        currentState.memories.indexWhere((element) => element.id == memory.id);
+    if (memToRemove != -1) currentState.memories.removeAt(memToRemove);
+    // return the memories with the new/edited memory at the beginning
+    yield MemoriesLoadSuccess.fromMemoriesState(this.state,
+        memories: [memory] + currentState.memories);
   }
 }

@@ -58,26 +58,26 @@ class MemoriesLoadFailure extends MemoriesState {
   List<Object> get props => [this.errorCode, this.memories, this.hasReachedMax];
 }
 
-/// Saving memory in progress
-class MemoriesSaveInProgress extends MemoriesState {}
+// /// Saving memory in progress
+// class MemoriesSaveInProgress extends MemoriesState {}
 
-/// Saving memory was successful
-class MemoriesSaveSuccess extends MemoriesState {
-  final Memory memory;
-  MemoriesSaveSuccess(this.memory);
+// /// Saving memory was successful
+// class MemoriesSaveSuccess extends MemoriesState {
+//   final Memory memory;
+//   MemoriesSaveSuccess(this.memory);
 
-  @override
-  List<Object> get props => [this.memory];
-}
+//   @override
+//   List<Object> get props => [this.memory];
+// }
 
-/// Failed saving a memory
-class MemoriesSaveFailure extends MemoriesState {
-  final String errorCode;
-  MemoriesSaveFailure(this.errorCode);
+// /// Failed saving a memory
+// class MemoriesSaveFailure extends MemoriesState {
+//   final String errorCode;
+//   MemoriesSaveFailure(this.errorCode);
 
-  @override
-  List<Object> get props => [this.errorCode];
-}
+//   @override
+//   List<Object> get props => [this.errorCode];
+// }
 
 // part of 'memories_bloc.dart';
 

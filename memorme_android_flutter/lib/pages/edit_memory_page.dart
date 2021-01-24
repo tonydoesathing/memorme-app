@@ -118,13 +118,15 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                   });
                 }),
             actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.check),
-                onPressed: () {
-                  // save
-                  _checkCanSave(state.memory);
-                },
-              ),
+              // only display if it's been edited in some form
+              if (state.memory != state.initialMemory)
+                IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: () {
+                    // save
+                    _checkCanSave(state.memory);
+                  },
+                ),
             ],
           ),
           // check to see if user is going back and trying to discard

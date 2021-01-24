@@ -27,13 +27,11 @@ class DisplayMemoriesGrid extends StatelessWidget {
           onPressed: () {
             //display memory UI
             Navigator.pushNamed(context, '/edit_memory',
-                arguments: EditMemoryArguments(onSave: (memory) {
-              BlocProvider.of<MemoriesBloc>(context).add(MemoriesLoaded(true));
-            }));
+                arguments: EditMemoryArguments(onSave: (memory) {}));
           },
           child: Icon(Icons.add),
         ),
-        body: BlocBuilder(
+        body: BlocConsumer(
           cubit: BlocProvider.of<MemoriesBloc>(context),
           builder: (context, state) {
             if (state is MemoriesInitial) {
@@ -44,18 +42,7 @@ class DisplayMemoriesGrid extends StatelessWidget {
                   height: 100,
                 ),
               );
-            } else if (state is MemoriesLoadInProgress) {
-              // loading memories
-              // render what memories we have
-              return MemoriesGrid(
-                memories: state.memories,
-                onTileTap: (memory, index) {
-                  //navigate to listview display
-                  Navigator.pushNamed(context, '/display_memory_list',
-                      arguments: MemoriesListArguments(index));
-                },
-              );
-            } else if (state is MemoriesLoadSuccess) {
+            } else {
               // memories have been loaded
               // render what memories we have
               return MemoriesGrid(
@@ -69,27 +56,16 @@ class DisplayMemoriesGrid extends StatelessWidget {
                   // load more memories if there are more
                   if (!state.hasReachedMax) {
                     BlocProvider.of<MemoriesBloc>(context)
-                        .add(MemoriesLoaded(false));
+                        .add(MemoriesBlocLoadMemories(false));
                   }
                 },
               );
-            } else if (state is MemoriesLoadFailure) {
-              // error in loading memories
-              print(state.errorCode);
-              // render what memories we have
-              return MemoriesGrid(
-                memories: state.memories,
-                onTileTap: (memory, index) {
-                  //navigate to listview display
-                  Navigator.pushNamed(context, '/display_memory_list',
-                      arguments: MemoriesListArguments(index));
-                },
-              );
             }
-            // catches all others
-            return Container(
-              child: Text(state.toString()),
-            );
+          },
+          listener: (context, state) {
+            if (state is MemoriesLoadFailure) {
+              print(state.errorCode);
+            }
           },
         ));
   }

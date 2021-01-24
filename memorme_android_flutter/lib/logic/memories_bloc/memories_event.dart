@@ -7,36 +7,18 @@ abstract class MemoriesEvent extends Equatable {
   List<Object> get props => [];
 }
 
-/// Add [memory] to [memories]
-class MemoriesMemoryAdded extends MemoriesEvent {
-  final Memory memory;
-  const MemoriesMemoryAdded(this.memory);
-
-  @override
-  List<Object> get props => [this.memory];
-}
-
-/// Remove [memory] from [memories]
-class MemoriesMemoryRemoved extends MemoriesEvent {
-  final Memory memory;
-  const MemoriesMemoryRemoved(this.memory);
-
-  @override
-  List<Object> get props => [this.memory];
-}
-
 /// Update [memory] in [memories]
-class MemoriesMemoryUpdated extends MemoriesEvent {
+class MemoriesBlocUpdateMemory extends MemoriesEvent {
   final Memory memory;
-  const MemoriesMemoryUpdated(this.memory);
+  const MemoriesBlocUpdateMemory(this.memory);
 
   @override
   List<Object> get props => [this.memory];
 }
 
 /// Fetch [memories] from optional [fromStart]
-class MemoriesLoaded extends MemoriesEvent {
+class MemoriesBlocLoadMemories extends MemoriesEvent {
   final bool fromStart;
 
-  MemoriesLoaded(this.fromStart);
+  MemoriesBlocLoadMemories(this.fromStart);
 }

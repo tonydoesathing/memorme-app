@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'memory_display.dart';
 
 class MemoriesListArguments {
@@ -36,9 +37,12 @@ class MemoriesList extends StatefulWidget {
   /// takes an [index] and a [max]
   final Function(int index, int max) onPageChanged;
 
-  MemoriesList(
-      {Key key, List<Memory> memories, this.focusedIndex, this.onPageChanged})
-      : memories = memories ?? const [],
+  MemoriesList({
+    Key key,
+    List<Memory> memories,
+    this.focusedIndex,
+    this.onPageChanged,
+  })  : memories = memories ?? const [],
         super(key: key);
 
   @override
@@ -63,7 +67,11 @@ class _MemoriesListState extends State<MemoriesList> {
       itemCount: widget.memories.length,
       itemBuilder: (context, index) {
         return ListView(
-          children: [MemoryDisplay(widget.memories[index])],
+          children: [
+            MemoryDisplay(
+              widget.memories[index],
+            )
+          ],
         );
       },
       onPageChanged: (index) => this.widget.onPageChanged == null

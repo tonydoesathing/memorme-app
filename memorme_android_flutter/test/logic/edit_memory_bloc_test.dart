@@ -5,10 +5,13 @@ import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/logic/edit_memory_bloc/edit_memory_bloc.dart';
+import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 class MockMemoryRepository extends Mock implements LocalMemoryRepository {}
+
+class MockMemoriesBloc extends Mock implements MemoriesBloc {}
 
 main() {
   group("EditMemoryBloc Test >", () {
@@ -32,7 +35,7 @@ main() {
     setUp(() {
       memoryRepository = MockMemoryRepository();
 
-      editMemoryBloc = EditMemoryBloc(memoryRepository);
+      editMemoryBloc = EditMemoryBloc(memoryRepository, new MockMemoriesBloc());
     });
 
     test("Not passing in a memory should create an empty memory", () async {
@@ -42,7 +45,7 @@ main() {
 
     test("Passing in a memory should return an initial state with that memory",
         () async {
-      editMemoryBloc = EditMemoryBloc(memoryRepository,
+      editMemoryBloc = EditMemoryBloc(memoryRepository, new MockMemoriesBloc(),
           memory: Memory(
               id: 5,
               dateCreated: 15,

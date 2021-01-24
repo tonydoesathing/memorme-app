@@ -25,66 +25,41 @@ class DisplayMemoriesList extends StatelessWidget {
           onPressed: () {
             //display memory UI
             Navigator.pushNamed(context, '/edit_memory',
-                arguments: EditMemoryArguments(onSave: (memory) {
-              BlocProvider.of<MemoriesBloc>(context).add(MemoriesLoaded(true));
-            }));
+                arguments: EditMemoryArguments(onSave: (memory) {}));
           },
           child: Icon(Icons.add),
         ),
-        body: BlocBuilder(
-            cubit: BlocProvider.of<MemoriesBloc>(context),
-            builder: (context, state) {
-              if (state is MemoriesInitial) {
-                return Center(
-                  child: LoadingIndicator(
-                    width: 100,
-                    height: 100,
-                  ),
-                );
-              } else if (state is MemoriesLoadInProgress) {
-                return MemoriesList(
-                  memories: state.memories,
-                  focusedIndex: focusedIndex ?? 0,
-                  onPageChanged: (index, max) {
-                    // if we're near the end of the memories list we have (the next memory is the last one)
-                    // and we know there are more memories
-                    // load the next set of memories
-                    if (index == max - 2 && !state.hasReachedMax) {
-                      BlocProvider.of<MemoriesBloc>(context)
-                          .add(MemoriesLoaded(false));
-                    }
-                  },
-                );
-              } else if (state is MemoriesLoadSuccess) {
-                return MemoriesList(
-                  memories: state.memories,
-                  focusedIndex: focusedIndex ?? 0,
-                  onPageChanged: (index, max) {
-                    // if we're near the end of the memories list we have (the next memory is the last one)
-                    // and we know there are more memories
-                    // load the next set of memories
-                    if (index == max - 2 && !state.hasReachedMax) {
-                      BlocProvider.of<MemoriesBloc>(context)
-                          .add(MemoriesLoaded(false));
-                    }
-                  },
-                );
-              } else if (state is MemoriesLoadFailure) {
-                print("memories failure: ${state.errorCode}");
-                return MemoriesList(
-                  memories: state.memories,
-                  focusedIndex: focusedIndex ?? 0,
-                  onPageChanged: (index, max) {
-                    // if we're near the end of the memories list we have (the next memory is the last one)
-                    // and we know there are more memories
-                    // load the next set of memories
-                    if (index == max - 2 && !state.hasReachedMax) {
-                      BlocProvider.of<MemoriesBloc>(context)
-                          .add(MemoriesLoaded(false));
-                    }
-                  },
-                );
-              }
-            }));
+        body: BlocConsumer(
+          cubit: BlocProvider.of<MemoriesBloc>(context),
+          builder: (context, state) {
+            if (state is MemoriesInitial) {
+              return Center(
+                child: LoadingIndicator(
+                  width: 100,
+                  height: 100,
+                ),
+              );
+            } else {
+              return MemoriesList(
+                memories: state.memories,
+                focusedIndex: focusedIndex ?? 0,
+                onPageChanged: (index, max) {
+                  // if we're near the end of the memories list we have (the next memory is the last one)
+                  // and we know there are more memories
+                  // load the next set of memories
+                  if (index == max - 2 && !state.hasReachedMax) {
+                    BlocProvider.of<MemoriesBloc>(context)
+                        .add(MemoriesBlocLoadMemories(false));
+                  }
+                },
+              );
+            }
+          },
+          listener: (context, state) {
+            if (state is MemoriesLoadFailure) {
+              print(state.errorCode);
+            }
+          },
+        ));
   }
 }
