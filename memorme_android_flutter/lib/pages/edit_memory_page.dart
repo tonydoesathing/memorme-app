@@ -131,91 +131,139 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
           ),
           // check to see if user is going back and trying to discard
           body: !(state is EditMemoryDiscarded)
-              ? WillPopScope(
-                  onWillPop: () async => await _onPop(state),
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                        // build list of stories
-                        child: ListView.builder(
-                          itemCount: state.memory.stories.length,
-                          itemBuilder: (context, index) {
-                            Story s = state.memory.stories[index];
-                            Widget w = Text("No preview for $s");
-                            if (s.type == StoryType.TEXT_STORY) {
-                              w = TextStoryItem(s);
-                            } else if (s.type == StoryType.PICTURE_STORY) {
-                              w = PictureStoryItem(s);
-                            }
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: w,
-                            );
-                          },
+              ? Container(
+                  color: Colors.grey[200],
+                  child: WillPopScope(
+                    onWillPop: () async => await _onPop(state),
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          // build list of stories
+                          child: ListView.builder(
+                            itemCount: state.memory.stories.length,
+                            itemBuilder: (context, index) {
+                              Story s = state.memory.stories[index];
+                              Widget w = Text("No preview for $s");
+                              if (s.type == StoryType.TEXT_STORY) {
+                                w = Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextStoryItem(s),
+                                );
+                              } else if (s.type == StoryType.PICTURE_STORY) {
+                                // give the picture a little more padding
+                                w = Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: PictureStoryItem(s),
+                                );
+                              }
+                              return Padding(
+                                // pad the card
+                                // all of them have padding except on the bottom
+                                // then the last card has padding on the bottom
+                                padding: index ==
+                                        state.memory.stories.length - 1
+                                    ? const EdgeInsets.fromLTRB(16, 8, 16, 8)
+                                    : const EdgeInsets.only(
+                                        top: 8.0, left: 16.0, right: 16.0),
+                                child: Card(
+                                  elevation: 2.0,
+                                  child: w,
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            // add photo button
-                            RaisedButton(
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/take_picture',
-                                    arguments: TakePictureArguments((path) {
-                                  _editMemoryBloc.add(EditMemoryBlocAddStory(
-                                      Story(
-                                          dateCreated: DateTime.now()
-                                              .millisecondsSinceEpoch,
-                                          dateLastEdited: DateTime.now()
-                                              .millisecondsSinceEpoch,
-                                          data: path,
-                                          type: StoryType.PICTURE_STORY)));
-                                  Navigator.pop(context);
-                                }));
-                              },
-                              padding: EdgeInsets.all(8),
-                              child: Column(
-                                children: <Widget>[
-                                  Icon(Icons.add_a_photo),
-                                  Text("Add Photo")
-                                ],
-                              ),
-                            ),
-                            // add text button
-                            RaisedButton(
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                    new MaterialPageRoute(builder: (context) {
-                                  return FullscreenTextField(
-                                    text: "",
-                                    onSave: (val) {
+                        Container(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                  begin: Alignment.bottomLeft,
+                                  end: Alignment.topRight,
+                                  // TODO: replace with theme
+                                  colors: [Colors.blue, Colors.blue[200]])),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                // add photo button
+                                RaisedButton(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, '/take_picture',
+                                        arguments: TakePictureArguments((path) {
                                       _editMemoryBloc.add(
                                           EditMemoryBlocAddStory(Story(
                                               dateCreated: DateTime.now()
                                                   .millisecondsSinceEpoch,
                                               dateLastEdited: DateTime.now()
                                                   .millisecondsSinceEpoch,
-                                              data: val,
-                                              type: StoryType.TEXT_STORY)));
-                                    },
-                                  );
-                                }));
-                              },
-                              padding: EdgeInsets.all(8),
-                              child: Column(
-                                children: <Widget>[
-                                  Icon(Icons.add_comment),
-                                  Text("Add Text")
-                                ],
-                              ),
+                                              data: path,
+                                              type: StoryType.PICTURE_STORY)));
+                                      Navigator.pop(context);
+                                    }));
+                                  },
+                                  padding: EdgeInsets.all(8),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.add_a_photo,
+                                        color: Colors.blue,
+                                      ),
+                                      Text(
+                                        "Add Photo",
+                                        style: TextStyle(color: Colors.blue),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                // add text button
+                                RaisedButton(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        new MaterialPageRoute(
+                                            builder: (context) {
+                                      return FullscreenTextField(
+                                        text: "",
+                                        onSave: (val) {
+                                          _editMemoryBloc.add(
+                                              EditMemoryBlocAddStory(Story(
+                                                  dateCreated: DateTime.now()
+                                                      .millisecondsSinceEpoch,
+                                                  dateLastEdited: DateTime.now()
+                                                      .millisecondsSinceEpoch,
+                                                  data: val,
+                                                  type: StoryType.TEXT_STORY)));
+                                        },
+                                      );
+                                    }));
+                                  },
+                                  padding: EdgeInsets.all(8),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.add_comment,
+                                        color: Colors.blue,
+                                      ),
+                                      Text(
+                                        "Add Text",
+                                        style: TextStyle(color: Colors.blue),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      )
-                    ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 )
               : Container(),
