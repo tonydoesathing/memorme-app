@@ -108,7 +108,8 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Make Memory'),
+            iconTheme: IconThemeData(color: Theme.of(context).accentColor),
+            title: Text('Make Memory', style: TextStyle(color: Theme.of(context).accentColor)),
             leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
@@ -178,8 +179,7 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                               gradient: LinearGradient(
                                   begin: Alignment.bottomLeft,
                                   end: Alignment.topRight,
-                                  // TODO: replace with theme
-                                  colors: [Colors.blue, Colors.blue[200]])),
+                                  colors: [Theme.of(context).accentColor, Colors.blue[200]])),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -211,11 +211,11 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                                     children: <Widget>[
                                       Icon(
                                         Icons.add_a_photo,
-                                        color: Colors.blue,
+                                        color: Theme.of(context).accentColor,
                                       ),
                                       Text(
                                         "Add Photo",
-                                        style: TextStyle(color: Colors.blue),
+                                        style: TextStyle(color: Theme.of(context).accentColor),
                                       )
                                     ],
                                   ),
@@ -249,11 +249,11 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                                     children: <Widget>[
                                       Icon(
                                         Icons.add_comment,
-                                        color: Colors.blue,
+                                        color: Theme.of(context).accentColor,
                                       ),
                                       Text(
                                         "Add Text",
-                                        style: TextStyle(color: Colors.blue),
+                                        style: TextStyle(color: Theme.of(context).accentColor),
                                       )
                                     ],
                                   ),

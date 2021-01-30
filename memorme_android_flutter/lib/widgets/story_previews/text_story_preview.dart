@@ -14,7 +14,17 @@ class TextStoryPreview extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return Container(
-        child: Text(textStory.data, style: TextStyle(color: Colors.blue, fontSize: 20))
-      );
+      child: Card(
+        margin: EdgeInsetsDirectional.fromSTEB(15, 8, 15, 8), 
+        child: Container(
+          color: Colors.lightBlue[50],
+          padding: EdgeInsetsDirectional.only(start: 10, end: 10),
+          child: Text(
+            textStory.data, 
+            style: TextStyle(color: Colors.black, fontSize: 12),
+            overflow: TextOverflow.fade)
+        )
+      )
+    );
   }
 }

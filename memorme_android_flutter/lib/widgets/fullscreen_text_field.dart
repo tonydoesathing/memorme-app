@@ -36,7 +36,8 @@ class _FullscreenTextFieldState extends State<FullscreenTextField> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: widget.text != null ? Text("Edit Story") : Text("New Story"),
+        iconTheme: IconThemeData(color: Theme.of(context).accentColor),
+        title: widget.text != null ? Text("Edit Story", style: TextStyle(color: Theme.of(context).accentColor)) : Text("New Story", style: TextStyle(color: Theme.of(context).accentColor)),
         actions: <Widget>[
           IconButton(
             key: Key('Check_icon'),

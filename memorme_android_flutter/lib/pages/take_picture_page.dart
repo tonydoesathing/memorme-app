@@ -79,7 +79,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Take a picture'),
+        iconTheme: IconThemeData(color: Theme.of(context).accentColor),
+        title: Text('Take a picture', style: TextStyle(color: Theme.of(context).accentColor)),
       ),
       body: FutureBuilder(
         future: _initializeControllerFuture,

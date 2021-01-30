@@ -8,10 +8,16 @@ main() {
 class MemorMe extends StatelessWidget {
   final AppRouter _appRouter = AppRouter();
 
+  ThemeData memormeTheme = 
+    ThemeData(
+      primaryColor: Colors.white,
+      accentColor: Colors.blue[400]
+    );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData.light(),
+        theme: memormeTheme,
         debugShowCheckedModeBanner: false,
         onGenerateRoute: _appRouter.onGenerateRoute);
   }
