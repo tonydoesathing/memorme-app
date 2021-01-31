@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:path/path.dart';
@@ -67,76 +68,156 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   void initState() {
     super.initState();
     _initializeControllerFuture = initCameraController();
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Theme.of(context).accentColor),
-        title: Text('Take a picture', style: TextStyle(color: Theme.of(context).accentColor)),
-      ),
-      body: FutureBuilder(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_controller);
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        key: Key("TakePictureButton"),
-        child: Icon(Icons.camera_alt),
-        onPressed: () async {
-          //try and take the photo then go to the DisplayMemoryPage
-          try {
-            await _initializeControllerFuture;
-            String path = await FileProvider().makeTempMediaPath(".png");
-            //try to save the picture
-            try {
-              await _controller.takePicture(path);
-            } catch (_) {
-              // just print an error; should actually handle it
-              print(_);
-            }
+      body: Column(
+        children: <Widget>[
+          /// holds the camera preview
+          Expanded(
+            /// stack is needed to put the raised button on top
+            child: Stack(
+              children: <Widget>[
+                /// build the camera preview when we get it
+                FutureBuilder(
+                  future: _initializeControllerFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return CameraPreview(_controller);
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
 
-            widget.takePictureCallback(path);
-          } catch (e) {
-            print(e);
-          }
-        },
+                /// place the close button in the top left
+                Positioned(
+                  left: 0,
+                  top: 16,
+                  child: RaisedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    padding: EdgeInsets.all(8),
+                    elevation: 3,
+                    child: Icon(
+                      Icons.close,
+                      color: Theme.of(context).textTheme.button.color,
+                    ),
+                    shape: CircleBorder(),
+                  ),
+                )
+              ],
+            ),
+          ),
+
+          /// action bar at the bottom
+          Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight,
+                    colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).primaryColor.withOpacity(0.4)
+                ])),
+
+            /// place to hold the buttons
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  /// gallery button
+                  FlatButton(
+                    onPressed: () async {
+                      try {
+                        final pickedFile =
+                            await picker.getImage(source: ImageSource.gallery);
+                        widget.takePictureCallback(pickedFile.path);
+                      } catch (e) {
+                        print(e);
+                      }
+                    },
+                    child: Icon(
+                      Icons.photo_library,
+                      color: Theme.of(context).textTheme.button.color,
+                    ),
+                    color: Theme.of(context).buttonColor,
+                    padding: EdgeInsets.all(16),
+                    shape: CircleBorder(),
+                  ),
+
+                  /// take picture button
+                  FlatButton(
+                    onPressed: () async {
+                      //try and take the photo then go to the DisplayMemoryPage
+                      try {
+                        await _initializeControllerFuture;
+                        String path =
+                            await FileProvider().makeTempMediaPath(".png");
+                        //try to save the picture
+                        try {
+                          await _controller.takePicture(path);
+                        } catch (_) {
+                          // just print an error; should actually handle it
+                          print(_);
+                        }
+
+                        widget.takePictureCallback(path);
+                      } catch (e) {
+                        print(e);
+                      }
+                    },
+                    color: Theme.of(context).buttonColor,
+                    padding: EdgeInsets.all(8),
+                    shape: CircleBorder(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          shape: BoxShape.circle),
+                      child: Padding(
+                        padding: EdgeInsets.all(2),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).backgroundColor,
+                              shape: BoxShape.circle),
+                          child: Padding(
+                            padding: EdgeInsets.all(32),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  /// switch camera button
+                  FlatButton(
+                    onPressed: switchCamera,
+                    child: Icon(
+                      Icons.switch_camera,
+                      color: Theme.of(context).textTheme.button.color,
+                    ),
+                    color: Theme.of(context).buttonColor,
+                    padding: EdgeInsets.all(16),
+                    shape: CircleBorder(),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
-      persistentFooterButtons: <Widget>[
-        RaisedButton(
-            key: Key("GalleryButton"),
-            onPressed: () async {
-              try {
-                final pickedFile =
-                    await picker.getImage(source: ImageSource.gallery);
-                widget.takePictureCallback(pickedFile.path);
-              } catch (e) {
-                print(e);
-              }
-            },
-            color: Colors.white,
-            child: Icon(Icons.photo_library, color: Colors.blueAccent)),
-        RaisedButton(
-            key: Key("SwitchCameraButton"),
-            onPressed: switchCamera,
-            color: Colors.black,
-            child: Icon(
-              Icons.switch_camera,
-              color: Colors.white,
-            ))
-      ],
     );
   }
 }

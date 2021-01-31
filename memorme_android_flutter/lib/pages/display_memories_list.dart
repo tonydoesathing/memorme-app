@@ -17,10 +17,7 @@ class DisplayMemoriesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: Theme.of(context).accentColor),
-          title: Text("Memories", style: TextStyle(color: Theme.of(context).accentColor)),
-        ),
+        appBar: AppBar(),
         floatingActionButton: FloatingActionButton(
           key: Key("AddMemoryFAB"),
           onPressed: () {

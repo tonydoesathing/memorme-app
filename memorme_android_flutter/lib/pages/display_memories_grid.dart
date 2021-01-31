@@ -20,7 +20,9 @@ class DisplayMemoriesGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Home", style: TextStyle(color: Theme.of(context).accentColor)),
+          title: Text(
+            "Home",
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           key: Key("AddMemoryFAB"),

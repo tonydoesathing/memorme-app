@@ -35,9 +35,10 @@ class _FullscreenTextFieldState extends State<FullscreenTextField> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Theme.of(context).accentColor),
-        title: widget.text != null ? Text("Edit Story", style: TextStyle(color: Theme.of(context).accentColor)) : Text("New Story", style: TextStyle(color: Theme.of(context).accentColor)),
+        backgroundColor: Colors.white,
+        title: widget.text != null ? Text("Edit Story") : Text("New Story"),
         actions: <Widget>[
           IconButton(
             key: Key('Check_icon'),
@@ -56,13 +57,14 @@ class _FullscreenTextFieldState extends State<FullscreenTextField> {
               child: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(8),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
               key: Key('Textfield'),
               controller: _controller,
               autofocus: true,
               maxLines: null,
               autocorrect: true,
+              style: Theme.of(context).textTheme.bodyText2,
             ),
           )
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/presentation/router/app_router.dart';
+import 'package:memorme_android_flutter/presentation/theme/memorme_theme.dart';
 
 main() {
   runApp(MemorMe());
@@ -8,16 +9,10 @@ main() {
 class MemorMe extends StatelessWidget {
   final AppRouter _appRouter = AppRouter();
 
-  ThemeData memormeTheme = 
-    ThemeData(
-      primaryColor: Colors.white,
-      accentColor: Colors.blue[400]
-    );
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: memormeTheme,
+        theme: MemorMeTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         onGenerateRoute: _appRouter.onGenerateRoute);
   }

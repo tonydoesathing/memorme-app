@@ -108,8 +108,6 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            iconTheme: IconThemeData(color: Theme.of(context).accentColor),
-            title: Text('Make Memory', style: TextStyle(color: Theme.of(context).accentColor)),
             leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
@@ -133,7 +131,6 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
           // check to see if user is going back and trying to discard
           body: !(state is EditMemoryDiscarded)
               ? Container(
-                  color: Colors.grey[200],
                   child: WillPopScope(
                     onWillPop: () async => await _onPop(state),
                     child: Column(
@@ -179,7 +176,10 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                               gradient: LinearGradient(
                                   begin: Alignment.bottomLeft,
                                   end: Alignment.topRight,
-                                  colors: [Theme.of(context).accentColor, Colors.blue[200]])),
+                                  colors: [
+                                Theme.of(context).primaryColor,
+                                Theme.of(context).primaryColor.withOpacity(0.4)
+                              ])),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -211,11 +211,15 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                                     children: <Widget>[
                                       Icon(
                                         Icons.add_a_photo,
-                                        color: Theme.of(context).accentColor,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .button
+                                            .color,
                                       ),
                                       Text(
                                         "Add Photo",
-                                        style: TextStyle(color: Theme.of(context).accentColor),
+                                        style:
+                                            Theme.of(context).textTheme.button,
                                       )
                                     ],
                                   ),
@@ -249,11 +253,15 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                                     children: <Widget>[
                                       Icon(
                                         Icons.add_comment,
-                                        color: Theme.of(context).accentColor,
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .button
+                                            .color,
                                       ),
                                       Text(
                                         "Add Text",
-                                        style: TextStyle(color: Theme.of(context).accentColor),
+                                        style:
+                                            Theme.of(context).textTheme.button,
                                       )
                                     ],
                                   ),

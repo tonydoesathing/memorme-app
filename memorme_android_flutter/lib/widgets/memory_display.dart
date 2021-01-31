@@ -24,7 +24,8 @@ class MemoryDisplay extends StatelessWidget {
                 DateTime.fromMillisecondsSinceEpoch(memory.dateLastEdited)
                     .toIso8601String()),
             trailing: IconButton(
-                icon: Icon(Icons.more_vert, color: Theme.of(context).accentColor),
+                icon: Icon(Icons.more_vert,
+                    color: Theme.of(context).primaryColor),
                 onPressed: () {
                   // maybe make use of https://pub.dev/packages/modal_bottom_sheet
                   showModalBottomSheet(
@@ -35,8 +36,11 @@ class MemoryDisplay extends StatelessWidget {
                         child: Column(
                           children: [
                             ListTile(
-                              leading: Icon(Icons.edit, color: Theme.of(context).accentColor),
-                              title: Text("Edit Memory", style: TextStyle(color: Theme.of(context).accentColor)),
+                              leading: Icon(Icons.edit,
+                                  color: Theme.of(context).primaryColor),
+                              title: Text("Edit Memory",
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor)),
                               onTap: () {
                                 Navigator.pop(context);
                                 Navigator.pushNamed(context, '/edit_memory',
