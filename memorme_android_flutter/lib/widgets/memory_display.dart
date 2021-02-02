@@ -12,6 +12,21 @@ class MemoryDisplay extends StatelessWidget {
 
   const MemoryDisplay(this.memory, {Key key}) : super(key: key);
 
+  parseTime(String datetime){
+    String date = datetime.split('T')[0];
+    String time = datetime.split('T')[1];
+    
+    String year = date.split('-')[0];
+    String month = date.split('-')[1];
+    String day = date.split('-')[2];
+
+    String hour = time.split(':')[0];
+    String minute = time.split(':')[1];
+
+    String parsed = "Last edit at " + hour + ":" + minute + " on " + month + "/" + day + "/" + year;
+    return Text(parsed);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -20,9 +35,10 @@ class MemoryDisplay extends StatelessWidget {
           child: Column(
         children: <Widget>[
           ListTile(
-            title: Text(
-                DateTime.fromMillisecondsSinceEpoch(memory.dateLastEdited)
-                    .toIso8601String()),
+            title: 
+              parseTime(
+                DateTime.fromMillisecondsSinceEpoch(memory.dateLastEdited).toIso8601String()
+              ),
             trailing: IconButton(
                 icon: Icon(Icons.more_vert,
                     color: Theme.of(context).primaryColor),
