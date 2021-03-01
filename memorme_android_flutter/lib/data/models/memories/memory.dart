@@ -1,4 +1,56 @@
 import 'package:equatable/equatable.dart';
+import 'package:memorme_android_flutter/data/models/sql_constants.dart';
+
+class Memory extends Equatable {
+  //final int memoryID;
+  final String memoryTitle;
+  //final int previewStoryID;
+  final int dateCreated;
+  final int dateLastEdited;
+  final int memoryCreateLocation;
+
+  //Memory(this.memoryID, this.memoryTitle, this.previewStoryID, this.dateCreated, this.dateLastEdited, this.memoryCreateLocation);
+  Memory(this.memoryTitle, this.dateCreated, this.dateLastEdited,
+      this.memoryCreateLocation);
+
+  /// creates a [Memory] from an SQL [map]
+  factory Memory.fromMap(Map<String, dynamic> map) {
+    //final int memoryID = map["$id"];
+    final String memoryTitle = map["$title"];
+    //final int previewStoryID = map["$preview_story_fk"];
+    final int dateCreated = map["$date_created"];
+    final int dateLastEdited = map["$date_last_edited"];
+    final int memoryCreateLocation = map["$location"];
+
+    return Memory(
+        //memoryID,
+        memoryTitle,
+        //previewStoryID,
+        dateCreated,
+        dateLastEdited,
+        memoryCreateLocation);
+  }
+
+  /// gives an SQL [map] from the [Memory]
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{
+      //"$id": memoryID,
+      "$title": memoryTitle,
+      //"$preview_story_fk": previewStoryID,
+      "$date_created": dateCreated,
+      "$date_last_edited": dateLastEdited,
+      "$location": memoryCreateLocation
+    };
+    return map;
+  }
+
+  @override
+  // List<Object> get props => [memoryID, memoryTitle, previewStoryID, dateCreated, dateLastEdited, memoryCreateLocation];
+  List<Object> get props =>
+      [memoryTitle, dateCreated, dateLastEdited, memoryCreateLocation];
+}
+
+/*import 'package:equatable/equatable.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 
 const String memoriesTable = "Memories";
@@ -93,3 +145,4 @@ class Memory extends Equatable {
     return "Memory $id - created:$dateCreated edited:$dateLastEdited storyPreviewId:$storyPreviewId stories:$stories";
   }
 }
+*/

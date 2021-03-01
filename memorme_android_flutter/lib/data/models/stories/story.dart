@@ -1,4 +1,67 @@
 import 'package:equatable/equatable.dart';
+import 'package:memorme_android_flutter/data/models/sql_constants.dart';
+
+class Story extends Equatable {
+  //final int storyID;
+  final int memoryFK;
+  final int dateCreated;
+  final int dateLastEdited;
+  final String storyData;
+  final int storyType;
+  final int storyPosition;
+
+  // const Story(this.storyID, this.memoryFK, this.dateCreated, this.dateLastEdited, this.storyData, this.storyType, this.storyPosition);
+  const Story(this.memoryFK, this.dateCreated, this.dateLastEdited,
+      this.storyData, this.storyType, this.storyPosition);
+
+  /// Creates a [Story] from an SQL [map]
+  factory Story.fromMap(Map<String, dynamic> map) {
+    //final int storyID = map["$id"];
+    final int memoryFK = map["$memory_fk"];
+    final int dateCreated = map["$date_created"];
+    final int dateLastEdited = map["$date_last_edited"];
+    final String storyData = map["$data"];
+    final int storyType = map["$type"];
+    final int storyPosition = map["$position"];
+
+    return Story(
+        //storyID,
+        memoryFK,
+        dateCreated,
+        dateLastEdited,
+        storyData,
+        storyType,
+        storyPosition);
+  }
+
+  /// Turns the [Story] into an SQL [map]
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{
+      //"$id": storyID,
+      "$memory_fk": memoryFK,
+      "$date_created": dateCreated,
+      "$date_last_edited": dateLastEdited,
+      "$data": storyData,
+      "$type": storyType,
+      "$position": storyPosition
+    };
+    return map;
+  }
+
+  @override
+  // List<Object> get props => [storyID, memoryFK, dateCreated, dateLastEdited, storyData, storyType, storyPosition];
+  List<Object> get props => [
+        memoryFK,
+        dateCreated,
+        dateLastEdited,
+        storyData,
+        storyType,
+        storyPosition
+      ];
+}
+
+/*
+import 'package:equatable/equatable.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 
 //SQL constants
@@ -84,3 +147,4 @@ class Story extends Equatable {
     return "Story $id - created:$dateCreated edited:$dateLastEdited data:$data type:$type";
   }
 }
+*/
