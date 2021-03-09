@@ -1,150 +1,88 @@
 import 'package:equatable/equatable.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/sql_constants.dart';
 
-class Story extends Equatable {
-  //final int storyID;
-  final int memoryFK;
-  final int dateCreated;
-  final int dateLastEdited;
-  final String storyData;
-  final int storyType;
-  final int storyPosition;
-
-  // const Story(this.storyID, this.memoryFK, this.dateCreated, this.dateLastEdited, this.storyData, this.storyType, this.storyPosition);
-  const Story(this.memoryFK, this.dateCreated, this.dateLastEdited,
-      this.storyData, this.storyType, this.storyPosition);
-
-  /// Creates a [Story] from an SQL [map]
-  factory Story.fromMap(Map<String, dynamic> map) {
-    //final int storyID = map["$id"];
-    final int memoryFK = map["$memory_fk"];
-    final int dateCreated = map["$date_created"];
-    final int dateLastEdited = map["$date_last_edited"];
-    final String storyData = map["$data"];
-    final int storyType = map["$type"];
-    final int storyPosition = map["$position"];
-
-    return Story(
-        //storyID,
-        memoryFK,
-        dateCreated,
-        dateLastEdited,
-        storyData,
-        storyType,
-        storyPosition);
-  }
-
-  /// Turns the [Story] into an SQL [map]
-  Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{
-      //"$id": storyID,
-      "$memory_fk": memoryFK,
-      "$date_created": dateCreated,
-      "$date_last_edited": dateLastEdited,
-      "$data": storyData,
-      "$type": storyType,
-      "$position": storyPosition
-    };
-    return map;
-  }
-
-  @override
-  // List<Object> get props => [storyID, memoryFK, dateCreated, dateLastEdited, storyData, storyType, storyPosition];
-  List<Object> get props => [
-        memoryFK,
-        dateCreated,
-        dateLastEdited,
-        storyData,
-        storyType,
-        storyPosition
-      ];
-}
-
-/*
-import 'package:equatable/equatable.dart';
-import 'package:memorme_android_flutter/data/models/memories/memory.dart';
-
-//SQL constants
-const String storiesTable = "Stories";
-const String storyIdColumn = "story_id";
-const String storyDateCreatedColumn = "date_created";
-const String storyDatedLastEditedColumn = "date_last_edited";
-const String storyDataColumn = "data";
-const String storyTypeColumn = "type";
-
-/// A data representation of a story; a memory is made up of many stories
-///
-/// A story has an [id], the [dateCreated], the [dateLastEdited], the actual [data], and a [type]
-///
-/// Different stories store different [data], and the [type] tells you how to read and write it
+/// A [Story] is a piece of media with an [id], [row_type], [dateCreated], [dateLastEdited], [data], and [position]
+/// It exists within a [Memory].
 class Story extends Equatable {
   final int id;
-  final int dateCreated;
-  final int dateLastEdited;
+  final DateTime dateCreated;
+  final DateTime dateLastEdited;
   final String data;
   final int type;
-  //TODO: make UUID when doing cloud things
-  //final String uuid;
+  final int position;
 
-  /// Creates a story with an [id], the [dateCreated], the [dateLastEdited], the actual [data], and a [type]
-  ///
-  /// Different stories store different [data], and the [type] tells you how to read and write it
   const Story(
-      {this.id, this.dateCreated, this.dateLastEdited, this.data, this.type});
+      {this.id,
+      this.dateCreated,
+      this.dateLastEdited,
+      this.data,
+      this.type,
+      this.position});
 
   /// Creates a [Story] from an SQL [map]
   factory Story.fromMap(Map<String, dynamic> map) {
-    final int id = map[storyIdColumn];
-    final int dateCreated = map[storyDateCreatedColumn];
-    final int dateLastEdited = map[storyDatedLastEditedColumn];
-    final String data = map[storyDataColumn];
-    final int type = map[storyTypeColumn];
+    final int storyID = map["$row_id"];
+    final int dateCreated = map["$date_created"];
+    final int dateLastEdited = map["$date_last_edited"];
+    final String storyData = map["$row_data"];
+    final int storyType = map["$row_type"];
+    final int storyPosition = map["$story_position"];
 
     return Story(
-        id: id,
-        dateCreated: dateCreated,
-        dateLastEdited: dateLastEdited,
-        data: data,
-        type: type);
+      id: storyID,
+      dateCreated: dateCreated != null
+          ? DateTime.fromMillisecondsSinceEpoch(dateCreated)
+          : null,
+      dateLastEdited: dateCreated != null
+          ? DateTime.fromMillisecondsSinceEpoch(dateLastEdited)
+          : null,
+      data: storyData,
+      type: storyType,
+      position: storyPosition,
+    );
   }
 
-  /// Creates a [Story] from an old story
-  factory Story.editStory(Story s, String data, int lastEditedTime) {
+  /// edit an existing [story] with optional parameters
+  factory Story.editStory(
+    Story story, {
+    int id,
+    DateTime dateCreated,
+    DateTime dateLastEdited,
+    String storyData,
+    int storyType,
+    int storyPosition,
+  }) {
     return Story(
-        id: s.id,
-        dateCreated: s.dateCreated,
-        dateLastEdited: lastEditedTime,
-        data: data,
-        type: s.type);
+        id: id ?? story.id,
+        dateCreated: dateCreated ?? story.dateCreated,
+        dateLastEdited: dateLastEdited ?? story.dateLastEdited,
+        data: storyData ?? story.data,
+        type: storyType ?? story.type,
+        position: storyPosition ?? story.position);
   }
 
-  /// Turns the [Story] into an SQL [map]
-  Map<String, dynamic> toMap() {
+  /// Turns the [Story] and its [parent] into an SQL [map]
+  Map<String, dynamic> toMap(Memory parent) {
     var map = <String, dynamic>{
-      storyDateCreatedColumn: dateCreated,
-      storyDatedLastEditedColumn: dateLastEdited,
-      storyDataColumn: data,
-      storyTypeColumn: type
+      "$row_id": id,
+      "$memory_fk": parent.id,
+      "$date_created": dateCreated?.millisecondsSinceEpoch,
+      "$date_last_edited": dateLastEdited?.millisecondsSinceEpoch,
+      "$row_data": data,
+      "$row_type": type,
+      "$story_position": position
     };
-    if (id != null) {
-      map[storyIdColumn] = id;
-    }
-    return map;
-  }
-
-  /// Turns the [Story] into an SQL [map] with a [memoryId]
-  Map<String, dynamic> toMapWithMemoryId(int memoryId) {
-    var map = toMap();
-    map[memoryIdColumn] = memoryId;
     return map;
   }
 
   @override
-  List<Object> get props => [id, dateCreated, dateLastEdited, data, type];
-
-  @override
-  String toString() {
-    return "Story $id - created:$dateCreated edited:$dateLastEdited data:$data type:$type";
-  }
+  List<Object> get props => [
+        id,
+        dateCreated?.millisecondsSinceEpoch,
+        dateLastEdited?.millisecondsSinceEpoch,
+        data,
+        type,
+        position
+      ];
 }
-*/
