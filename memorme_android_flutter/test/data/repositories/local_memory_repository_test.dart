@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
+import 'package:memorme_android_flutter/data/repositories/exceptions/element_does_not_exist_exception.dart';
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:test/test.dart';
 
@@ -11,88 +12,94 @@ main() {
     LocalMemoryRepository repository;
 
     setUp(() {
-      repository = LocalMemoryRepository([]);
+      repository = LocalMemoryRepository();
     });
-    test("Should return empty initial memories list", () {
-      repository
-          .fetchMemories(15, null)
-          .then((memories) => expect(memories, []));
+    test("Should return empty initial memories list", () async {
+      List<Memory> mems = await repository.fetchMemories(5, null);
+      expect(mems, []);
     });
-    test("Should be able to save memories", () {
-      repository
-          .fetchMemories(15, null)
-          .then((memories) => expect(memories, []));
-      int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(id: 1, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
-      repository.saveMemory(memory1);
-      repository
-          .fetchMemories(15, null)
-          .then((memories) => expect(memories[0], memory1));
-      Memory memory2 = Memory(id: 2, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
-      repository.saveMemory(memory2);
-      repository
-          .fetchMemories(15, null)
-          .then((memories) => expect(memories[1], memory2));
+    test("Should be able to save and fetch memories", () async {
+      List<Story> stories = [Story(id: 1), Story(id: 2)];
+      Memory m = Memory(
+          id: 3,
+          title: "meow",
+          previewStory: stories[0],
+          dateCreated: DateTime.now(),
+          dateLastEdited: DateTime.now(),
+          stories: stories);
+      List<Memory> mems = await repository.fetchMemories(5, null);
+      expect(mems, []);
+
+      await repository.saveMemory(m);
+
+      Memory memInRepo = await repository.fetch(m.id);
+      expect(memInRepo, m);
+    });
+
+    test("Saving a memory without an ID should give an ID", () async {
+      Memory m = Memory(
+          title: "test",
+          dateCreated: DateTime.now(),
+          dateLastEdited: DateTime.now());
+      Memory savedMem = await repository.saveMemory(m);
+      expect(savedMem.id, 0);
+      m = Memory.editMemory(m, id: savedMem.id);
+      expect(savedMem, m);
     });
 
     test("Should be able to pageinate memories", () async {
-      final pageSize = 3;
-      List<Memory> memories = await repository.fetchMemories(pageSize, null);
-      expect(memories, []);
-      //add 7 memories
-      List<Memory> addedMems = [];
-      for (int i = 0; i < 7; i++) {
-        int now = DateTime.now().millisecondsSinceEpoch;
-        Story story = Story(id: i, dateCreated: now, dateLastEdited: now, data: "Story #$i", type: StoryType.TEXT_STORY);
-        Memory memory = Memory(id: i, dateCreated: now, dateLastEdited: now, storyPreviewId: i, stories: [story]);
-        addedMems.add(memory);
-        await repository.saveMemory(memory);
+      List<Memory> memories = [];
+      for (int i = 0; i < 10; i++) {
+        Memory savedMem = await repository.saveMemory(Memory(
+            dateCreated: DateTime.now(), dateLastEdited: DateTime.now()));
+        memories.add(savedMem);
       }
-      memories = await repository.fetchMemories(15, null);
-      expect(memories, addedMems);
-      //fetch the first page of memories
-      memories = await repository.fetchMemories(3, null);
-      //should be the first 3
-      expect(memories, addedMems.sublist(0, 3));
-      //fetch the next page of memories
-      memories =
-          await repository.fetchMemories(3, memories[memories.length - 1]);
-      //should be the next 3
-      expect(memories, addedMems.sublist(3, 6));
-      //fetch the last page of memories
-      memories =
-          await repository.fetchMemories(3, memories[memories.length - 1]);
-      //should be the last memory
-      expect(memories, addedMems.sublist(6));
-      //fetch again
-      memories =
-          await repository.fetchMemories(3, memories[memories.length - 1]);
-      //should be an empty list
-      expect(memories, []);
+      memories
+          .sort((a, b) => -1 * a.dateLastEdited.compareTo(b.dateLastEdited));
+      expect(memories, await repository.fetchMemories(10, null));
+      expect(memories.sublist(2, 4),
+          await repository.fetchMemories(2, memories[1]));
+      memories.sort((a, b) => a.dateLastEdited.compareTo(b.dateLastEdited));
+      expect(
+          memories, await repository.fetchMemories(10, null, ascending: true));
     });
 
     test("Should be able to remove memories", () async {
-      List<Memory> memories = await repository.fetchMemories(15, null);
-      expect(memories, []);
+      List<Story> stories = [Story(id: 1), Story(id: 2)];
+      Memory m = Memory(
+          id: 3,
+          title: "meow",
+          previewStory: stories[0],
+          dateCreated: DateTime.now(),
+          dateLastEdited: DateTime.now(),
+          stories: stories);
+      List<Memory> mems = await repository.fetchMemories(5, null);
+      expect(mems, []);
 
-      int now = DateTime.now().millisecondsSinceEpoch;
-      Memory memory1 = Memory(id: 1, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
-      await repository.saveMemory(memory1);
-      memories = await repository.fetchMemories(15, null);
-      expect(memories[0], memory1);
+      await repository.saveMemory(m);
 
-      Memory memory2 = Memory(id: 2, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: []);
-      await repository.saveMemory(memory2);
-      memories = await repository.fetchMemories(15, null);
-      expect(memories[1], memory2);
+      Memory memInRepo = await repository.fetch(m.id);
+      expect(memInRepo, m);
 
-      await repository.removeMemory(memory1);
-      memories = await repository.fetchMemories(15, null);
-      expect(memories[0], memory2);
+      Memory deletedMem = await repository.removeMemory(m);
+      mems = await repository.fetchMemories(5, null);
+      expect(mems, []);
+    });
 
-      await repository.removeMemory(memory2);
-      memories = await repository.fetchMemories(15, null);
-      expect(memories, []);
+    test("Shouldn't be able to remove memories that aren't there", () async {
+      List<Story> stories = [Story(id: 1), Story(id: 2)];
+      Memory m = Memory(
+          id: 3,
+          title: "meow",
+          previewStory: stories[0],
+          dateCreated: DateTime.now(),
+          dateLastEdited: DateTime.now(),
+          stories: stories);
+      List<Memory> mems = await repository.fetchMemories(5, null);
+      expect(mems, []);
+
+      expect(() async => await repository.removeMemory(m),
+          throwsA(isA<ElementNotInStorageException>()));
     });
   });
 }
