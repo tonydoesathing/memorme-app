@@ -59,7 +59,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     }
     _controller = CameraController(
       cameras[activeCamera],
-      ResolutionPreset.medium,
+      ResolutionPreset.high,
     );
     return _controller.initialize();
   }
@@ -169,7 +169,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             await FileProvider().makeTempMediaPath(".png");
                         //try to save the picture
                         try {
-                          await _controller.takePicture(path);
+                          XFile picFile = await _controller.takePicture();
+                          await picFile.saveTo(path);
                         } catch (_) {
                           // just print an error; should actually handle it
                           print(_);

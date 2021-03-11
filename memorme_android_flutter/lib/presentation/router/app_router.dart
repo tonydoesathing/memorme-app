@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/providers/sqlite_db_provider.dart';
+import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/sqlite_memory_repository.dart';
 import 'package:memorme_android_flutter/logic/edit_memory_bloc/edit_memory_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
@@ -12,10 +13,12 @@ import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 
 class AppRouter {
-  final _memoriesBloc = MemoriesBloc(
-      SQLiteMemoryRepository(SQLiteDBProvider.memorMeSQLiteDBProvider()));
+  LocalMemoryRepository _memoryRepository;
+  MemoriesBloc _memoriesBloc;
 
   AppRouter() {
+    _memoryRepository = LocalMemoryRepository();
+    _memoriesBloc = MemoriesBloc(_memoryRepository);
     _memoriesBloc.add(MemoriesBlocLoadMemories(true));
   }
 
@@ -49,9 +52,7 @@ class AppRouter {
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                   create: (context) => EditMemoryBloc(
-                      SQLiteMemoryRepository(
-                          SQLiteDBProvider.memorMeSQLiteDBProvider()),
-                      _memoriesBloc,
+                      _memoryRepository, _memoriesBloc,
                       memory: arguments.memory),
                   child: EditMemoryPage(
                     onSave: arguments.onSave,

@@ -30,7 +30,7 @@ class Memory extends Equatable {
   factory Memory.editMemory(Memory memory,
       {int id,
       String title,
-      int previewStory,
+      Story previewStory,
       DateTime dateLastEdited,
       DateTime dateCreated,
       int createLocation,

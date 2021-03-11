@@ -197,10 +197,8 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                                         arguments: TakePictureArguments((path) {
                                       _editMemoryBloc.add(
                                           EditMemoryBlocAddStory(Story(
-                                              dateCreated: DateTime.now()
-                                                  .millisecondsSinceEpoch,
-                                              dateLastEdited: DateTime.now()
-                                                  .millisecondsSinceEpoch,
+                                              dateCreated: DateTime.now(),
+                                              dateLastEdited: DateTime.now(),
                                               data: path,
                                               type: StoryType.PICTURE_STORY)));
                                       Navigator.pop(context);
@@ -238,10 +236,9 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                                         onSave: (val) {
                                           _editMemoryBloc.add(
                                               EditMemoryBlocAddStory(Story(
-                                                  dateCreated: DateTime.now()
-                                                      .millisecondsSinceEpoch,
-                                                  dateLastEdited: DateTime.now()
-                                                      .millisecondsSinceEpoch,
+                                                  dateCreated: DateTime.now(),
+                                                  dateLastEdited:
+                                                      DateTime.now(),
                                                   data: val,
                                                   type: StoryType.TEXT_STORY)));
                                         },
