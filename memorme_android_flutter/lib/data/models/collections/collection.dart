@@ -130,6 +130,25 @@ class MCRelation extends Equatable {
     );
   }
 
+  factory MCRelation.editMCRelation(
+    MCRelation mcRelation, {
+    int id,
+    int memoryID,
+    int collectionID,
+    String relationshipData,
+    DateTime dateCreated,
+    DateTime dateLastEdited,
+  }) {
+    return MCRelation(
+      id: id ?? mcRelation.id,
+      memoryID: memoryID ?? mcRelation.memoryID,
+      collectionID: collectionID ?? mcRelation.collectionID,
+      relationshipData: relationshipData ?? mcRelation.relationshipData,
+      dateCreated: dateCreated ?? mcRelation.dateCreated,
+      dateLastEdited: dateLastEdited ?? mcRelation.dateLastEdited,
+    );
+  }
+
   /// Turns [MCRelation] into an SQL [map]
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
