@@ -19,6 +19,10 @@ class MemorMeTheme {
                   .headline6
                   .copyWith(color: MemorMeColors.blue))),
 
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          selectedItemColor: MemorMeColors.blue,
+          unselectedItemColor: MemorMeColors.darkGrey),
+
       /// the default background color of some widgets
       backgroundColor: MemorMeColors.background,
 

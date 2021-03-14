@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
+import 'package:memorme_android_flutter/widgets/BottomNavBar.dart';
 import 'package:memorme_android_flutter/widgets/loading_indicator.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
 import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
@@ -24,6 +25,7 @@ class DisplayMemoriesGrid extends StatelessWidget {
             "Home",
           ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           key: Key("AddMemoryFAB"),
           onPressed: () {
@@ -69,6 +71,9 @@ class DisplayMemoriesGrid extends StatelessWidget {
               print(state.errorCode);
             }
           },
+        ),
+        bottomNavigationBar: BottomNavBar(
+          focusedTab: 3,
         ));
   }
 }

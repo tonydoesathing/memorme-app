@@ -18,15 +18,6 @@ class DisplayMemoriesList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(),
-        floatingActionButton: FloatingActionButton(
-          key: Key("AddMemoryFAB"),
-          onPressed: () {
-            //display memory UI
-            Navigator.pushNamed(context, '/edit_memory',
-                arguments: EditMemoryArguments(onSave: (memory) {}));
-          },
-          child: Icon(Icons.add),
-        ),
         body: BlocConsumer(
           cubit: BlocProvider.of<MemoriesBloc>(context),
           builder: (context, state) {
