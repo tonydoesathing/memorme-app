@@ -4,7 +4,9 @@ class BottomNavBar extends StatelessWidget {
   final double height = 60.0;
   final double iconSize = 24.0;
   final int focusedTab;
-  const BottomNavBar({Key key, this.focusedTab = 0}) : super(key: key);
+  final ValueChanged<int> onPressed;
+  const BottomNavBar({Key key, this.focusedTab = 0, this.onPressed})
+      : super(key: key);
 
   Widget _buildMiddleTabItem() {
     return Expanded(
@@ -23,7 +25,6 @@ class BottomNavBar extends StatelessWidget {
     BuildContext context,
     IconData icon,
     int index,
-    ValueChanged<int> onPressed,
   }) {
     Color color = focusedTab == index
         ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor
@@ -34,7 +35,7 @@ class BottomNavBar extends StatelessWidget {
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            onTap: () => onPressed(index),
+            onTap: () => onPressed != null ? onPressed(index) : null,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -59,34 +60,22 @@ class BottomNavBar extends StatelessWidget {
             context: context,
             icon: Icons.home,
             index: 0,
-            onPressed: (value) {
-              print(value.toString() + " HOME");
-            },
           ),
           _buildTabItem(
             context: context,
             icon: Icons.search,
             index: 1,
-            onPressed: (value) {
-              print(value.toString() + " SEARCH");
-            },
           ),
           _buildMiddleTabItem(),
           _buildTabItem(
             context: context,
             icon: Icons.collections,
             index: 2,
-            onPressed: (value) {
-              print(value.toString() + " COLLECTIONS");
-            },
           ),
           _buildTabItem(
             context: context,
             icon: Icons.batch_prediction,
             index: 3,
-            onPressed: (value) {
-              print(value.toString() + " MEMORIES");
-            },
           )
         ],
       ),

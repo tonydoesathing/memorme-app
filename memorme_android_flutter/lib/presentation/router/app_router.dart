@@ -6,9 +6,13 @@ import 'package:memorme_android_flutter/data/repositories/local_memory_repositor
 import 'package:memorme_android_flutter/data/repositories/sqlite_memory_repository.dart';
 import 'package:memorme_android_flutter/logic/edit_memory_bloc/edit_memory_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
-import 'package:memorme_android_flutter/pages/display_memories_grid.dart';
+import 'package:memorme_android_flutter/pages/TopLevelPage.dart';
+import 'package:memorme_android_flutter/pages/collections_page.dart';
+import 'package:memorme_android_flutter/pages/memories_page.dart';
 import 'package:memorme_android_flutter/pages/display_memories_list.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
+import 'package:memorme_android_flutter/pages/home_page.dart';
+import 'package:memorme_android_flutter/pages/search_page.dart';
 import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 
@@ -28,7 +32,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
             value: _memoriesBloc,
-            child: DisplayMemoriesGrid(),
+            child: TopLevelPage(),
           ),
         );
       case '/display_memory_list':

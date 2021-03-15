@@ -65,6 +65,7 @@ class _MemoriesGridState extends State<MemoriesGrid> {
     return Padding(
         padding: EdgeInsets.only(top: 3),
         child: GridView.builder(
+          padding: EdgeInsets.zero,
           itemCount: widget.memories.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3, mainAxisSpacing: 3, crossAxisSpacing: 3),
