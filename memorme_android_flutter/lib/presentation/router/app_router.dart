@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/providers/sqlite_db_provider.dart';
+import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/local_collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/sqlite_memory_repository.dart';
+import 'package:memorme_android_flutter/logic/edit_collection_bloc/edit_collection_bloc.dart';
 import 'package:memorme_android_flutter/logic/edit_memory_bloc/edit_memory_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
-import 'package:memorme_android_flutter/pages/TopLevelPage.dart';
+import 'package:memorme_android_flutter/pages/top_level_page.dart';
 import 'package:memorme_android_flutter/pages/collections_page.dart';
+import 'package:memorme_android_flutter/pages/edit_collection_page.dart';
 import 'package:memorme_android_flutter/pages/memories_page.dart';
 import 'package:memorme_android_flutter/pages/display_memories_list.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
@@ -17,11 +22,14 @@ import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 
 class AppRouter {
-  LocalMemoryRepository _memoryRepository;
+  MemoryRepository _memoryRepository;
+  CollectionRepository _collectionRepository;
   MemoriesBloc _memoriesBloc;
 
   AppRouter() {
     _memoryRepository = LocalMemoryRepository();
+    _collectionRepository = LocalCollectionRepository();
+
     _memoriesBloc = MemoriesBloc(_memoryRepository);
     _memoriesBloc.add(MemoriesBlocLoadMemories(true));
   }
@@ -59,6 +67,17 @@ class AppRouter {
                       _memoryRepository, _memoriesBloc,
                       memory: arguments.memory),
                   child: EditMemoryPage(
+                    onSave: arguments.onSave,
+                  ),
+                ));
+
+      case '/edit_collection':
+        EditCollectionArguments arguments = settings.arguments;
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                  create: (context) => EditCollectionBloc(_collectionRepository,
+                      collection: arguments.collection),
+                  child: EditCollectionPage(
                     onSave: arguments.onSave,
                   ),
                 ));
