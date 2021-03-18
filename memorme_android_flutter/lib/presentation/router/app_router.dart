@@ -75,8 +75,10 @@ class AppRouter {
         EditCollectionArguments arguments = settings.arguments;
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                  create: (context) => EditCollectionBloc(_collectionRepository,
-                      collection: arguments.collection),
+                  create: (context) => EditCollectionBloc(
+                      _collectionRepository, _memoryRepository,
+                      collection: arguments.collection)
+                    ..add(EditCollectionBlocLoadCollection()),
                   child: EditCollectionPage(
                     onSave: arguments.onSave,
                   ),

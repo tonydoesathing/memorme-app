@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/pages/edit_collection_page.dart';
 import 'package:memorme_android_flutter/widgets/BottomNavBar.dart';
 
@@ -21,10 +22,11 @@ class CollectionsPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, '/edit_collection',
                     arguments: EditCollectionArguments(
-                  onSave: (collection) {
-                    print(collection);
-                  },
-                ));
+                      collection: Collection(),
+                      onSave: (collection) {
+                        print("New collection: $collection");
+                      },
+                    ));
               },
             )
           ],
