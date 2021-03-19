@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/collections_page.dart';
 import 'package:memorme_android_flutter/pages/home_page.dart';
@@ -46,7 +47,10 @@ class _TopLevelPageState extends State<TopLevelPage> {
             // these are our main pages
             HomePage(),
             SearchPage(),
-            CollectionsPage(),
+            BlocProvider.value(
+              value: BlocProvider.of<CollectionsBloc>(context),
+              child: CollectionsPage(),
+            ),
             BlocProvider.value(
               value: BlocProvider.of<MemoriesBloc>(context),
               child: MemoriesPage(),

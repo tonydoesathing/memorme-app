@@ -7,6 +7,7 @@ import 'package:memorme_android_flutter/data/repositories/local_collection_repos
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/sqlite_memory_repository.dart';
+import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.dart';
 import 'package:memorme_android_flutter/logic/edit_collection_bloc/edit_collection_bloc.dart';
 import 'package:memorme_android_flutter/logic/edit_memory_bloc/edit_memory_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
@@ -25,6 +26,7 @@ class AppRouter {
   MemoryRepository _memoryRepository;
   CollectionRepository _collectionRepository;
   MemoriesBloc _memoriesBloc;
+  CollectionsBloc _collectionsBloc;
 
   AppRouter() {
     _memoryRepository = LocalMemoryRepository();
@@ -32,17 +34,24 @@ class AppRouter {
 
     _memoriesBloc = MemoriesBloc(_memoryRepository);
     _memoriesBloc.add(MemoriesBlocLoadMemories(true));
+
+    _collectionsBloc =
+        CollectionsBloc(_collectionRepository, _memoryRepository);
+    _collectionsBloc.add(CollectionsBlocLoadCollections(true));
   }
 
   Route onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: _memoriesBloc,
-            child: TopLevelPage(),
-          ),
-        );
+            builder: (_) => MultiBlocProvider(providers: [
+                  BlocProvider.value(
+                    value: _memoriesBloc,
+                  ),
+                  BlocProvider.value(
+                    value: _collectionsBloc,
+                  ),
+                ], child: TopLevelPage()));
       case '/display_memory_list':
         MemoriesListArguments arguments = settings.arguments;
         return MaterialPageRoute(
