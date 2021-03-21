@@ -86,13 +86,13 @@ main() {
     test("Do collection maps work", () {
       Collection c = Collection(id: 1);
       Map mappedC = c.toMap();
-      Collection unmappedC = Collection.fromMap(mappedC, null);
+      Collection unmappedC = Collection.fromMap(mappedC);
       expect(c, unmappedC);
 
       c = Collection(
           id: 1, dateCreated: DateTime.now(), dateLastEdited: DateTime.now());
       mappedC = c.toMap();
-      unmappedC = Collection.fromMap(mappedC, null);
+      unmappedC = Collection.fromMap(mappedC);
       expect(c, unmappedC);
 
       List<MCRelation> mcRelations = [
@@ -108,10 +108,9 @@ main() {
           previewData: "FUCk",
           type: CollectionType.DECK,
           dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          mcRelations: mcRelations);
+          dateLastEdited: DateTime.now());
       mappedC = c.toMap();
-      unmappedC = Collection.fromMap(mappedC, mcRelations);
+      unmappedC = Collection.fromMap(mappedC);
       expect(c, unmappedC);
     });
 

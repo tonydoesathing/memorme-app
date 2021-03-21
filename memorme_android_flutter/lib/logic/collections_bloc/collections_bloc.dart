@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 
@@ -15,7 +16,7 @@ class CollectionsBloc extends Bloc<CollectionsBlocEvent, CollectionsBlocState> {
   static const int pageSize = 5;
 
   CollectionsBloc(this.collectionsRepository, this.memoryRepository)
-      : super(CollectionsLoading(memories: {}));
+      : super(CollectionsLoading(collections: [], collectionsMemories: {}));
 
   @override
   Stream<CollectionsBlocState> mapEventToState(
@@ -30,37 +31,38 @@ class CollectionsBloc extends Bloc<CollectionsBlocEvent, CollectionsBlocState> {
       bool fromStart) async* {
     try {
       yield CollectionsLoading(
-          collections: state.collections, memories: state.memories);
-      List<Collection> newCollections;
-      if (!fromStart) {
-        // if the collection is null or empty, load from the beginning
-        if (state.collections == null || state.collections.isEmpty) {
-          fromStart = true;
-        } else {
-          // else, load the next page
-          List<Collection> page = await collectionsRepository.fetchCollections(
-              pageSize, state.collections.last);
-          newCollections = [...state.collections, ...page];
-        }
-      }
-      if (fromStart) {
-        // replace whatever our current list of collections is with first page
-        newCollections =
-            await collectionsRepository.fetchCollections(pageSize, null);
-      }
-      // load memories into map
+          collections: state.collections,
+          collectionsMemories: state.collectionsMemories);
+      // load collections from beginning if fromStart true or collections.last is null
+      List<Collection> newCollections =
+          await collectionsRepository.fetchCollections(
+              pageSize,
+              fromStart
+                  ? null
+                  : state.collections[state.collections.length - 1]);
+
+      // load memories into collectionsMemories
       for (Collection collection in newCollections) {
-        for (MCRelation mcRelation in collection.mcRelations) {
-          // put memory in map
-          state.memories[mcRelation.memoryID] =
-              await memoryRepository.fetch(mcRelation.memoryID);
+        List<Memory> memories = [];
+        // get the first n mcRelations
+        List<MCRelation> mcRelations = await collectionsRepository
+            .fetchMCRelations(collection, pageSize, null);
+        // load the associated memories into collectionsMemories
+        for (MCRelation mcRelation in mcRelations) {
+          Memory mem = await memoryRepository.fetch(mcRelation.memoryID);
+          memories.add(mem);
         }
+        state.collectionsMemories[collection] = memories;
       }
-      yield CollectionsDisplayed(
-          collections: newCollections, memories: state.memories);
+
+      yield (CollectionsDisplayed(
+          collections:
+              (fromStart ? <Collection>[] : state.collections) + newCollections,
+          collectionsMemories: state.collectionsMemories));
     } catch (_) {
       yield CollectionsError(_,
-          collections: state.collections, memories: state.memories);
+          collections: state.collections,
+          collectionsMemories: state.collectionsMemories);
     }
   }
 }

@@ -7,7 +7,11 @@ abstract class EditCollectionBlocEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class EditCollectionBlocLoadCollection extends EditCollectionBlocEvent {}
+class EditCollectionBlocLoadCollection extends EditCollectionBlocEvent {
+  final fromStart;
+
+  EditCollectionBlocLoadCollection(this.fromStart);
+}
 
 class EditCollectionBlocSaveCollection extends EditCollectionBlocEvent {}
 

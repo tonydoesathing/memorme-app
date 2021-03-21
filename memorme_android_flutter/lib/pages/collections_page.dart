@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.dart';
 import 'package:memorme_android_flutter/pages/edit_collection_page.dart';
+import 'package:memorme_android_flutter/pages/view_collection_page.dart';
 import 'package:memorme_android_flutter/widgets/BottomNavBar.dart';
 import 'package:memorme_android_flutter/widgets/collection/collection_preview.dart';
 
@@ -27,7 +28,7 @@ class CollectionsPage extends StatelessWidget {
                     arguments: EditCollectionArguments(
                       collection: Collection(),
                       onSave: (collection) {
-                        print("New collection: $collection");
+                        print(collection);
                         BlocProvider.of<CollectionsBloc>(context)
                             .add(CollectionsBlocLoadCollections(true));
                       },
@@ -50,7 +51,14 @@ class CollectionsPage extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: CollectionPreview(
                       collection: state.collections[index],
-                      memories: state.memories,
+                      memories:
+                          state.collectionsMemories[state.collections[index]],
+                      onTap: (collection) {
+                        Navigator.pushNamed(context, '/view_collection',
+                            arguments: ViewCollectionArguments(
+                              collection: collection,
+                            ));
+                      },
                     ),
                   );
                 },

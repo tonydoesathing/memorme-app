@@ -51,9 +51,9 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
     );
   }
 
-  void _checkCanSave(Collection collection) {
+  void _checkCanSave(EditCollectionBlocState state) {
     // check to make sure there's everything for a Collection
-    if (collection.mcRelations.length > 0) {
+    if (state.mcRelations.length > 0) {
       _editCollectionBloc.add(EditCollectionBlocSaveCollection());
     } else {
       _showDialog();
@@ -115,11 +115,11 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
                   });
                 }),
             actions: <Widget>[
-              if (state.collection != state.initialCollection)
+              if (state.changed)
                 IconButton(
                     icon: Icon(Icons.check),
                     onPressed: () {
-                      _checkCanSave(state.collection);
+                      _checkCanSave(state);
                     })
             ],
           ),
@@ -138,8 +138,8 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
                       children: [
                         Expanded(
                           child: ListView.builder(
-                            itemCount: state.collection.mcRelations != null
-                                ? state.collection.mcRelations.length + 1
+                            itemCount: state.mcRelations != null
+                                ? state.mcRelations.length + 1
                                 : 1,
                             itemBuilder: (context, index) {
                               if (index == 0) {
@@ -193,7 +193,7 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
                                   padding: const EdgeInsets.only(
                                       bottom: 8.0, left: 8.0, right: 8.0),
                                   child: MemoryPreview(
-                                      memory: state.memories[state.collection
+                                      memory: state.memories[state
                                           .mcRelations[index - 1].memoryID]),
                                 );
                               }

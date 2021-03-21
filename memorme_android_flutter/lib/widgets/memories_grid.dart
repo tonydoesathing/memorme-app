@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
+import 'package:memorme_android_flutter/widgets/memory/memory_preview.dart';
 import 'package:memorme_android_flutter/widgets/story_previews/picture_story_preview.dart';
 import 'package:memorme_android_flutter/widgets/story_previews/text_story_preview.dart';
 
@@ -14,8 +15,13 @@ class MemoriesGrid extends StatefulWidget {
   final List<Memory> memories;
   final void Function(Memory memory, int index) onTileTap;
   final void Function() onScrollHit;
+  final bool Function() shouldCheckScroll;
   const MemoriesGrid(
-      {Key key, List<Memory> memories, this.onTileTap, this.onScrollHit})
+      {Key key,
+      List<Memory> memories,
+      this.onTileTap,
+      this.onScrollHit,
+      this.shouldCheckScroll})
       : memories = memories ?? const [],
         super(key: key);
 
@@ -31,11 +37,14 @@ class _MemoriesGridState extends State<MemoriesGrid> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      final maxScroll = _scrollController.position.maxScrollExtent;
-      final currentScroll = _scrollController.position.pixels;
-      if (maxScroll - currentScroll <= _scrollThreshold) {
-        if (widget.onScrollHit != null) {
-          widget.onScrollHit.call();
+      if (widget.shouldCheckScroll == null || widget.shouldCheckScroll()) {
+        print("checking scroll");
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final currentScroll = _scrollController.position.pixels;
+        if (maxScroll - currentScroll <= _scrollThreshold) {
+          if (widget.onScrollHit != null) {
+            widget.onScrollHit.call();
+          }
         }
       }
     });
@@ -47,19 +56,6 @@ class _MemoriesGridState extends State<MemoriesGrid> {
     super.dispose();
   }
 
-  /// from the memory at [memoryIndex], return its preview
-  Widget _getPreview(int memoryIndex) {
-    Story previewStory = widget.memories[memoryIndex].stories[
-        0]; // the default preview is currenly the first story in the memory
-    if (previewStory.type == StoryType.TEXT_STORY) {
-      return TextStoryPreview(previewStory);
-    } else if (previewStory.type == StoryType.PICTURE_STORY) {
-      return PictureStoryPreview(previewStory);
-    }
-    return Container(
-        child: Text("Need to implement a preview for this story type"));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -68,18 +64,17 @@ class _MemoriesGridState extends State<MemoriesGrid> {
           padding: EdgeInsets.zero,
           itemCount: widget.memories.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, mainAxisSpacing: 3, crossAxisSpacing: 3),
+              crossAxisCount: 2,
+              mainAxisSpacing: 3,
+              crossAxisSpacing: 3,
+              childAspectRatio: 0.85),
           itemBuilder: (context, index) {
-            return GridTile(
-                child: GestureDetector(
-                    onTap: () {
-                      //on tile tap, if callback passed in, call it
-                      this
-                          .widget
-                          .onTileTap
-                          ?.call(widget.memories[index], index);
-                    },
-                    child: _getPreview(index)));
+            return GestureDetector(
+                onTap: () {
+                  //on tile tap, if callback passed in, call it
+                  this.widget.onTileTap?.call(widget.memories[index], index);
+                },
+                child: MemoryPreview(memory: widget.memories[index]));
           },
           controller: _scrollController,
         ));

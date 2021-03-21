@@ -11,7 +11,7 @@ part 'memories_state.dart';
 /// a BLoC for accessing memories
 class MemoriesBloc extends Bloc<MemoriesEvent, MemoriesState> {
   final MemoryRepository repository;
-  static const int pageSize = 18;
+  static const int pageSize = 6;
   MemoriesBloc(this.repository) : super(MemoriesInitial());
 
   @override

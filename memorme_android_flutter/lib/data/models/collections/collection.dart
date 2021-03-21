@@ -9,20 +9,18 @@ class Collection extends Equatable {
   final String title;
   final DateTime dateCreated;
   final DateTime dateLastEdited;
-  final List<MCRelation> mcRelations;
 
-  const Collection(
-      {this.id,
-      this.previewData,
-      this.type,
-      this.title,
-      this.dateCreated,
-      this.dateLastEdited,
-      this.mcRelations});
+  const Collection({
+    this.id,
+    this.previewData,
+    this.type,
+    this.title,
+    this.dateCreated,
+    this.dateLastEdited,
+  });
 
   /// Creates a [Collection] from an SQL [map] and a list of [mcRelations]
-  factory Collection.fromMap(
-      Map<String, dynamic> map, List<MCRelation> mcRelations) {
+  factory Collection.fromMap(Map<String, dynamic> map) {
     final int collectionId = map["$row_id"];
     final String previewData = map["$preview_data"];
     final int collectionType = map["$row_type"];
@@ -31,17 +29,17 @@ class Collection extends Equatable {
     final int dateLastEdited = map["$date_last_edited"];
 
     return Collection(
-        id: collectionId,
-        previewData: previewData,
-        type: collectionType,
-        title: collectionTitle,
-        dateCreated: dateCreated != null
-            ? DateTime.fromMillisecondsSinceEpoch(dateCreated)
-            : null,
-        dateLastEdited: dateLastEdited != null
-            ? DateTime.fromMillisecondsSinceEpoch(dateCreated)
-            : null,
-        mcRelations: mcRelations);
+      id: collectionId,
+      previewData: previewData,
+      type: collectionType,
+      title: collectionTitle,
+      dateCreated: dateCreated != null
+          ? DateTime.fromMillisecondsSinceEpoch(dateCreated)
+          : null,
+      dateLastEdited: dateLastEdited != null
+          ? DateTime.fromMillisecondsSinceEpoch(dateCreated)
+          : null,
+    );
   }
 
   /// Edit an existing [collection] with optional parameters
@@ -53,16 +51,15 @@ class Collection extends Equatable {
     String title,
     DateTime dateCreated,
     DateTime dateLastEdited,
-    List<MCRelation> mcRelations,
   }) {
     return Collection(
-        id: id ?? collection.id,
-        previewData: previewData ?? collection.previewData,
-        type: type ?? collection.type,
-        title: title ?? collection.title,
-        dateCreated: dateCreated ?? collection.dateCreated,
-        dateLastEdited: dateLastEdited ?? collection.dateLastEdited,
-        mcRelations: mcRelations ?? collection.mcRelations);
+      id: id ?? collection.id,
+      previewData: previewData ?? collection.previewData,
+      type: type ?? collection.type,
+      title: title ?? collection.title,
+      dateCreated: dateCreated ?? collection.dateCreated,
+      dateLastEdited: dateLastEdited ?? collection.dateLastEdited,
+    );
   }
 
   /// Turns the [Collection] into an SQL [map]
@@ -86,7 +83,6 @@ class Collection extends Equatable {
         title,
         dateCreated?.millisecondsSinceEpoch,
         dateLastEdited?.millisecondsSinceEpoch,
-        mcRelations
       ];
 }
 

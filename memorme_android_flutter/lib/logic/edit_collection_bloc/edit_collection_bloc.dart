@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
+import 'package:memorme_android_flutter/data/models/collections/collection_type.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
@@ -14,19 +15,23 @@ class EditCollectionBloc
     extends Bloc<EditCollectionBlocEvent, EditCollectionBlocState> {
   final CollectionRepository collectionRepository;
   final MemoryRepository memoryRepository;
+  static const pageSize = 5;
 
   EditCollectionBloc(this.collectionRepository, this.memoryRepository,
       {Collection collection})
       : super(EditCollectionLoading(
-            collection: collection ?? Collection(mcRelations: []),
-            initialCollection: collection ?? Collection(mcRelations: [])));
+            collection: collection ?? Collection(),
+            initialCollection: collection ?? Collection(),
+            changed: false,
+            memories: {},
+            mcRelations: []));
 
   @override
   Stream<EditCollectionBlocState> mapEventToState(
     EditCollectionBlocEvent event,
   ) async* {
     if (event is EditCollectionBlocLoadCollection) {
-      yield* _mapLoadCollectionToState();
+      yield* _mapLoadCollectionToState(event.fromStart);
     } else if (event is EditCollectionBlocSaveCollection) {
       yield* _mapSaveCollectionToState();
     } else if (event is EditCollectionBlocEditTitle) {
@@ -36,56 +41,92 @@ class EditCollectionBloc
     }
   }
 
-  Stream<EditCollectionBlocState> _mapLoadCollectionToState() async* {
+  Stream<EditCollectionBlocState> _mapLoadCollectionToState(
+      bool fromStart) async* {
     try {
+      // say we're loading
       yield EditCollectionLoading(
           collection: state.collection,
           initialCollection: state.initialCollection,
-          memories: state.memories);
-      Collection collection = Collection.editCollection(state.collection);
-      // load memories
-      Map memories = Map();
-      if (collection.mcRelations != null) {
-        for (MCRelation relation in state.collection.mcRelations) {
-          Memory mem = await memoryRepository.fetch(relation.memoryID);
-          memories[mem.id] = mem;
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations);
+
+      List<MCRelation> mcRelations = [];
+
+      // is it new? if not, load, the MCRelations and memories
+      if (state.collection.id != null) {
+        print("Loading existing memory");
+        // load MCRelations
+        mcRelations = await collectionRepository.fetchMCRelations(
+            state.collection,
+            pageSize,
+            fromStart ? null : state.mcRelations[state.mcRelations.length - 1]);
+
+        // load memories
+        for (MCRelation mcRelation in mcRelations) {
+          Memory mem = await memoryRepository.fetch(mcRelation.memoryID);
+          state.memories[mem.id] = mem;
         }
-      } else {
-        collection = Collection.editCollection(collection, mcRelations: []);
       }
-      // display collection
+
       yield EditCollectionDisplayed(
-          collection: collection,
-          initialCollection: collection,
-          memories: memories);
+        collection: state.collection,
+        initialCollection: state.initialCollection,
+        changed: state.changed,
+        mcRelations: state.mcRelations + mcRelations,
+        memories: state.memories,
+      );
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
-          memories: state.memories);
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations);
     }
   }
 
   Stream<EditCollectionBlocState> _mapSaveCollectionToState() async* {
     try {
+      // say we're loading
       yield EditCollectionLoading(
           collection: state.collection,
           initialCollection: state.initialCollection,
-          memories: state.memories);
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations);
+      // save collection
       Collection savedCol = await collectionRepository.saveCollection(
           Collection.editCollection(state.collection,
+              type: CollectionType.DECK,
               dateCreated: state.collection.dateCreated ?? DateTime.now(),
               dateLastEdited: DateTime.now()));
-      print(await collectionRepository.fetchCollections(5, null));
+
+      List<MCRelation> savedMCRelations = [];
+      // save MCRelations
+      for (MCRelation mcRelation in state.mcRelations) {
+        MCRelation savedMCRelation = await collectionRepository.saveMCRelation(
+            MCRelation.editMCRelation(mcRelation,
+                collectionID: savedCol.id,
+                dateCreated: mcRelation.dateCreated ?? DateTime.now(),
+                dateLastEdited: DateTime.now()));
+        savedMCRelations.add(savedMCRelation);
+      }
+
       yield EditCollectionSaved(
           collection: savedCol,
           initialCollection: state.initialCollection,
-          memories: state.memories);
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: savedMCRelations);
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
-          memories: state.memories);
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations);
     }
   }
 
@@ -95,36 +136,45 @@ class EditCollectionBloc
           collection:
               Collection.editCollection(state.collection, title: newTitle),
           initialCollection: state.initialCollection,
-          memories: state.memories);
+          changed: true,
+          memories: state.memories,
+          mcRelations: state.mcRelations);
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
-          memories: state.memories);
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations);
     }
   }
 
   Stream<EditCollectionBlocState> _mapAddMemoryToState(Memory memory) async* {
     try {
-      Map memories = state.memories;
-      memories[memory.id] = memory;
+      // add memory to memories
+      state.memories[memory.id] = memory;
+
+      // add mcrelation to mcrelations
       yield EditCollectionDisplayed(
-          collection: Collection.editCollection(state.collection, mcRelations: [
-            ...state.collection.mcRelations,
-            MCRelation(
-                memoryID: memory.id,
-                relationshipData:
-                    state.collection.mcRelations.length.toString(),
-                dateCreated: DateTime.now(),
-                dateLastEdited: DateTime.now())
-          ]),
+          collection: state.collection,
           initialCollection: state.initialCollection,
-          memories: memories);
+          changed: true,
+          mcRelations: state.mcRelations +
+              [
+                MCRelation(
+                    memoryID: memory.id,
+                    relationshipData: state.mcRelations.length.toString(),
+                    dateCreated: DateTime.now(),
+                    dateLastEdited: DateTime.now())
+              ],
+          memories: state.memories);
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
-          memories: state.memories);
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations);
     }
   }
 }

@@ -2,30 +2,39 @@ part of 'collections_bloc.dart';
 
 abstract class CollectionsBlocState extends Equatable {
   final List<Collection> collections;
-  final Map memories;
+  final Map<Collection, List<Memory>> collectionsMemories;
   const CollectionsBlocState({
     this.collections,
-    this.memories,
+    this.collectionsMemories,
   });
 
   @override
-  List<Object> get props => [this.collections];
+  List<Object> get props => [this.collections, collectionsMemories];
 }
 
 class CollectionsLoading extends CollectionsBlocState {
-  CollectionsLoading({List<Collection> collections, Map memories})
-      : super(collections: collections, memories: memories);
+  CollectionsLoading(
+      {List<Collection> collections,
+      Map<Collection, List<Memory>> collectionsMemories})
+      : super(
+            collections: collections, collectionsMemories: collectionsMemories);
 }
 
 class CollectionsDisplayed extends CollectionsBlocState {
-  CollectionsDisplayed({List<Collection> collections, Map memories})
-      : super(collections: collections, memories: memories);
+  CollectionsDisplayed(
+      {List<Collection> collections,
+      Map<Collection, List<Memory>> collectionsMemories})
+      : super(
+            collections: collections, collectionsMemories: collectionsMemories);
 }
 
 class CollectionsError extends CollectionsBlocState {
   final errorCode;
-  CollectionsError(this.errorCode, {List<Collection> collections, Map memories})
-      : super(collections: collections, memories: memories);
+  CollectionsError(this.errorCode,
+      {List<Collection> collections,
+      Map<Collection, List<Memory>> collectionsMemories})
+      : super(
+            collections: collections, collectionsMemories: collectionsMemories);
 
   @override
   List<Object> get props => [...super.props, errorCode];

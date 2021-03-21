@@ -11,6 +11,7 @@ import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.
 import 'package:memorme_android_flutter/logic/edit_collection_bloc/edit_collection_bloc.dart';
 import 'package:memorme_android_flutter/logic/edit_memory_bloc/edit_memory_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
+import 'package:memorme_android_flutter/logic/view_collection_bloc/view_collection_bloc.dart';
 import 'package:memorme_android_flutter/pages/top_level_page.dart';
 import 'package:memorme_android_flutter/pages/collections_page.dart';
 import 'package:memorme_android_flutter/pages/edit_collection_page.dart';
@@ -20,6 +21,7 @@ import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'package:memorme_android_flutter/pages/home_page.dart';
 import 'package:memorme_android_flutter/pages/search_page.dart';
 import 'package:memorme_android_flutter/pages/take_picture_page.dart';
+import 'package:memorme_android_flutter/pages/view_collection_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 
 class AppRouter {
@@ -87,10 +89,20 @@ class AppRouter {
                   create: (context) => EditCollectionBloc(
                       _collectionRepository, _memoryRepository,
                       collection: arguments.collection)
-                    ..add(EditCollectionBlocLoadCollection()),
+                    ..add(EditCollectionBlocLoadCollection(true)),
                   child: EditCollectionPage(
                     onSave: arguments.onSave,
                   ),
+                ));
+
+      case '/view_collection':
+        ViewCollectionArguments arguments = settings.arguments;
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                  create: (context) => ViewCollectionBloc(_collectionRepository,
+                      _memoryRepository, arguments.collection)
+                    ..add(ViewCollectionBlocLoadMemories(true)),
+                  child: ViewCollectionPage(),
                 ));
     }
   }

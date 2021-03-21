@@ -28,4 +28,24 @@ class SQLiteCollectionRepository extends CollectionRepository {
     // TODO: implement saveCollection
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<MCRelation>> fetchMCRelations(
+      Collection collection, int pageSize, MCRelation lastMCRelation,
+      {bool ascending = false}) {
+    // TODO: implement fetchMCRelations
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<MCRelation> removeMCRelation(MCRelation mcRelation) {
+    // TODO: implement removeMCRelation
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<MCRelation> saveMCRelation(MCRelation mcRelation) {
+    // TODO: implement saveMCRelation
+    throw UnimplementedError();
+  }
 }

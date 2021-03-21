@@ -49,6 +49,10 @@ class MemoriesPage extends StatelessWidget {
                     Navigator.pushNamed(context, '/display_memory_list',
                         arguments: MemoriesListArguments(index));
                   },
+                  shouldCheckScroll: () {
+                    return !(state is MemoriesLoadInProgress) &&
+                        !state.hasReachedMax;
+                  },
                   onScrollHit: () {
                     // load more memories if there are more
                     if (!state.hasReachedMax) {

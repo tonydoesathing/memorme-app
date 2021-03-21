@@ -43,9 +43,10 @@ class LocalCollectionRepository implements CollectionRepository {
 
   @override
   Future<Collection> removeCollection(Collection collection) async {
-    for (MCRelation mcRelation in collection.mcRelations) {
-      _mcRelations.remove(mcRelation);
-    }
+    // remove mcRelations
+    _mcRelations.removeWhere((element) {
+      return element.collectionID == collection.id;
+    });
     bool removed = _collections.remove(collection);
     if (!removed) {
       throw ElementNotInStorageException();
@@ -63,29 +64,6 @@ class LocalCollectionRepository implements CollectionRepository {
           Collection.editCollection(savedCollection, id: _collections.length);
     }
 
-    List<MCRelation> updatedRelations = [];
-    // Update the MCRelations
-    for (MCRelation relation in savedCollection.mcRelations) {
-      // give the relations the collection id
-      MCRelation editedRelation =
-          MCRelation.editMCRelation(relation, collectionID: savedCollection.id);
-      // check to see if relation is in list
-      int indexWhere =
-          _mcRelations.indexWhere((element) => element.id == editedRelation.id);
-      if (indexWhere == -1) {
-        // not in array; add it
-        editedRelation =
-            MCRelation.editMCRelation(editedRelation, id: _mcRelations.length);
-        _mcRelations.add(editedRelation);
-      } else {
-        // in array; update it
-        _mcRelations[indexWhere] = editedRelation;
-      }
-      updatedRelations.add(editedRelation);
-    }
-    savedCollection = Collection.editCollection(savedCollection,
-        mcRelations: updatedRelations);
-
     // check to see if collection is in list and add it if it isn't
     int indexWhere =
         _collections.indexWhere((element) => element.id == savedCollection.id);
@@ -97,5 +75,64 @@ class LocalCollectionRepository implements CollectionRepository {
     }
 
     return savedCollection;
+  }
+
+  @override
+  Future<List<MCRelation>> fetchMCRelations(
+      Collection collection, int pageSize, MCRelation lastMCRelation,
+      {bool ascending = false}) async {
+    // sort the mcRelations in ascending or descending order based on the collection type
+    // for deck, sort according to relationshipData
+    List<MCRelation> collectionsMCRelations = List.from(
+        _mcRelations.where((element) => element.collectionID == collection.id));
+    collectionsMCRelations.sort((a, b) => ascending
+        ? int.parse(a.relationshipData).compareTo(int.parse(b.relationshipData))
+        : -1 *
+            int.parse(a.relationshipData)
+                .compareTo(int.parse(b.relationshipData)));
+
+    int indexOfLastMCRelation = collectionsMCRelations.indexOf(lastMCRelation);
+    if (indexOfLastMCRelation == -1 && lastMCRelation != null) {
+      throw ElementNotInStorageException();
+    }
+
+    int offset = lastMCRelation == null ? 0 : indexOfLastMCRelation + 1;
+    if (offset + pageSize > collectionsMCRelations.length) {
+      // not enough mcRelations left for entire page size;
+      // just reutrn up to last value
+      return collectionsMCRelations.sublist(offset);
+    }
+    // return entire pageSize
+    return collectionsMCRelations.sublist(offset, offset + pageSize);
+  }
+
+  @override
+  Future<MCRelation> saveMCRelation(MCRelation mcRelation) async {
+    MCRelation savedMCRelation = mcRelation;
+    // give id if it doesn't have one
+    if (savedMCRelation.id == null) {
+      savedMCRelation =
+          MCRelation.editMCRelation(savedMCRelation, id: _mcRelations.length);
+    }
+    // if mcRelation in list, update it
+    int indexWhere =
+        _mcRelations.indexWhere((element) => element.id == savedMCRelation.id);
+    if (indexWhere == -1) {
+      _mcRelations.add(savedMCRelation);
+    } else {
+      // update it if it is
+      _mcRelations[indexWhere] = savedMCRelation;
+    }
+
+    return savedMCRelation;
+  }
+
+  @override
+  Future<MCRelation> removeMCRelation(MCRelation mcRelation) async {
+    bool removed = _mcRelations.remove(mcRelation);
+    if (!removed) {
+      throw ElementNotInStorageException();
+    }
+    return mcRelation;
   }
 }
