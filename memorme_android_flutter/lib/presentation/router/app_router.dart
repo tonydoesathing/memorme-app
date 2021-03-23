@@ -22,6 +22,7 @@ import 'package:memorme_android_flutter/pages/home_page.dart';
 import 'package:memorme_android_flutter/pages/search_page.dart';
 import 'package:memorme_android_flutter/pages/take_picture_page.dart';
 import 'package:memorme_android_flutter/pages/view_collection_page.dart';
+import 'package:memorme_android_flutter/pages/view_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 
 class AppRouter {
@@ -54,6 +55,13 @@ class AppRouter {
                     value: _collectionsBloc,
                   ),
                 ], child: TopLevelPage()));
+      case '/view_memory':
+        ViewMemoryPageArguments arguments = settings.arguments;
+        return MaterialPageRoute(
+          builder: (context) {
+            return ViewMemoryPage(arguments.memory);
+          },
+        );
       case '/display_memory_list':
         MemoriesListArguments arguments = settings.arguments;
         return MaterialPageRoute(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
+import 'package:memorme_android_flutter/pages/view_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/BottomNavBar.dart';
 import 'package:memorme_android_flutter/widgets/loading_indicator.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
@@ -46,8 +47,10 @@ class MemoriesPage extends StatelessWidget {
                   memories: state.memories,
                   onTileTap: (memory, index) {
                     //navigate to listview display
-                    Navigator.pushNamed(context, '/display_memory_list',
-                        arguments: MemoriesListArguments(index));
+                    // Navigator.pushNamed(context, '/display_memory_list',
+                    //     arguments: MemoriesListArguments(index));
+                    Navigator.pushNamed(context, "/view_memory",
+                        arguments: ViewMemoryPageArguments(memory));
                   },
                   shouldCheckScroll: () {
                     return !(state is MemoriesLoadInProgress) &&

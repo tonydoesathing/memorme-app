@@ -4,6 +4,7 @@ import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
+import 'package:memorme_android_flutter/presentation/theme/memorme_colors.dart';
 import 'package:memorme_android_flutter/widgets/story_items/picture_story_item.dart';
 import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart';
 
@@ -23,66 +24,88 @@ class MemoryDisplay extends StatelessWidget {
     String hour = time.split(':')[0];
     String minute = time.split(':')[1];
 
-    String parsed = "Last edit at " +
-        hour +
-        ":" +
-        minute +
-        " on " +
-        month +
-        "/" +
-        day +
-        "/" +
-        year;
-    return Text(parsed);
+    String parsed = month + "/" + day + "/" + year;
+    return parsed;
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
       child: Card(
           child: Column(
         children: <Widget>[
-          ListTile(
-            title: parseTime(memory.dateLastEdited.toIso8601String()),
-            trailing: IconButton(
-                icon: Icon(Icons.more_vert,
-                    color: Theme.of(context).primaryColor),
-                onPressed: () {
-                  // maybe make use of https://pub.dev/packages/modal_bottom_sheet
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return Container(
-                        height: 200,
-                        child: Column(
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.edit,
-                                  color: Theme.of(context).primaryColor),
-                              title: Text("Edit Memory",
-                                  style: TextStyle(
-                                      color: Theme.of(context).primaryColor)),
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.pushNamed(context, '/edit_memory',
-                                    arguments:
-                                        EditMemoryArguments(memory: memory));
-                              },
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                }),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Text(
+                this.memory.title ??
+                    parseTime(memory.dateLastEdited.toIso8601String()),
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ),
           ),
-          Divider(),
+          // ListTile(
+          //   title: Text(
+          //     this.memory.title ??
+          //         parseTime(memory.dateLastEdited.toIso8601String()),
+          //     style: Theme.of(context).textTheme.headline6,
+          //   ),
+          //   trailing: IconButton(
+          //       icon: Icon(Icons.more_vert,
+          //           color: Theme.of(context).primaryColor),
+          //       onPressed: () {
+          //         // maybe make use of https://pub.dev/packages/modal_bottom_sheet
+          //         showModalBottomSheet(
+          //           context: context,
+          //           builder: (context) {
+          //             return Container(
+          //               height: 200,
+          //               child: Column(
+          //                 children: [
+          //                   ListTile(
+          //                     leading: Icon(Icons.edit,
+          //                         color: Theme.of(context).primaryColor),
+          //                     title: Text("Edit Memory",
+          //                         style: TextStyle(
+          //                             color: Theme.of(context).primaryColor)),
+          //                     onTap: () {
+          //                       Navigator.pop(context);
+          //                       Navigator.pushNamed(context, '/edit_memory',
+          //                           arguments:
+          //                               EditMemoryArguments(memory: memory));
+          //                     },
+          //                   )
+          //                 ],
+          //               ),
+          //             );
+          //           },
+          //         );
+          //       }),
+          // ),
+          // Divider(),
           for (Story s in memory.stories)
-            s.type == StoryType.TEXT_STORY
-                ? Padding(padding: EdgeInsets.all(10), child: TextStoryItem(s))
-                : Padding(
-                    padding: EdgeInsets.all(10), child: PictureStoryItem(s))
+            if (s.type == StoryType.TEXT_STORY)
+              Padding(padding: EdgeInsets.all(10), child: TextStoryItem(s))
+            else if (s.type == StoryType.PICTURE_STORY)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return ConstrainedBox(
+                    constraints:
+                        BoxConstraints(maxHeight: constraints.maxWidth),
+                    child: Container(
+                      //color: MemorMeColors.darkGrey,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          PictureStoryItem(s),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+          Padding(padding: EdgeInsets.all(8.0))
         ],
       )),
     );

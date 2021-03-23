@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/logic/view_collection_bloc/view_collection_bloc.dart';
+import 'package:memorme_android_flutter/pages/view_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
 import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 
@@ -42,7 +43,10 @@ class ViewCollectionPage extends StatelessWidget {
           ),
           body: MemoriesGrid(
             memories: state.memories,
-            onTileTap: (memory, index) {},
+            onTileTap: (memory, index) {
+              Navigator.pushNamed(context, '/view_memory',
+                  arguments: ViewMemoryPageArguments(memory));
+            },
             shouldCheckScroll: () {
               return true;
             },

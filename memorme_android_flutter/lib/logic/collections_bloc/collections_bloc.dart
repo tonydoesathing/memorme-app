@@ -31,7 +31,6 @@ class CollectionsBloc extends Bloc<CollectionsBlocEvent, CollectionsBlocState> {
   Stream<CollectionsBlocState> _mapLoadCollectionsToState(
       bool fromStart) async* {
     try {
-      print("Loading fromStart? $fromStart");
       yield CollectionsLoading(
           collections: state.collections,
           collectionsMemories: state.collectionsMemories,
@@ -49,7 +48,7 @@ class CollectionsBloc extends Bloc<CollectionsBlocEvent, CollectionsBlocState> {
         List<Memory> memories = [];
         // get the first n mcRelations
         List<MCRelation> mcRelations = await collectionsRepository
-            .fetchMCRelations(collection, pageSize, null);
+            .fetchMCRelations(collection, pageSize, null, ascending: true);
         // load the associated memories into collectionsMemories
         for (MCRelation mcRelation in mcRelations) {
           Memory mem = await memoryRepository.fetch(mcRelation.memoryID);
