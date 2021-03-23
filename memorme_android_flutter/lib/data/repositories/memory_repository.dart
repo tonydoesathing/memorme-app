@@ -33,4 +33,12 @@ abstract class MemoryRepository {
   ///  * [ElementNotInStorageException] - the element is not in the storage mechanism
   ///  * [RemoveElementFailureException] - an error occurred when removing the element
   Future<Memory> removeMemory(Memory memory);
+
+  /// removes the [story] from the repo
+  /// returns the removed [story]
+  ///
+  /// surround with `try{}catch{}` to handle exceptions:
+  ///  * [ElementNotInStorageException] - the element is not in the storage mechanism
+  ///  * [RemoveElementFailureException] - an error occurred when removing the element
+  Future<Story> removeStory(Story story);
 }

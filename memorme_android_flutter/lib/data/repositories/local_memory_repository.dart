@@ -1,9 +1,11 @@
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/repositories/exceptions/element_does_not_exist_exception.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 
 class LocalMemoryRepository extends MemoryRepository {
   List<Memory> _memories = [];
+  List<Story> _stories = [];
 
   @override
   Future<Memory> fetch(int id) async {
@@ -43,12 +45,38 @@ class LocalMemoryRepository extends MemoryRepository {
     bool removed = _memories.remove(memory);
     if (!removed) {
       throw ElementNotInStorageException();
+    } else {
+      // remove stories
+      for (Story story in memory.stories) {
+        _stories.removeWhere((element) => element.id == story.id);
+      }
     }
     return memory;
   }
 
   @override
   Future<Memory> saveMemory(Memory memory) async {
+    // go through stories
+    List<Story> stories = [];
+    for (Story story in memory.stories) {
+      Story s = story;
+      // id is null? give it an id
+      if (s.id == null) {
+        s = Story.editStory(s, id: _stories.length);
+      }
+      int index = _stories.indexWhere((element) => element.id == story.id);
+      if (index == -1) {
+        // not in _stories; add it
+        _stories.add(story);
+      } else {
+        // it's in stories; update it
+        _stories[index] = story;
+      }
+      stories.add(s);
+    }
+    // add stories to memory
+    memory = Memory.editMemory(memory, stories: stories);
+
     // give memory an id if it doesn't have one
     if (memory.id == null) {
       int id = _memories.length;
@@ -63,6 +91,28 @@ class LocalMemoryRepository extends MemoryRepository {
     }
     // otherwise, add it
     _memories.add(memory);
+
     return memory;
+  }
+
+  @override
+  Future<Story> removeStory(Story story) async {
+    int index = 0;
+    // see if the story is in one of the memories
+    for (Memory m in _memories) {
+      index = m.stories.indexWhere((element) => element.id == story.id);
+      if (index != -1) {
+        // remove it and break
+        m.stories.removeAt(index);
+        break;
+      }
+    }
+    // see if in stories
+    int secondIndex = 0;
+    secondIndex = _stories.indexWhere((element) => element.id == story.id);
+    if (index == -1 && secondIndex == -1) {
+      throw ElementNotInStorageException();
+    }
+    return story;
   }
 }

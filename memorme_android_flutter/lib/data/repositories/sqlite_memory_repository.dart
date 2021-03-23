@@ -31,6 +31,12 @@ class SQLiteMemoryRepository extends MemoryRepository {
     // TODO: implement saveMemory
     throw UnimplementedError();
   }
+
+  @override
+  Future<Story> removeStory(Story story) {
+    // TODO: implement removeStory
+    throw UnimplementedError();
+  }
 }
 
 /// Allows for persistent [Memory] storage via SQLite

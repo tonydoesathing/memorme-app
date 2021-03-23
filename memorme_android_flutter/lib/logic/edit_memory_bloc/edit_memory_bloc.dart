@@ -17,7 +17,10 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
   final MemoriesBloc _memoriesBloc;
   EditMemoryBloc(this.repository, this._memoriesBloc, {Memory memory})
       : super(EditMemoryDisplayed(
-            memory ?? Memory(stories: []), memory ?? Memory(stories: [])));
+            memory != null
+                ? Memory.editMemory(memory, stories: List.from(memory.stories))
+                : Memory(stories: []),
+            memory ?? Memory(stories: [])));
 
   @override
   Stream<EditMemoryState> mapEventToState(
@@ -27,8 +30,14 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       yield* _mapSaveMemoryToState();
     } else if (event is EditMemoryBlocDiscardMemory) {
       yield* _mapDiscardMemoryToState();
+    } else if (event is EditMemoryBlocEditTitle) {
+      yield* _mapEditTitleToState(event.newTitle);
     } else if (event is EditMemoryBlocAddStory) {
       yield* _mapAddStoryToState(event.story);
+    } else if (event is EditMemoryBlocRemoveStory) {
+      yield* _mapRemoveStoryFromState(event.story);
+    } else if (event is EditMemoryBlocReorderStory) {
+      yield* _mapReorderStoryToState(event.oldIndex, event.newIndex);
     }
   }
 
@@ -41,6 +50,21 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       Memory preparedMemory = Memory.editMemory(state.memory,
           dateCreated: state.memory.dateCreated ?? DateTime.now(),
           dateLastEdited: DateTime.now());
+
+      // if story in initialMemory not in savedMemory, remove it from storage
+      for (Story s in state.initialMemory.stories) {
+        if (preparedMemory.stories
+                .indexWhere((element) => element.id == s.id) ==
+            -1) {
+          if (s.type == StoryType.PICTURE_STORY) {
+            // remove file
+            await FileProvider().removeFileFromPath(s.data);
+          }
+          // remove from repo
+          repository.removeStory(s);
+        }
+      }
+
       Memory savedMem = await this.repository.saveMemory(preparedMemory);
       // update the memories bloc with the memory
       _memoriesBloc.add(MemoriesBlocUpdateMemory(savedMem));
@@ -58,12 +82,25 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       yield EditMemoryLoading(state.memory, state.initialMemory);
       // find added media
       for (Story story in state.memory.stories) {
-        if (!state.initialMemory.stories.contains(story) &&
+        if (state.initialMemory.stories
+                    .indexWhere((element) => element.id == story.id) ==
+                -1 &&
             story.type == StoryType.PICTURE_STORY) {
           await FileProvider().removeFileFromPath(story.data);
         }
       }
       yield EditMemoryDiscarded(state.memory, state.initialMemory);
+    } catch (_) {
+      yield EditMemoryError(state.memory, state.initialMemory, _);
+    }
+  }
+
+  /// Updates the memory with the new title
+  Stream<EditMemoryState> _mapEditTitleToState(String newTitle) async* {
+    try {
+      yield EditMemoryDisplayed(
+          Memory.editMemory(state.memory, title: newTitle),
+          state.initialMemory);
     } catch (_) {
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
@@ -77,6 +114,49 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
           Memory.editMemory(state.memory,
               stories: state.memory.stories + [story]),
           state.initialMemory);
+    } catch (_) {
+      yield EditMemoryError(state.memory, state.initialMemory, _);
+    }
+  }
+
+  /// Removes a story from the memory
+  Stream<EditMemoryState> _mapRemoveStoryFromState(Story story) async* {
+    try {
+      yield EditMemoryLoading(state.memory, state.initialMemory);
+      // if story wasn't in initial memory, remove it from storage
+      if (!state.initialMemory.stories.contains(story) &&
+          story.type == StoryType.PICTURE_STORY) {
+        await FileProvider().removeFileFromPath(story.data);
+      }
+      // remove it from the memory
+      state.memory.stories.remove(story);
+
+      yield EditMemoryDisplayed(
+          Memory.editMemory(state.memory, stories: state.memory.stories),
+          state.initialMemory);
+    } catch (_) {
+      yield EditMemoryError(state.memory, state.initialMemory, _);
+    }
+  }
+
+  /// Removes a story from the memory
+  Stream<EditMemoryState> _mapReorderStoryToState(
+      int oldIndex, int newIndex) async* {
+    try {
+      yield EditMemoryLoading(state.memory, state.initialMemory);
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
+      final Story item = state.memory.stories.removeAt(oldIndex);
+
+      state.memory.stories.insert(newIndex, item);
+      //shiiiiiiiiiittttt we gotta reorder the whole goddamn list
+      for (int i = 0; i < state.memory.stories.length; i++) {
+        state.memory.stories[i] =
+            Story.editStory(state.memory.stories[i], storyPosition: i);
+      }
+
+      yield EditMemoryDisplayed(state.memory, state.initialMemory);
     } catch (_) {
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
