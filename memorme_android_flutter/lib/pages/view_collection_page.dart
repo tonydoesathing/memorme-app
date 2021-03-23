@@ -44,9 +44,12 @@ class ViewCollectionPage extends StatelessWidget {
             memories: state.memories,
             onTileTap: (memory, index) {},
             shouldCheckScroll: () {
-              return false;
+              return true;
             },
-            onScrollHit: () {},
+            onScrollHit: () {
+              BlocProvider.of<ViewCollectionBloc>(context)
+                  .add(ViewCollectionBlocLoadMemories(false));
+            },
           ),
         );
       },

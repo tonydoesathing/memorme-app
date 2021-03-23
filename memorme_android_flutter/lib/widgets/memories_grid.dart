@@ -38,7 +38,6 @@ class _MemoriesGridState extends State<MemoriesGrid> {
     super.initState();
     _scrollController.addListener(() {
       if (widget.shouldCheckScroll == null || widget.shouldCheckScroll()) {
-        print("checking scroll");
         final maxScroll = _scrollController.position.maxScrollExtent;
         final currentScroll = _scrollController.position.pixels;
         if (maxScroll - currentScroll <= _scrollThreshold) {

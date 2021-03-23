@@ -15,7 +15,7 @@ class EditCollectionBloc
     extends Bloc<EditCollectionBlocEvent, EditCollectionBlocState> {
   final CollectionRepository collectionRepository;
   final MemoryRepository memoryRepository;
-  static const pageSize = 5;
+  static const pageSize = 2000;
 
   EditCollectionBloc(this.collectionRepository, this.memoryRepository,
       {Collection collection})
@@ -56,12 +56,12 @@ class EditCollectionBloc
 
       // is it new? if not, load, the MCRelations and memories
       if (state.collection.id != null) {
-        print("Loading existing memory");
         // load MCRelations
         mcRelations = await collectionRepository.fetchMCRelations(
             state.collection,
             pageSize,
-            fromStart ? null : state.mcRelations[state.mcRelations.length - 1]);
+            fromStart ? null : state.mcRelations[state.mcRelations.length - 1],
+            ascending: true);
 
         // load memories
         for (MCRelation mcRelation in mcRelations) {

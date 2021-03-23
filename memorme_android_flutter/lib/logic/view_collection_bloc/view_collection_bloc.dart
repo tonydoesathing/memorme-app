@@ -40,6 +40,7 @@ class ViewCollectionBloc
       yield ViewCollectionLoading(
           collection: state.collection,
           memories: state.memories,
+          mcRelations: state.mcRelations,
           isLoading: true,
           moreToLoad: state.moreToLoad);
 
@@ -50,7 +51,8 @@ class ViewCollectionBloc
               pageSize,
               fromStart
                   ? null
-                  : state.mcRelations[state.mcRelations.length - 1]);
+                  : state.mcRelations[state.mcRelations.length - 1],
+              ascending: true);
       // load memories
       List<Memory> memories = [];
       for (MCRelation mcRelation in mcRelations) {
