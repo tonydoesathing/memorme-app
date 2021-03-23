@@ -9,8 +9,36 @@ import 'package:memorme_android_flutter/widgets/collection/collection_preview.da
 
 import 'edit_memory_page.dart';
 
-class CollectionsPage extends StatelessWidget {
+class CollectionsPage extends StatefulWidget {
   const CollectionsPage({Key key}) : super(key: key);
+
+  @override
+  _CollectionsPageState createState() => _CollectionsPageState();
+}
+
+class _CollectionsPageState extends State<CollectionsPage> {
+  ScrollController _scrollController = ScrollController();
+  final _scrollThreshold = 200.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      final maxScroll = _scrollController.position.maxScrollExtent;
+      final currentScroll = _scrollController.position.pixels;
+      if (maxScroll - currentScroll <= _scrollThreshold) {
+        // load more if there's more
+        BlocProvider.of<CollectionsBloc>(context)
+            .add(CollectionsBlocLoadCollections(false));
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +74,7 @@ class CollectionsPage extends StatelessWidget {
               return ListView.builder(
                 padding: EdgeInsets.all(8.0),
                 itemCount: state.collections.length,
+                controller: _scrollController,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),

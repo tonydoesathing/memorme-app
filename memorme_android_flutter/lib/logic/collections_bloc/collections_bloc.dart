@@ -13,10 +13,11 @@ part 'collections_bloc_state.dart';
 class CollectionsBloc extends Bloc<CollectionsBlocEvent, CollectionsBlocState> {
   CollectionRepository collectionsRepository;
   MemoryRepository memoryRepository;
-  static const int pageSize = 5;
+  static const int pageSize = 3;
 
   CollectionsBloc(this.collectionsRepository, this.memoryRepository)
-      : super(CollectionsLoading(collections: [], collectionsMemories: {}));
+      : super(CollectionsLoading(
+            collections: [], collectionsMemories: {}, hasReachedMax: false));
 
   @override
   Stream<CollectionsBlocState> mapEventToState(
@@ -30,9 +31,11 @@ class CollectionsBloc extends Bloc<CollectionsBlocEvent, CollectionsBlocState> {
   Stream<CollectionsBlocState> _mapLoadCollectionsToState(
       bool fromStart) async* {
     try {
+      print("Loading fromStart? $fromStart");
       yield CollectionsLoading(
           collections: state.collections,
-          collectionsMemories: state.collectionsMemories);
+          collectionsMemories: state.collectionsMemories,
+          hasReachedMax: state.hasReachedMax);
       // load collections from beginning if fromStart true or collections.last is null
       List<Collection> newCollections =
           await collectionsRepository.fetchCollections(
@@ -58,11 +61,13 @@ class CollectionsBloc extends Bloc<CollectionsBlocEvent, CollectionsBlocState> {
       yield (CollectionsDisplayed(
           collections:
               (fromStart ? <Collection>[] : state.collections) + newCollections,
-          collectionsMemories: state.collectionsMemories));
+          collectionsMemories: state.collectionsMemories,
+          hasReachedMax: newCollections.length == 0 ? true : false));
     } catch (_) {
       yield CollectionsError(_,
           collections: state.collections,
-          collectionsMemories: state.collectionsMemories);
+          collectionsMemories: state.collectionsMemories,
+          hasReachedMax: state.hasReachedMax);
     }
   }
 }
