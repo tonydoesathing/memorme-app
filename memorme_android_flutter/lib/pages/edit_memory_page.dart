@@ -193,6 +193,7 @@ class _EditMemoryPageState extends State<EditMemoryPage> {
                                 ],
                               ),
                               itemCount: state.memory.stories.length,
+                              // items
                               itemBuilder: (context, index) {
                                 Story s = state.memory.stories[index];
 

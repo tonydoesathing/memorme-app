@@ -32,3 +32,12 @@ class EditCollectionBlocAddMemory extends EditCollectionBlocEvent {
   @override
   List<Object> get props => [this.memory];
 }
+
+class EditCollectionBlocRemoveMemory extends EditCollectionBlocEvent {
+  final MCRelation mcRelation;
+
+  EditCollectionBlocRemoveMemory(this.mcRelation);
+
+  @override
+  List<Object> get props => [this.mcRelation];
+}

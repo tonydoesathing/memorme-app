@@ -189,15 +189,38 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
                                 );
                               } else {
                                 // load mcRelations
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 8.0, left: 8.0, right: 8.0),
-                                  child: Center(
-                                    child: MemoryPreview(
-                                        width: 200,
-                                        memory: state.memories[state
-                                            .mcRelations[index - 1].memoryID]),
-                                  ),
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                        color: Theme.of(context).errorColor,
+                                        icon: Icon(Icons.close),
+                                        onPressed: () {
+                                          _editCollectionBloc.add(
+                                              EditCollectionBlocRemoveMemory(
+                                                  state
+                                                      .mcRelations[index - 1]));
+                                        }),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: 8.0, left: 8.0, right: 8.0),
+                                      child: MemoryPreview(
+                                          width: 200,
+                                          memory: state.memories[state
+                                              .mcRelations[index - 1]
+                                              .memoryID]),
+                                    ),
+                                    Column(
+                                      children: [
+                                        IconButton(
+                                            color: Theme.of(context)
+                                                .backgroundColor,
+                                            icon: Icon(Icons.edit),
+                                            onPressed: () {}),
+                                      ],
+                                    ),
+                                  ],
                                 );
                               }
                             },

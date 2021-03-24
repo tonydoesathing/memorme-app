@@ -24,7 +24,8 @@ class EditCollectionBloc
             initialCollection: collection ?? Collection(),
             changed: false,
             memories: {},
-            mcRelations: []));
+            mcRelations: [],
+            removedMCRelations: []));
 
   @override
   Stream<EditCollectionBlocState> mapEventToState(
@@ -38,6 +39,8 @@ class EditCollectionBloc
       yield* _mapEditTitleToState(event.newTitle);
     } else if (event is EditCollectionBlocAddMemory) {
       yield* _mapAddMemoryToState(event.memory);
+    } else if (event is EditCollectionBlocRemoveMemory) {
+      yield* _mapRemoveMemoryToState(event.mcRelation);
     }
   }
 
@@ -50,7 +53,8 @@ class EditCollectionBloc
           initialCollection: state.initialCollection,
           changed: state.changed,
           memories: state.memories,
-          mcRelations: state.mcRelations);
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
 
       List<MCRelation> mcRelations = [];
 
@@ -71,19 +75,20 @@ class EditCollectionBloc
       }
 
       yield EditCollectionDisplayed(
-        collection: state.collection,
-        initialCollection: state.initialCollection,
-        changed: state.changed,
-        mcRelations: state.mcRelations + mcRelations,
-        memories: state.memories,
-      );
+          collection: state.collection,
+          initialCollection: state.initialCollection,
+          changed: state.changed,
+          mcRelations: state.mcRelations + mcRelations,
+          memories: state.memories,
+          removedMCRelations: state.removedMCRelations);
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
           changed: state.changed,
           memories: state.memories,
-          mcRelations: state.mcRelations);
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
     }
   }
 
@@ -95,7 +100,8 @@ class EditCollectionBloc
           initialCollection: state.initialCollection,
           changed: state.changed,
           memories: state.memories,
-          mcRelations: state.mcRelations);
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
       // save collection
       Collection savedCol = await collectionRepository.saveCollection(
           Collection.editCollection(state.collection,
@@ -114,19 +120,26 @@ class EditCollectionBloc
         savedMCRelations.add(savedMCRelation);
       }
 
+      // delete MCRelations that aren't in the initialCollection
+      for (MCRelation mcRelation in state.removedMCRelations) {
+        await collectionRepository.removeMCRelation(mcRelation);
+      }
+
       yield EditCollectionSaved(
           collection: savedCol,
           initialCollection: state.initialCollection,
           changed: state.changed,
           memories: state.memories,
-          mcRelations: savedMCRelations);
+          mcRelations: savedMCRelations,
+          removedMCRelations: state.removedMCRelations);
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
           changed: state.changed,
           memories: state.memories,
-          mcRelations: state.mcRelations);
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
     }
   }
 
@@ -138,14 +151,16 @@ class EditCollectionBloc
           initialCollection: state.initialCollection,
           changed: true,
           memories: state.memories,
-          mcRelations: state.mcRelations);
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
           changed: state.changed,
           memories: state.memories,
-          mcRelations: state.mcRelations);
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
     }
   }
 
@@ -167,14 +182,53 @@ class EditCollectionBloc
                     dateCreated: DateTime.now(),
                     dateLastEdited: DateTime.now())
               ],
-          memories: state.memories);
+          memories: state.memories,
+          removedMCRelations: state.removedMCRelations);
     } catch (_) {
       yield EditCollectionError(_,
           collection: state.collection,
           initialCollection: state.initialCollection,
           changed: state.changed,
           memories: state.memories,
-          mcRelations: state.mcRelations);
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
+    }
+  }
+
+  Stream<EditCollectionBlocState> _mapRemoveMemoryToState(
+      MCRelation mcRelation) async* {
+    try {
+      yield EditCollectionLoading(
+          collection: state.collection,
+          initialCollection: state.initialCollection,
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
+
+      // remove mcRelation from mcRelations
+      state.mcRelations.remove(mcRelation);
+
+      if (mcRelation.id != null) {
+        // add it to removed mcRelations
+        state.removedMCRelations.add(mcRelation);
+      }
+
+      yield EditCollectionDisplayed(
+          collection: state.collection,
+          initialCollection: state.initialCollection,
+          changed: true,
+          memories: state.memories,
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
+    } catch (_) {
+      yield EditCollectionError(_,
+          collection: state.collection,
+          initialCollection: state.initialCollection,
+          changed: state.changed,
+          memories: state.memories,
+          mcRelations: state.mcRelations,
+          removedMCRelations: state.removedMCRelations);
     }
   }
 }

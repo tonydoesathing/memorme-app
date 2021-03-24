@@ -78,7 +78,6 @@ class SearchBloc extends Bloc<SearchBlocEvent, SearchBlocState> {
         }
 
         List<SearchResult> finalResults = memoryResults + collectionResults;
-        print("Query: $query, final results: $finalResults");
         // sort according to points
         finalResults.sort((a, b) => -1 * a.points.compareTo(b.points));
 
