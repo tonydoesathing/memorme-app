@@ -76,7 +76,7 @@ class SearchPage extends StatelessWidget {
                         ),
                       );
                     } else if (result is Memory) {
-                      return SizedBox(
+                      return Center(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: GestureDetector(
@@ -84,7 +84,8 @@ class SearchPage extends StatelessWidget {
                                 Navigator.pushNamed(context, "/view_memory",
                                     arguments: ViewMemoryPageArguments(result));
                               },
-                              child: MemoryPreview(memory: result)),
+                              child: MemoryPreview(
+                                  width: 240 * 0.8, memory: result)),
                         ),
                       );
                     } else {

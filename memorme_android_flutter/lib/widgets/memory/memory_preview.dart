@@ -9,11 +9,15 @@ import 'package:memorme_android_flutter/widgets/memory/inner_shadow.dart';
 /// A preview for a [Memory]
 class MemoryPreview extends StatelessWidget {
   final Memory memory;
-  const MemoryPreview({Key key, @required this.memory}) : super(key: key);
+  final double width, height;
+  const MemoryPreview({Key key, @required this.memory, this.width, this.height})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: this.height,
+      width: this.width,
       child: Card(
           elevation: 2.0,
           child: Padding(

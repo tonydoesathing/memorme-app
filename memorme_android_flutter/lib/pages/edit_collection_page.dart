@@ -192,9 +192,12 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
                                 return Padding(
                                   padding: const EdgeInsets.only(
                                       bottom: 8.0, left: 8.0, right: 8.0),
-                                  child: MemoryPreview(
-                                      memory: state.memories[state
-                                          .mcRelations[index - 1].memoryID]),
+                                  child: Center(
+                                    child: MemoryPreview(
+                                        width: 200,
+                                        memory: state.memories[state
+                                            .mcRelations[index - 1].memoryID]),
+                                  ),
                                 );
                               }
                             },
