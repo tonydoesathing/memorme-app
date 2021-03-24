@@ -5,6 +5,7 @@ import 'package:memorme_android_flutter/data/repositories/memory_repository.dart
 import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.dart';
 import 'package:memorme_android_flutter/logic/home_page_bloc/home_page_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
+import 'package:memorme_android_flutter/logic/search_bloc/search_bloc.dart';
 import 'package:memorme_android_flutter/pages/collections_page.dart';
 import 'package:memorme_android_flutter/pages/home_page.dart';
 import 'package:memorme_android_flutter/pages/memories_page.dart';
@@ -57,7 +58,14 @@ class _TopLevelPageState extends State<TopLevelPage> {
               },
               child: HomePage(),
             ),
-            SearchPage(),
+            BlocProvider(
+                create: (context) {
+                  return SearchBloc(
+                      RepositoryProvider.of<CollectionRepository>(context),
+                      RepositoryProvider.of<MemoryRepository>(context))
+                    ..add(SearchBlocInitialize());
+                },
+                child: SearchPage()),
             BlocProvider(
               create: (context) {
                 return CollectionsBloc(

@@ -6,39 +6,6 @@ import 'package:memorme_android_flutter/data/providers/sqlite_db_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SQLiteMemoryRepository extends MemoryRepository {
-  @override
-  Future<Memory> fetch(int id) {
-    // TODO: implement fetch
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<Memory>> fetchMemories(int pageSize, Memory lastMemory,
-      {bool ascending = false}) {
-    // TODO: implement fetchMemories
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Memory> removeMemory(Memory memory) {
-    // TODO: implement removeMemory
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Memory> saveMemory(Memory memory) {
-    // TODO: implement saveMemory
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Story> removeStory(Story story) {
-    // TODO: implement removeStory
-    throw UnimplementedError();
-  }
-}
-
 /// Allows for persistent [Memory] storage via SQLite
 ///
 /// Takes an [SQLiteDBProvider]; for defaults, pass in ```SQLiteDBProvider.memorMeSQLiteDBProvider()```

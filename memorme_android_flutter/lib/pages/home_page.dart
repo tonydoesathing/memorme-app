@@ -84,7 +84,9 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 return Padding(
                   padding: index == state.collections.length - 1
-                      ? EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0)
+                      ? state.collections.length > 1
+                          ? EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0)
+                          : EdgeInsets.all(8.0)
                       : EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.93,

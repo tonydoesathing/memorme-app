@@ -1,4 +1,5 @@
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 
 abstract class MemoryRepository {
@@ -41,4 +42,8 @@ abstract class MemoryRepository {
   ///  * [ElementNotInStorageException] - the element is not in the storage mechanism
   ///  * [RemoveElementFailureException] - an error occurred when removing the element
   Future<Story> removeStory(Story story);
+
+  /// searches for [memory] that match the [query]
+  /// returns a list of [searchResults] sorted by points decending
+  Future<List<SearchResult>> searchMemories(String query);
 }

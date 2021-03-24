@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/data/repositories/exceptions/element_does_not_exist_exception.dart';
@@ -100,6 +101,32 @@ main() {
 
       expect(() async => await repository.removeMemory(m),
           throwsA(isA<ElementNotInStorageException>()));
+    });
+    test("Should be able to search according to query", () async {
+      List<Story> stories = [Story(id: 1, data: "1"), Story(id: 2, data: "2")];
+      Memory m = Memory(
+          title: "Meow",
+          previewStory: stories[0],
+          dateCreated: DateTime.now(),
+          dateLastEdited: DateTime.now(),
+          stories: stories);
+      m = await repository.saveMemory(m);
+
+      List<SearchResult> search = await repository.searchMemories("meow");
+      expect(search.length, 1);
+
+      Memory m2 = Memory(
+          title: "2",
+          previewStory: stories[0],
+          dateCreated: DateTime.now(),
+          dateLastEdited: DateTime.now(),
+          stories: stories);
+      m2 = await repository.saveMemory(m2);
+
+      search = await repository.searchMemories("2");
+      expect(search.length, 2);
+      expect(search[0].object, m2);
+      print(search);
     });
   });
 }

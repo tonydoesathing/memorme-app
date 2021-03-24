@@ -1,4 +1,5 @@
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/repositories/exceptions/element_does_not_exist_exception.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
@@ -114,5 +115,32 @@ class LocalMemoryRepository extends MemoryRepository {
       throw ElementNotInStorageException();
     }
     return story;
+  }
+
+  @override
+  Future<List<SearchResult>> searchMemories(String query) async {
+    List<SearchResult> searchResults = [];
+    // go through memories
+    for (Memory memory in _memories) {
+      SearchResult result = SearchResult(memory, 0);
+      // give a point if matches title
+      if (memory.title != null &&
+          memory.title.toLowerCase().contains(query.toLowerCase())) {
+        result = SearchResult.copyWith(result, points: result.points + 1);
+      }
+      for (Story story in memory.stories) {
+        // give a point if matches story data
+        if (story.data != null && story.data.contains(query)) {
+          result = SearchResult.copyWith(result, points: result.points + 1);
+        }
+      }
+      // if it has more than 0 points, add it to the search results
+      if (result.points > 0) {
+        searchResults.add(result);
+      }
+    }
+    // sort according to points
+    searchResults.sort((a, b) => -1 * a.points.compareTo(b.points));
+    return searchResults;
   }
 }

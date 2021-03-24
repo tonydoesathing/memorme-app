@@ -1,5 +1,6 @@
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 
 abstract class CollectionRepository {
@@ -29,4 +30,8 @@ abstract class CollectionRepository {
   Future<List<MCRelation>> fetchMCRelations(
       Collection collection, int pageSize, MCRelation lastMCRelation,
       {bool ascending = false});
+
+  /// searches for [collection] that match the [query]
+  /// returns a list of [searchResults] sorted by points decending
+  Future<List<SearchResult>> searchCollections(String query);
 }

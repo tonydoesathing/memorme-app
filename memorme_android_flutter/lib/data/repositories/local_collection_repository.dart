@@ -1,4 +1,5 @@
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
+import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
 
 import 'exceptions/element_does_not_exist_exception.dart';
@@ -134,5 +135,23 @@ class LocalCollectionRepository implements CollectionRepository {
       throw ElementNotInStorageException();
     }
     return mcRelation;
+  }
+
+  @override
+  Future<List<SearchResult>> searchCollections(String query) async {
+    List<SearchResult> results = [];
+    // go through the collections
+    for (Collection collection in _collections) {
+      SearchResult result = SearchResult(collection, 0);
+      if (collection.title != null &&
+          collection.title.toLowerCase().contains(query.toLowerCase())) {
+        result = SearchResult.copyWith(result, points: result.points + 1);
+      }
+      if (result.points > 0) {
+        results.add(result);
+      }
+    }
+    results.sort((a, b) => -1 * a.points.compareTo(b.points));
+    return results;
   }
 }
