@@ -28,48 +28,27 @@ import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 class AppRouter {
   MemoryRepository _memoryRepository;
   CollectionRepository _collectionRepository;
-  MemoriesBloc _memoriesBloc;
-  CollectionsBloc _collectionsBloc;
 
   AppRouter() {
     _memoryRepository = LocalMemoryRepository();
     _collectionRepository = LocalCollectionRepository();
-
-    _memoriesBloc = MemoriesBloc(_memoryRepository);
-    _memoriesBloc.add(MemoriesBlocLoadMemories(true));
-
-    _collectionsBloc =
-        CollectionsBloc(_collectionRepository, _memoryRepository);
-    _collectionsBloc.add(CollectionsBlocLoadCollections(true));
   }
 
   Route onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-            builder: (_) => MultiBlocProvider(providers: [
-                  BlocProvider.value(
-                    value: _memoriesBloc,
-                  ),
-                  BlocProvider.value(
-                    value: _collectionsBloc,
-                  ),
+            builder: (_) => MultiRepositoryProvider(providers: [
+                  RepositoryProvider<MemoryRepository>.value(
+                      value: _memoryRepository),
+                  RepositoryProvider<CollectionRepository>.value(
+                      value: _collectionRepository),
                 ], child: TopLevelPage()));
       case '/view_memory':
         ViewMemoryPageArguments arguments = settings.arguments;
         return MaterialPageRoute(
           builder: (context) {
             return ViewMemoryPage(arguments.memory);
-          },
-        );
-      case '/display_memory_list':
-        MemoriesListArguments arguments = settings.arguments;
-        return MaterialPageRoute(
-          builder: (context) {
-            return BlocProvider.value(
-              value: _memoriesBloc,
-              child: DisplayMemoriesList(focusedIndex: arguments.focusedIndex),
-            );
           },
         );
       case '/take_picture':
@@ -82,8 +61,7 @@ class AppRouter {
         EditMemoryArguments arguments = settings.arguments;
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                  create: (context) => EditMemoryBloc(
-                      _memoryRepository, _memoriesBloc,
+                  create: (context) => EditMemoryBloc(_memoryRepository,
                       memory: arguments.memory),
                   child: EditMemoryPage(
                     onSave: arguments.onSave,

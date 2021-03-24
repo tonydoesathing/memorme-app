@@ -14,8 +14,7 @@ part 'edit_memory_state.dart';
 
 class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
   final MemoryRepository repository;
-  final MemoriesBloc _memoriesBloc;
-  EditMemoryBloc(this.repository, this._memoriesBloc, {Memory memory})
+  EditMemoryBloc(this.repository, {Memory memory})
       : super(EditMemoryDisplayed(
             memory != null
                 ? Memory.editMemory(memory, stories: List.from(memory.stories))
@@ -67,7 +66,7 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
 
       Memory savedMem = await this.repository.saveMemory(preparedMemory);
       // update the memories bloc with the memory
-      _memoriesBloc.add(MemoriesBlocUpdateMemory(savedMem));
+      // _memoriesBloc.add(MemoriesBlocUpdateMemory(savedMem));
       yield EditMemorySaved(savedMem, state.initialMemory);
     } catch (_) {
       yield EditMemoryError(state.memory, state.initialMemory, _);

@@ -15,7 +15,7 @@ class MemoryPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Card(
-          elevation: 3.0,
+          elevation: 2.0,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

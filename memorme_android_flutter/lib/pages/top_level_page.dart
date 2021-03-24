@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.dart';
+import 'package:memorme_android_flutter/logic/home_page_bloc/home_page_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 import 'package:memorme_android_flutter/pages/collections_page.dart';
 import 'package:memorme_android_flutter/pages/home_page.dart';
@@ -45,16 +48,33 @@ class _TopLevelPageState extends State<TopLevelPage> {
           onPageChanged: onPageChanged,
           children: [
             // these are our main pages
-            HomePage(),
+            BlocProvider(
+              create: (context) {
+                return HomePageBloc(
+                    RepositoryProvider.of<CollectionRepository>(context),
+                    RepositoryProvider.of<MemoryRepository>(context))
+                  ..add(HomePageBlocInit());
+              },
+              child: HomePage(),
+            ),
             SearchPage(),
-            BlocProvider.value(
-              value: BlocProvider.of<CollectionsBloc>(context),
+            BlocProvider(
+              create: (context) {
+                return CollectionsBloc(
+                    RepositoryProvider.of<CollectionRepository>(context),
+                    RepositoryProvider.of<MemoryRepository>(context))
+                  ..add(CollectionsBlocLoadCollections(true));
+              },
               child: CollectionsPage(),
             ),
-            BlocProvider.value(
-              value: BlocProvider.of<MemoriesBloc>(context),
+            BlocProvider(
+              create: (context) {
+                return MemoriesBloc(
+                    RepositoryProvider.of<MemoryRepository>(context))
+                  ..add(MemoriesBlocLoadMemories(true));
+              },
               child: MemoriesPage(),
-            )
+            ),
           ],
         ),
         // the following is the bottom nav bar
