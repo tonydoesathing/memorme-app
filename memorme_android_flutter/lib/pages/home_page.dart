@@ -6,6 +6,7 @@ import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/logic/home_page_bloc/home_page_bloc.dart';
 import 'package:memorme_android_flutter/pages/view_collection_page.dart';
 import 'package:memorme_android_flutter/pages/view_memory_page.dart';
+import 'package:memorme_android_flutter/presentation/theme/memorme_colors.dart';
 import 'package:memorme_android_flutter/widgets/BottomNavBar.dart';
 import 'package:memorme_android_flutter/widgets/collection/collection_preview.dart';
 import 'package:memorme_android_flutter/widgets/memory/memory_preview.dart';
@@ -77,32 +78,43 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             height: 240.0,
-            child: ListView.builder(
-              controller: _collectionsScroll,
-              scrollDirection: Axis.horizontal,
-              itemCount: state.collections.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: index == state.collections.length - 1
-                      ? state.collections.length > 1
-                          ? EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0)
-                          : EdgeInsets.all(8.0)
-                      : EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.93,
-                    child: CollectionPreview(
-                        onTap: (collection) {
-                          Navigator.pushNamed(context, "/view_collection",
-                              arguments: ViewCollectionArguments(
-                                  collection: collection));
-                        },
-                        collection: state.collections[index],
-                        memories: state
-                            .collectionMemories[state.collections[index].id]),
+            child: state.collections.length > 0
+                ? ListView.builder(
+                    controller: _collectionsScroll,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: state.collections.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: index == state.collections.length - 1
+                            ? state.collections.length > 1
+                                ? EdgeInsets.only(
+                                    right: 8.0, top: 8.0, bottom: 8.0)
+                                : EdgeInsets.all(8.0)
+                            : EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.93,
+                          child: CollectionPreview(
+                              onTap: (collection) {
+                                Navigator.pushNamed(context, "/view_collection",
+                                    arguments: ViewCollectionArguments(
+                                        collection: collection));
+                              },
+                              collection: state.collections[index],
+                              memories: state.collectionMemories[
+                                  state.collections[index].id]),
+                        ),
+                      );
+                    },
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                    child: Container(
+                      color: MemorMeColors.background,
+                      child: Center(
+                        child: Text("No collections to display at this time"),
+                      ),
+                    ),
                   ),
-                );
-              },
-            ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 8.0),
@@ -113,27 +125,38 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             height: 240.0,
-            child: ListView.builder(
-              controller: _memoriesScroll,
-              scrollDirection: Axis.horizontal,
-              itemCount: state.memories.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: index == state.memories.length - 1
-                      ? EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0)
-                      : EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
-                  child: SizedBox(
-                      width: 240 * 0.8,
-                      child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, "/view_memory",
-                                arguments: ViewMemoryPageArguments(
-                                    state.memories[index]));
-                          },
-                          child: MemoryPreview(memory: state.memories[index]))),
-                );
-              },
-            ),
+            child: state.memories.length > 0
+                ? ListView.builder(
+                    controller: _memoriesScroll,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: state.memories.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: index == state.memories.length - 1
+                            ? EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0)
+                            : EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
+                        child: SizedBox(
+                            width: 240 * 0.8,
+                            child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(context, "/view_memory",
+                                      arguments: ViewMemoryPageArguments(
+                                          state.memories[index]));
+                                },
+                                child: MemoryPreview(
+                                    memory: state.memories[index]))),
+                      );
+                    },
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                    child: Container(
+                      color: MemorMeColors.background,
+                      child: Center(
+                        child: Text("No memories to display at this time"),
+                      ),
+                    ),
+                  ),
           ),
           Expanded(
             child: Container(),

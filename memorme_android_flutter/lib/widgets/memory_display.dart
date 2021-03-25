@@ -31,7 +31,7 @@ class MemoryDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Card(
           child: Column(
         children: <Widget>[
@@ -88,22 +88,25 @@ class MemoryDisplay extends StatelessWidget {
             if (s.type == StoryType.TEXT_STORY)
               Padding(padding: EdgeInsets.all(10), child: TextStoryItem(s))
             else if (s.type == StoryType.PICTURE_STORY)
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return ConstrainedBox(
-                    constraints:
-                        BoxConstraints(maxHeight: constraints.maxWidth),
-                    child: Container(
-                      //color: MemorMeColors.darkGrey,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          PictureStoryItem(s),
-                        ],
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return ConstrainedBox(
+                      constraints:
+                          BoxConstraints(maxHeight: constraints.maxWidth),
+                      child: Container(
+                        //color: MemorMeColors.darkGrey,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            PictureStoryItem(s),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
           Padding(padding: EdgeInsets.all(8.0))
         ],
