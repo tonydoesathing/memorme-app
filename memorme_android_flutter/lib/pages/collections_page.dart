@@ -88,6 +88,8 @@ class _CollectionsPageState extends State<CollectionsPage> {
                               collection: collection,
                             ));
                       },
+                      repository: BlocProvider.of<CollectionsBloc>(context)
+                          .collectionsRepository,
                     ),
                   );
                 },

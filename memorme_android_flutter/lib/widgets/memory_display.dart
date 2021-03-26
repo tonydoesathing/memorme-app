@@ -82,7 +82,50 @@ class MemoryDisplay extends StatelessWidget {
                                                   memory: memory,
                                                   onSave: this.onEditSave));
                                         },
-                                      )
+                                      ),
+                                      // ListTile(
+                                      //   leading: Icon(Icons.delete_forever,
+                                      //       color:
+                                      //           Theme.of(context).errorColor),
+                                      //   title: Text("Delete Memory",
+                                      //       style: TextStyle(
+                                      //           color: Theme.of(context)
+                                      //               .errorColor)),
+                                      //   onTap: () {
+                                      //     Navigator.pop(context);
+                                      //     showDialog<bool>(
+                                      //       context: context,
+                                      //       barrierDismissible: true,
+                                      //       builder: (BuildContext context) {
+                                      //         return AlertDialog(
+                                      //           title: Text(
+                                      //               'This will delete the memory forever.\nContinue?'),
+                                      //           actions: <Widget>[
+                                      //             FlatButton(
+                                      //               child: Text('Yes'),
+                                      //               onPressed: () {
+                                      //                 // discard the collection
+
+                                      //                 // close the dialog and allow it to pop
+                                      //                 Navigator.pop(
+                                      //                     context, true);
+                                      //                 Navigator.pop(
+                                      //                     context, true);
+                                      //               },
+                                      //             ),
+                                      //             FlatButton(
+                                      //               child: Text('No'),
+                                      //               onPressed: () {
+                                      //                 Navigator.pop(
+                                      //                     context, false);
+                                      //               },
+                                      //             ),
+                                      //           ],
+                                      //         );
+                                      //       },
+                                      //     );
+                                      //   },
+                                      // ),
                                     ],
                                   ),
                                 );

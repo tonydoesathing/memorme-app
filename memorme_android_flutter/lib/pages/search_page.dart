@@ -71,8 +71,11 @@ class SearchPage extends StatelessWidget {
                                     collection: result));
                           },
                           child: CollectionPreview(
-                              collection: result,
-                              memories: state.collectionMemories[result.id]),
+                            collection: result,
+                            memories: state.collectionMemories[result.id],
+                            repository: BlocProvider.of<SearchBloc>(context)
+                                .collectionRepository,
+                          ),
                         ),
                       );
                     } else if (result is Memory) {

@@ -94,14 +94,17 @@ class _HomePageState extends State<HomePage> {
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.93,
                           child: CollectionPreview(
-                              onTap: (collection) {
-                                Navigator.pushNamed(context, "/view_collection",
-                                    arguments: ViewCollectionArguments(
-                                        collection: collection));
-                              },
-                              collection: state.collections[index],
-                              memories: state.collectionMemories[
-                                  state.collections[index].id]),
+                            onTap: (collection) {
+                              Navigator.pushNamed(context, "/view_collection",
+                                  arguments: ViewCollectionArguments(
+                                      collection: collection));
+                            },
+                            collection: state.collections[index],
+                            memories: state.collectionMemories[
+                                state.collections[index].id],
+                            repository: BlocProvider.of<HomePageBloc>(context)
+                                .collectionRepository,
+                          ),
                         ),
                       );
                     },
