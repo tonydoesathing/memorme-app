@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
+import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/logic/edit_collection_bloc/edit_collection_bloc.dart';
+import 'package:memorme_android_flutter/pages/select_memories_page.dart';
 import 'package:memorme_android_flutter/widgets/memory/memory_preview.dart';
 
 import 'edit_memory_page.dart';
@@ -66,7 +68,7 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
 
     // if we've modified the collection and user backs out
     // check to see if user wants to discard it
-    if (state.collection != state.initialCollection) {
+    if (state.changed) {
       return showDialog<bool>(
         context: context,
         barrierDismissible: true,
@@ -247,22 +249,38 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
                                       scrollDirection: Axis.horizontal,
                                       padding: EdgeInsets.all(8.0),
                                       children: [
-                                        // Padding(
-                                        //   padding: const EdgeInsets.all(8.0),
-                                        //   child: RaisedButton.icon(
-                                        //     onPressed: () {},
-                                        //     icon: Icon(Icons.add_to_photos),
-                                        //     label: Text("Add Existing Memory"),
-                                        //     color: Colors.white,
-                                        //     shape: RoundedRectangleBorder(
-                                        //         borderRadius:
-                                        //             BorderRadius.circular(10)),
-                                        //     textColor: Theme.of(context)
-                                        //         .textTheme
-                                        //         .button
-                                        //         .color,
-                                        //   ),
-                                        // ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: RaisedButton.icon(
+                                            onPressed: () {
+                                              FocusManager.instance.primaryFocus
+                                                  .unfocus();
+                                              Navigator.pushNamed(
+                                                  context, '/select_memories',
+                                                  arguments:
+                                                      SelectMemoriesPageArguments(
+                                                onSave: (selectedMemories) {
+                                                  for (Memory memory
+                                                      in selectedMemories) {
+                                                    _editCollectionBloc.add(
+                                                        EditCollectionBlocAddMemory(
+                                                            memory));
+                                                  }
+                                                },
+                                              ));
+                                            },
+                                            icon: Icon(Icons.add_to_photos),
+                                            label: Text("Select Memories"),
+                                            color: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            textColor: Theme.of(context)
+                                                .textTheme
+                                                .button
+                                                .color,
+                                          ),
+                                        ),
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: RaisedButton.icon(
@@ -280,7 +298,7 @@ class _EditCollectionPageState extends State<EditCollectionPage> {
                                               }));
                                             },
                                             icon: Icon(Icons.add_circle),
-                                            label: Text("Add New Memory"),
+                                            label: Text("New Memory"),
                                             color: Colors.white,
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:

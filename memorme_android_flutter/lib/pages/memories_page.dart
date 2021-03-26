@@ -13,8 +13,6 @@ import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 /// Once it gets to 200 pixels above the end of the scrollable
 /// grid, it checks to see if there are more [Memory] to load;
 /// if so, it loads them
-/// TODO: add variable to state to check to see if we're loading memories already
-/// so then we don't call it a bajillion times on scroll
 class MemoriesPage extends StatelessWidget {
   const MemoriesPage({Key key}) : super(key: key);
 
@@ -45,7 +43,7 @@ class MemoriesPage extends StatelessWidget {
                 return MemoriesGrid(
                   key: PageStorageKey(key),
                   memories: state.memories,
-                  onTileTap: (memory, index) {
+                  onTileTap: (memory, isSelectActive) {
                     //navigate to listview display
                     // Navigator.pushNamed(context, '/display_memory_list',
                     //     arguments: MemoriesListArguments(index));

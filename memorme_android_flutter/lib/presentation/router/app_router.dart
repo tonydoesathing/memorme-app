@@ -11,7 +11,9 @@ import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.
 import 'package:memorme_android_flutter/logic/edit_collection_bloc/edit_collection_bloc.dart';
 import 'package:memorme_android_flutter/logic/edit_memory_bloc/edit_memory_bloc.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
+import 'package:memorme_android_flutter/logic/select_memories_bloc/select_memories_bloc.dart';
 import 'package:memorme_android_flutter/logic/view_collection_bloc/view_collection_bloc.dart';
+import 'package:memorme_android_flutter/pages/select_memories_page.dart';
 import 'package:memorme_android_flutter/pages/top_level_page.dart';
 import 'package:memorme_android_flutter/pages/collections_page.dart';
 import 'package:memorme_android_flutter/pages/edit_collection_page.dart';
@@ -89,6 +91,16 @@ class AppRouter {
                       _memoryRepository, arguments.collection)
                     ..add(ViewCollectionBlocLoadMemories(true)),
                   child: ViewCollectionPage(),
+                ));
+      case '/select_memories':
+        SelectMemoriesPageArguments arguments = settings.arguments;
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                  create: (context) => SelectMemoriesBloc(_memoryRepository)
+                    ..add(SelectMemoriesBlocLoadMemories(true)),
+                  child: SelectMemoriesPage(
+                    onSave: arguments.onSave,
+                  ),
                 ));
     }
   }
