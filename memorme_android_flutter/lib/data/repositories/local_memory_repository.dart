@@ -89,9 +89,10 @@ class LocalMemoryRepository extends MemoryRepository {
     int index = _memories.indexWhere((element) => element.id == memory.id);
     if (index > -1) {
       _memories[index] = memory;
+    } else {
+      // otherwise, add it
+      _memories.add(memory);
     }
-    // otherwise, add it
-    _memories.add(memory);
 
     return memory;
   }
