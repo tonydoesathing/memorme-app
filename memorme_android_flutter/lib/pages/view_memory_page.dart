@@ -29,23 +29,26 @@ class _ViewMemoryPageState extends State<ViewMemoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                // go to edit memory page
-                Navigator.pushNamed(context, "/edit_memory",
-                    arguments: EditMemoryArguments(
-                        onSave: (memory) {
-                          setState(() {
-                            this.memory = memory;
-                          });
-                        },
-                        memory: this.memory));
-              })
-        ],
-      ),
-      body: SingleChildScrollView(child: MemoryDisplay(memory)),
+          // actions: [
+          //   IconButton(
+          //       icon: Icon(Icons.edit),
+          //       onPressed: () {
+          //         // go to edit memory page
+          //         Navigator.pushNamed(context, "/edit_memory",
+          //             arguments: EditMemoryArguments(
+          //                 onSave: (memory) {}, memory: this.memory));
+          //       })
+          // ],
+          ),
+      body: SingleChildScrollView(
+          child: MemoryDisplay(
+        memory,
+        onEditSave: (memory) {
+          setState(() {
+            this.memory = memory;
+          });
+        },
+      )),
     );
   }
 }

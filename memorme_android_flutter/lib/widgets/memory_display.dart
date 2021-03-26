@@ -9,9 +9,12 @@ import 'package:memorme_android_flutter/widgets/story_items/picture_story_item.d
 import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart';
 
 class MemoryDisplay extends StatelessWidget {
+  final void Function(Memory memory) onEditSave;
+
   final Memory memory;
 
-  const MemoryDisplay(this.memory, {Key key}) : super(key: key);
+  const MemoryDisplay(this.memory, {Key key, this.onEditSave})
+      : super(key: key);
 
   parseTime(String datetime) {
     String date = datetime.split('T')[0];
@@ -35,55 +38,62 @@ class MemoryDisplay extends StatelessWidget {
       child: Card(
           child: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Center(
-              child: Text(
-                this.memory.title ??
-                    parseTime(memory.dateLastEdited.toIso8601String()),
-                style: Theme.of(context).textTheme.headline6,
+          Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
+                  child: Text(
+                    this.memory.title ??
+                        parseTime(memory.dateLastEdited.toIso8601String()),
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
               ),
-            ),
+              Positioned.fill(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        icon: Icon(Icons.more_vert),
+                        onPressed: () {
+                          // maybe make use of https://pub.dev/packages/modal_bottom_sheet
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Container(
+                                  height: 200,
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        leading: Icon(Icons.edit,
+                                            color:
+                                                Theme.of(context).primaryColor),
+                                        title: Text("Edit Memory",
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor)),
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Navigator.pushNamed(
+                                              context, '/edit_memory',
+                                              arguments: EditMemoryArguments(
+                                                  memory: memory,
+                                                  onSave: this.onEditSave));
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                );
+                              });
+                        }),
+                  ],
+                ),
+              ),
+            ],
           ),
-          // ListTile(
-          //   title: Text(
-          //     this.memory.title ??
-          //         parseTime(memory.dateLastEdited.toIso8601String()),
-          //     style: Theme.of(context).textTheme.headline6,
-          //   ),
-          //   trailing: IconButton(
-          //       icon: Icon(Icons.more_vert,
-          //           color: Theme.of(context).primaryColor),
-          //       onPressed: () {
-          //         // maybe make use of https://pub.dev/packages/modal_bottom_sheet
-          //         showModalBottomSheet(
-          //           context: context,
-          //           builder: (context) {
-          //             return Container(
-          //               height: 200,
-          //               child: Column(
-          //                 children: [
-          //                   ListTile(
-          //                     leading: Icon(Icons.edit,
-          //                         color: Theme.of(context).primaryColor),
-          //                     title: Text("Edit Memory",
-          //                         style: TextStyle(
-          //                             color: Theme.of(context).primaryColor)),
-          //                     onTap: () {
-          //                       Navigator.pop(context);
-          //                       Navigator.pushNamed(context, '/edit_memory',
-          //                           arguments:
-          //                               EditMemoryArguments(memory: memory));
-          //                     },
-          //                   )
-          //                 ],
-          //               ),
-          //             );
-          //           },
-          //         );
-          //       }),
-          // ),
-          // Divider(),
+          Divider(),
           for (Story s in memory.stories)
             if (s.type == StoryType.TEXT_STORY)
               Padding(padding: EdgeInsets.all(10), child: TextStoryItem(s))

@@ -50,6 +50,7 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
           dateCreated: state.memory.dateCreated ?? DateTime.now(),
           dateLastEdited: DateTime.now());
 
+      List<Story> storiesToRemove = [];
       // if story in initialMemory not in savedMemory, remove it from storage
       for (Story s in state.initialMemory.stories) {
         if (preparedMemory.stories
@@ -60,8 +61,11 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
             await FileProvider().removeFileFromPath(s.data);
           }
           // remove from repo
-          repository.removeStory(s);
+          storiesToRemove.add(s);
         }
+      }
+      for (Story s in storiesToRemove) {
+        repository.removeStory(s);
       }
 
       Memory savedMem = await this.repository.saveMemory(preparedMemory);
