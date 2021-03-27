@@ -6,7 +6,9 @@ import 'package:memorme_android_flutter/data/models/collections/collection.dart'
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/collection_repository_event.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
 
 part 'search_bloc_event.dart';
 part 'search_bloc_state.dart';
@@ -14,10 +16,21 @@ part 'search_bloc_state.dart';
 class SearchBloc extends Bloc<SearchBlocEvent, SearchBlocState> {
   final CollectionRepository collectionRepository;
   final MemoryRepository memoryRepository;
+  StreamSubscription<CollectionRepositoryEvent> _collectionStreamSubscription;
+  StreamSubscription<MemoryRepositoryEvent> _memoryStreamSubscription;
 
   SearchBloc(this.collectionRepository, this.memoryRepository)
       : super(
-            SearchBlocLoading(query: "", results: [], collectionMemories: {}));
+            SearchBlocLoading(query: "", results: [], collectionMemories: {})) {
+    _collectionStreamSubscription =
+        collectionRepository.repositoryEventStream.listen((event) {
+      this.add(SearchBlocCollectionRepoEvent(event));
+    });
+    _memoryStreamSubscription =
+        memoryRepository.repositoryEventStream.listen((event) {
+      this.add(SearchBlocMemoryRepoEvent(event));
+    });
+  }
 
   @override
   Stream<SearchBlocState> mapEventToState(
@@ -27,6 +40,10 @@ class SearchBloc extends Bloc<SearchBlocEvent, SearchBlocState> {
       yield* _mapInitializeToState();
     } else if (event is SearchBlocSearch) {
       yield* _mapSearchToState(event.query);
+    } else if (event is SearchBlocCollectionRepoEvent) {
+      yield* _mapCollectionRepoEventToState(event.event);
+    } else if (event is SearchBlocMemoryRepoEvent) {
+      yield* _mapMemoryRepoEventToState(event.event);
     }
   }
 
@@ -93,5 +110,71 @@ class SearchBloc extends Bloc<SearchBlocEvent, SearchBlocState> {
           results: state.results,
           collectionMemories: state.collectionMemories);
     }
+  }
+
+  Stream<SearchBlocState> _mapCollectionRepoEventToState(
+      CollectionRepositoryEvent event) async* {
+    if (event is CollectionRepositoryAddCollection) {
+      // ummm also this shouldn't really happen
+      this.add(SearchBlocSearch(state.query));
+    } else if (event is CollectionRepositoryUpdateCollection) {
+      // update the collection
+      this.add(SearchBlocSearch(state.query));
+    } else if (event is CollectionRepositoryRemoveCollection) {
+      // remove the collection
+      yield SearchBlocLoading(
+          query: state.query,
+          results: state.results,
+          collectionMemories: state.collectionMemories);
+      int index = state.results.indexWhere((element) {
+        Object obj = element.object;
+        if (obj is Collection) {
+          return obj.id == event.removedCollection.id;
+        }
+        return false;
+      });
+      if (index != -1) {
+        state.results.removeAt(index);
+      }
+      yield SearchBlocDisplayed(
+          query: state.query,
+          results: state.results,
+          collectionMemories: state.collectionMemories);
+    }
+  }
+
+  Stream<SearchBlocState> _mapMemoryRepoEventToState(
+      MemoryRepositoryEvent event) async* {
+    if (event is MemoryRepositoryAddMemory) {
+      this.add(SearchBlocSearch(state.query));
+    } else if (event is MemoryRepositoryUpdateMemory) {
+      this.add(SearchBlocSearch(state.query));
+    } else if (event is MemoryRepositoryRemoveMemory) {
+      yield SearchBlocLoading(
+          query: state.query,
+          results: state.results,
+          collectionMemories: state.collectionMemories);
+      int index = state.results.indexWhere((element) {
+        Object obj = element.object;
+        if (obj is Memory) {
+          return obj.id == event.removedMemory.id;
+        }
+        return false;
+      });
+      if (index != -1) {
+        state.results.removeAt(index);
+      }
+      yield SearchBlocDisplayed(
+          query: state.query,
+          results: state.results,
+          collectionMemories: state.collectionMemories);
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _collectionStreamSubscription?.cancel();
+    _memoryStreamSubscription?.cancel();
+    return super.close();
   }
 }

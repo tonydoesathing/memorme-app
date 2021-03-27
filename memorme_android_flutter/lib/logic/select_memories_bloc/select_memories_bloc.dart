@@ -13,7 +13,7 @@ part 'select_memories_bloc_state.dart';
 class SelectMemoriesBloc
     extends Bloc<SelectMemoriesBlocEvent, SelectMemoriesBlocState> {
   final MemoryRepository repository;
-  static const pageSize = 6;
+  static const pageSize = 15;
 
   SelectMemoriesBloc(this.repository)
       : super(SelectMemoriesBlocLoading(

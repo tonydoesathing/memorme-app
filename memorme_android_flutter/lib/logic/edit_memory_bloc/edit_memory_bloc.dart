@@ -7,6 +7,7 @@ import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
 import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 
 part 'edit_memory_event.dart';
@@ -69,8 +70,12 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       }
 
       Memory savedMem = await this.repository.saveMemory(preparedMemory);
-      // update the memories bloc with the memory
-      // _memoriesBloc.add(MemoriesBlocUpdateMemory(savedMem));
+      // send event down the chain
+      if (preparedMemory.id == null) {
+        repository.addEvent(MemoryRepositoryAddMemory(savedMem));
+      } else {
+        repository.addEvent(MemoryRepositoryUpdateMemory(savedMem));
+      }
       yield EditMemorySaved(savedMem, state.initialMemory);
     } catch (_) {
       yield EditMemoryError(state.memory, state.initialMemory, _);

@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/rendering.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
 
 part 'memories_event.dart';
 part 'memories_state.dart';
@@ -11,8 +13,14 @@ part 'memories_state.dart';
 /// a BLoC for accessing memories
 class MemoriesBloc extends Bloc<MemoriesEvent, MemoriesState> {
   final MemoryRepository repository;
-  static const int pageSize = 6;
-  MemoriesBloc(this.repository) : super(MemoriesInitial());
+  StreamSubscription<MemoryRepositoryEvent> _memoryStreamSubscription;
+  static const int pageSize = 15;
+  MemoriesBloc(this.repository) : super(MemoriesInitial()) {
+    _memoryStreamSubscription =
+        repository.repositoryEventStream.listen((event) {
+      this.add(MemoriesBlocRepoEvent(event));
+    });
+  }
 
   @override
   Stream<MemoriesState> mapEventToState(
@@ -22,6 +30,8 @@ class MemoriesBloc extends Bloc<MemoriesEvent, MemoriesState> {
       yield* _mapMemoriesLoadedToState(event.fromStart);
     } else if (event is MemoriesBlocUpdateMemory) {
       yield* _mapMemoriesUpdateToState(event.memory);
+    } else if (event is MemoriesBlocRepoEvent) {
+      yield* _mapRepoEventToState(event.event);
     }
   }
 
@@ -80,5 +90,28 @@ class MemoriesBloc extends Bloc<MemoriesEvent, MemoriesState> {
     // return the memories with the new/edited memory at the beginning
     yield MemoriesLoadSuccess.fromMemoriesState(this.state,
         memories: [memory] + currentState.memories);
+  }
+
+  Stream<MemoriesState> _mapRepoEventToState(
+      MemoryRepositoryEvent event) async* {
+    if (event is MemoryRepositoryAddMemory) {
+      // add memory to top
+      this.add(MemoriesBlocUpdateMemory(event.addedMemory));
+    } else if (event is MemoryRepositoryUpdateMemory) {
+      // updat ememory
+      this.add(MemoriesBlocUpdateMemory(event.updatedMemory));
+    } else if (event is MemoryRepositoryRemoveMemory) {
+      final currentState = state;
+      yield MemoriesLoadInProgress.fromMemoriesState(currentState);
+      currentState.memories
+          .removeWhere((element) => element.id == event.removedMemory.id);
+      yield MemoriesLoadSuccess.fromMemoriesState(currentState);
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _memoryStreamSubscription.cancel();
+    return super.close();
   }
 }

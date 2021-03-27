@@ -17,3 +17,21 @@ class SearchBlocSearch extends SearchBlocEvent {
   @override
   List<Object> get props => [...super.props, query];
 }
+
+class SearchBlocCollectionRepoEvent extends SearchBlocEvent {
+  final CollectionRepositoryEvent event;
+
+  SearchBlocCollectionRepoEvent(this.event);
+
+  @override
+  List<Object> get props => [this.event];
+}
+
+class SearchBlocMemoryRepoEvent extends SearchBlocEvent {
+  final MemoryRepositoryEvent event;
+
+  SearchBlocMemoryRepoEvent(this.event);
+
+  @override
+  List<Object> get props => [this.event];
+}

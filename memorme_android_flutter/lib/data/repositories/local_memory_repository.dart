@@ -7,6 +7,8 @@ import 'package:memorme_android_flutter/data/repositories/memory_repository.dart
 class LocalMemoryRepository extends MemoryRepository {
   List<Memory> _memories = [];
   List<Story> _stories = [];
+  int _lastMemoryIndex = -1;
+  int _lastStoryIndex = -1;
 
   @override
   Future<Memory> fetch(int id) async {
@@ -63,7 +65,7 @@ class LocalMemoryRepository extends MemoryRepository {
       Story s = story;
       // id is null? give it an id
       if (s.id == null) {
-        s = Story.editStory(s, id: _stories.length);
+        s = Story.editStory(s, id: ++_lastStoryIndex);
       }
       int index = _stories.indexWhere((element) => element.id == story.id);
       if (index == -1) {
@@ -80,7 +82,7 @@ class LocalMemoryRepository extends MemoryRepository {
 
     // give memory an id if it doesn't have one
     if (memory.id == null) {
-      int id = _memories.length;
+      int id = ++_lastMemoryIndex;
       Memory newMem = Memory.editMemory(memory, id: id);
       _memories.add(newMem);
       return newMem;

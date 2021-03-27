@@ -56,9 +56,8 @@ class _CollectionsPageState extends State<CollectionsPage> {
                     arguments: EditCollectionArguments(
                       collection: Collection(),
                       onSave: (collection) {
-                        print(collection);
-                        BlocProvider.of<CollectionsBloc>(context)
-                            .add(CollectionsBlocLoadCollections(true));
+                        // BlocProvider.of<CollectionsBloc>(context)
+                        //     .add(CollectionsBlocLoadCollections(true));
                       },
                     ));
               },

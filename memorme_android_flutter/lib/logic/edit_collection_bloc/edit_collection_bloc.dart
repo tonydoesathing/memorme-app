@@ -6,6 +6,7 @@ import 'package:memorme_android_flutter/data/models/collections/collection.dart'
 import 'package:memorme_android_flutter/data/models/collections/collection_type.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/collection_repository_event.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 
 part 'edit_collection_bloc_event.dart';
@@ -102,6 +103,9 @@ class EditCollectionBloc
           memories: state.memories,
           mcRelations: state.mcRelations,
           removedMCRelations: state.removedMCRelations);
+
+      bool adding = state.collection.id == null;
+
       // save collection
       Collection savedCol = await collectionRepository.saveCollection(
           Collection.editCollection(state.collection,
@@ -123,6 +127,15 @@ class EditCollectionBloc
       // delete MCRelations that aren't in the initialCollection
       for (MCRelation mcRelation in state.removedMCRelations) {
         await collectionRepository.removeMCRelation(mcRelation);
+      }
+
+      // send the event to those listening
+      if (adding) {
+        collectionRepository.addEvent(
+            CollectionRepositoryAddCollection(savedCol, savedMCRelations));
+      } else {
+        collectionRepository.addEvent(
+            CollectionRepositoryUpdateCollection(savedCol, savedMCRelations));
       }
 
       yield EditCollectionSaved(

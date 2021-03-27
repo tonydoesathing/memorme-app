@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
 
 abstract class MemoryRepository {
+  final _controller = StreamController<MemoryRepositoryEvent>.broadcast();
+
   /// returns a list of memories with size [pageSize] after [offset] (inclusive)
   /// and sorts it by date last edited and optional [ascending] bool; defaults to false
   ///
@@ -46,4 +51,18 @@ abstract class MemoryRepository {
   /// searches for [memory] that match the [query]
   /// returns a list of [searchResults] sorted by points decending
   Future<List<SearchResult>> searchMemories(String query);
+
+  /// gives a stream of [MemoryRepositoryEvent] that can be subscribed to
+  Stream<MemoryRepositoryEvent> get repositoryEventStream =>
+      _controller.stream.asBroadcastStream();
+
+  /// add an event to the stream
+  void addEvent(MemoryRepositoryEvent event) {
+    _controller.add(event);
+  }
+
+  /// call to close the stream
+  void dispose() {
+    _controller.close();
+  }
 }

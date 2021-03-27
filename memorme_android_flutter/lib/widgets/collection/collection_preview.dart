@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/collection_repository_event.dart';
 import 'package:memorme_android_flutter/pages/edit_collection_page.dart';
 import 'package:memorme_android_flutter/widgets/memory/memory_preview.dart';
 
@@ -89,8 +90,13 @@ class CollectionPreview extends StatelessWidget {
                                                   child: Text('Yes'),
                                                   onPressed: () {
                                                     // discard the collection
-                                                    repository.removeCollection(
-                                                        collection);
+                                                    repository
+                                                        .removeCollection(
+                                                            collection)
+                                                        .then((value) =>
+                                                            repository.addEvent(
+                                                                CollectionRepositoryRemoveCollection(
+                                                                    value)));
                                                     // close the dialog and allow it to pop
                                                     Navigator.pop(
                                                         context, true);

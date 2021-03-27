@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 
+import 'collection_repository_event.dart';
+
 abstract class CollectionRepository {
+  final _controller = StreamController<CollectionRepositoryEvent>.broadcast();
+
   /// returns a list of collections with size [pageSize] after [lastCollection] (exclusive)
   /// and sorts it by date last edited and optional [ascending] bool; defaults to false
   Future<List<Collection>> fetchCollections(
@@ -31,7 +37,21 @@ abstract class CollectionRepository {
       Collection collection, int pageSize, MCRelation lastMCRelation,
       {bool ascending = false});
 
-  /// searches for [collection] that match the [query]
+  /// searches for [removedCollection] that match the [query]
   /// returns a list of [searchResults] sorted by points decending
   Future<List<SearchResult>> searchCollections(String query);
+
+  /// gives a stream of [CollectionRepositoryEvents] that can be subscribed to
+  Stream<CollectionRepositoryEvent> get repositoryEventStream =>
+      _controller.stream.asBroadcastStream();
+
+  /// add an event to the stream
+  void addEvent(CollectionRepositoryEvent event) {
+    _controller.add(event);
+  }
+
+  /// call to close the stream
+  void dispose() {
+    _controller.close();
+  }
 }

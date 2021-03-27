@@ -15,3 +15,21 @@ class ViewCollectionBlocLoadMemories extends ViewCollectionBlocEvent {
   @override
   List<Object> get props => [this.fromStart];
 }
+
+class ViewCollectionBlocCollectionRepoEvent extends ViewCollectionBlocEvent {
+  final CollectionRepositoryEvent event;
+
+  ViewCollectionBlocCollectionRepoEvent(this.event);
+
+  @override
+  List<Object> get props => [this.event];
+}
+
+class ViewCollectionBlocMemoryRepoEvent extends ViewCollectionBlocEvent {
+  final MemoryRepositoryEvent event;
+
+  ViewCollectionBlocMemoryRepoEvent(this.event);
+
+  @override
+  List<Object> get props => [this.event];
+}

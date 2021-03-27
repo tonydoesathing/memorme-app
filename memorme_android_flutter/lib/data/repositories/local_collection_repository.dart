@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/collection_repository_event.dart';
 
 import 'exceptions/element_does_not_exist_exception.dart';
 
-class LocalCollectionRepository implements CollectionRepository {
+class LocalCollectionRepository extends CollectionRepository {
   List<Collection> _collections = [];
   List<MCRelation> _mcRelations = [];
+  int _lastCollectionID = -1;
+  int _lastMCRelationID = -1;
 
   @override
   Future<Collection> fetch(int id) async {
@@ -62,7 +67,7 @@ class LocalCollectionRepository implements CollectionRepository {
     // give the collection an id if it doesn't have one
     if (savedCollection.id == null) {
       savedCollection =
-          Collection.editCollection(savedCollection, id: _collections.length);
+          Collection.editCollection(savedCollection, id: ++_lastCollectionID);
     }
 
     // check to see if collection is in list and add it if it isn't
@@ -113,7 +118,7 @@ class LocalCollectionRepository implements CollectionRepository {
     // give id if it doesn't have one
     if (savedMCRelation.id == null) {
       savedMCRelation =
-          MCRelation.editMCRelation(savedMCRelation, id: _mcRelations.length);
+          MCRelation.editMCRelation(savedMCRelation, id: ++_lastMCRelationID);
     }
     // if mcRelation in list, update it
     int indexWhere =
@@ -124,7 +129,6 @@ class LocalCollectionRepository implements CollectionRepository {
       // update it if it is
       _mcRelations[indexWhere] = savedMCRelation;
     }
-
     return savedMCRelation;
   }
 

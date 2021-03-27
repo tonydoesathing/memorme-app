@@ -32,9 +32,8 @@ class ViewCollectionPage extends StatelessWidget {
                       arguments: EditCollectionArguments(
                         collection: state.collection,
                         onSave: (collection) {
-                          print(collection);
-                          BlocProvider.of<ViewCollectionBloc>(context)
-                              .add(ViewCollectionBlocLoadMemories(true));
+                          // BlocProvider.of<ViewCollectionBloc>(context)
+                          //     .add(ViewCollectionBlocLoadMemories(true));
                         },
                       ));
                 },

@@ -5,7 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/collection_repository_event.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
 
 part 'view_collection_bloc_event.dart';
 part 'view_collection_bloc_state.dart';
@@ -15,6 +17,8 @@ class ViewCollectionBloc
   final Collection collection;
   final CollectionRepository collectionRepository;
   final MemoryRepository memoryRepository;
+  StreamSubscription<CollectionRepositoryEvent> _collectionStreamSubscription;
+  StreamSubscription<MemoryRepositoryEvent> _memoryStreamSubscription;
   static const pageSize = 10;
 
   ViewCollectionBloc(
@@ -23,7 +27,16 @@ class ViewCollectionBloc
           collection: collection,
           mcRelations: [],
           memories: [],
-        ));
+        )) {
+    _collectionStreamSubscription =
+        collectionRepository.repositoryEventStream.listen((event) {
+      this.add(ViewCollectionBlocCollectionRepoEvent(event));
+    });
+    _memoryStreamSubscription =
+        memoryRepository.repositoryEventStream.listen((event) {
+      this.add(ViewCollectionBlocMemoryRepoEvent(event));
+    });
+  }
 
   @override
   Stream<ViewCollectionBlocState> mapEventToState(
@@ -31,6 +44,10 @@ class ViewCollectionBloc
   ) async* {
     if (event is ViewCollectionBlocLoadMemories) {
       yield* _mapLoadMemoriesToState(event.fromStart);
+    } else if (event is ViewCollectionBlocCollectionRepoEvent) {
+      yield* _mapCollectionRepoEventToState(event.event);
+    } else if (event is ViewCollectionBlocMemoryRepoEvent) {
+      yield* _mapMemoryRepoEventToState(event.event);
     }
   }
 
@@ -77,5 +94,39 @@ class ViewCollectionBloc
         moreToLoad: state.moreToLoad,
       );
     }
+  }
+
+  Stream<ViewCollectionBlocState> _mapCollectionRepoEventToState(
+      CollectionRepositoryEvent event) async* {
+    if (event is CollectionRepositoryAddCollection) {
+      // ummm also this shouldn't really happen
+    } else if (event is CollectionRepositoryUpdateCollection) {
+      // reload the memory
+      this.add(ViewCollectionBlocLoadMemories(true));
+    } else if (event is CollectionRepositoryRemoveCollection) {
+      // ummmmmm hopefully this doesn't happen
+
+    }
+  }
+
+  Stream<ViewCollectionBlocState> _mapMemoryRepoEventToState(
+      MemoryRepositoryEvent event) async* {
+    if (event is MemoryRepositoryAddMemory) {
+      // ummm also this shouldn't really happen
+      this.add(ViewCollectionBlocLoadMemories(true));
+    } else if (event is MemoryRepositoryUpdateMemory) {
+      // reload the memory
+      this.add(ViewCollectionBlocLoadMemories(true));
+    } else if (event is MemoryRepositoryRemoveMemory) {
+      this.add(ViewCollectionBlocLoadMemories(true));
+    }
+  }
+
+  @override
+  Future<void> close() {
+    // close stream subscription
+    _collectionStreamSubscription?.cancel();
+    _memoryStreamSubscription?.cancel();
+    return super.close();
   }
 }
