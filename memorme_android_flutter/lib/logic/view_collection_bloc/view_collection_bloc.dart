@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
@@ -84,7 +85,8 @@ class ViewCollectionBloc
           memories: (fromStart ? <Memory>[] : state.memories) + memories,
           isLoading: false,
           moreToLoad: mcRelations.length > 0));
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield ViewCollectionBlocError(
         _,
         collection: state.collection,

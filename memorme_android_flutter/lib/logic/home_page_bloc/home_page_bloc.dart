@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
@@ -80,7 +81,8 @@ class HomePageBloc extends Bloc<HomePageBlocEvent, HomePageBlocState> {
           memories: memories,
           collections: collections,
           collectionMemories: state.collectionMemories);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield HomePageBlocError(_,
           memories: state.memories,
           collections: state.collections,
@@ -100,7 +102,8 @@ class HomePageBloc extends Bloc<HomePageBlocEvent, HomePageBlocState> {
           memories: state.memories + memories,
           collections: state.collections,
           collectionMemories: state.collectionMemories);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield HomePageBlocError(_,
           memories: state.memories,
           collections: state.collections,
@@ -132,7 +135,8 @@ class HomePageBloc extends Bloc<HomePageBlocEvent, HomePageBlocState> {
           memories: state.memories,
           collections: state.collections + collections,
           collectionMemories: state.collectionMemories);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield HomePageBlocError(_,
           memories: state.memories,
           collections: state.collections,

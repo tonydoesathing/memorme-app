@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/search_result.dart';
@@ -58,7 +59,8 @@ class SearchBloc extends Bloc<SearchBlocEvent, SearchBlocState> {
           query: state.query,
           results: state.results,
           collectionMemories: state.collectionMemories);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield SearchBlocError(_,
           query: state.query,
           results: state.results,
@@ -104,7 +106,8 @@ class SearchBloc extends Bloc<SearchBlocEvent, SearchBlocState> {
             results: finalResults,
             collectionMemories: state.collectionMemories);
       }
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield SearchBlocError(_,
           query: state.query,
           results: state.results,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:memorme_android_flutter/data/providers/analytics_provider.dart';
 import 'package:memorme_android_flutter/data/providers/sqlite_db_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/local_collection_repository.dart';
@@ -34,12 +35,15 @@ class AppRouter {
   AppRouter() {
     _memoryRepository = LocalMemoryRepository();
     _collectionRepository = LocalCollectionRepository();
+    AnalyticsProvider()
+        .registerRepositoryEvents(_collectionRepository, _memoryRepository);
   }
 
   Route onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
+            settings: RouteSettings(name: settings.name),
             builder: (_) => MultiRepositoryProvider(providers: [
                   RepositoryProvider<MemoryRepository>.value(
                       value: _memoryRepository),
@@ -49,6 +53,7 @@ class AppRouter {
       case '/view_memory':
         ViewMemoryPageArguments arguments = settings.arguments;
         return MaterialPageRoute(
+          settings: RouteSettings(name: settings.name),
           builder: (context) {
             return ViewMemoryPage(arguments.memory);
           },
@@ -56,12 +61,14 @@ class AppRouter {
       case '/take_picture':
         TakePictureArguments arguments = settings.arguments;
         return MaterialPageRoute(
+            settings: RouteSettings(name: settings.name),
             builder: (_) => TakePictureScreen(
                 takePictureCallback: arguments.takePictureCallback));
 
       case '/edit_memory':
         EditMemoryArguments arguments = settings.arguments;
         return MaterialPageRoute(
+            settings: RouteSettings(name: settings.name),
             builder: (_) => BlocProvider(
                   create: (context) => EditMemoryBloc(_memoryRepository,
                       memory: arguments.memory),
@@ -73,6 +80,7 @@ class AppRouter {
       case '/edit_collection':
         EditCollectionArguments arguments = settings.arguments;
         return MaterialPageRoute(
+            settings: RouteSettings(name: settings.name),
             builder: (_) => BlocProvider(
                   create: (context) => EditCollectionBloc(
                       _collectionRepository, _memoryRepository,
@@ -86,6 +94,7 @@ class AppRouter {
       case '/view_collection':
         ViewCollectionArguments arguments = settings.arguments;
         return MaterialPageRoute(
+            settings: RouteSettings(name: settings.name),
             builder: (_) => BlocProvider(
                   create: (context) => ViewCollectionBloc(_collectionRepository,
                       _memoryRepository, arguments.collection)
@@ -95,6 +104,7 @@ class AppRouter {
       case '/select_memories':
         SelectMemoriesPageArguments arguments = settings.arguments;
         return MaterialPageRoute(
+            settings: RouteSettings(name: settings.name),
             builder: (_) => BlocProvider(
                   create: (context) => SelectMemoriesBloc(_memoryRepository)
                     ..add(SelectMemoriesBlocLoadMemories(true)),

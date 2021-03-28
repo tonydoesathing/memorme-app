@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
@@ -76,7 +77,8 @@ class SelectMemoriesBloc
               selectedMemories: state.selectedMemories);
         }
       }
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield SelectMemoriesBlocError(_,
           memories: state.memories,
           hasReachedMax: state.hasReachedMax,
@@ -98,7 +100,8 @@ class SelectMemoriesBloc
           memories: state.memories,
           hasReachedMax: state.hasReachedMax,
           selectedMemories: selectedMemories);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield SelectMemoriesBlocError(_,
           memories: state.memories,
           hasReachedMax: state.hasReachedMax,
@@ -120,7 +123,8 @@ class SelectMemoriesBloc
           memories: state.memories,
           hasReachedMax: state.hasReachedMax,
           selectedMemories: selectedMemories);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield SelectMemoriesBlocError(_,
           memories: state.memories,
           hasReachedMax: state.hasReachedMax,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:memorme_android_flutter/data/providers/analytics_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.dart';
@@ -51,6 +52,9 @@ class _TopLevelPageState extends State<TopLevelPage> {
             // these are our main pages
             BlocProvider(
               create: (context) {
+                AnalyticsProvider()
+                    .analytics
+                    .setCurrentScreen(screenName: "Home");
                 return HomePageBloc(
                     RepositoryProvider.of<CollectionRepository>(context),
                     RepositoryProvider.of<MemoryRepository>(context))
@@ -60,6 +64,9 @@ class _TopLevelPageState extends State<TopLevelPage> {
             ),
             BlocProvider(
                 create: (context) {
+                  AnalyticsProvider()
+                      .analytics
+                      .setCurrentScreen(screenName: "Search");
                   return SearchBloc(
                       RepositoryProvider.of<CollectionRepository>(context),
                       RepositoryProvider.of<MemoryRepository>(context))
@@ -68,6 +75,9 @@ class _TopLevelPageState extends State<TopLevelPage> {
                 child: SearchPage()),
             BlocProvider(
               create: (context) {
+                AnalyticsProvider()
+                    .analytics
+                    .setCurrentScreen(screenName: "Collections");
                 return CollectionsBloc(
                     RepositoryProvider.of<CollectionRepository>(context),
                     RepositoryProvider.of<MemoryRepository>(context))
@@ -77,6 +87,9 @@ class _TopLevelPageState extends State<TopLevelPage> {
             ),
             BlocProvider(
               create: (context) {
+                AnalyticsProvider()
+                    .analytics
+                    .setCurrentScreen(screenName: "Memories");
                 return MemoriesBloc(
                     RepositoryProvider.of<MemoryRepository>(context))
                   ..add(MemoriesBlocLoadMemories(true));

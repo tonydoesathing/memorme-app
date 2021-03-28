@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
+import 'package:memorme_android_flutter/data/providers/analytics_provider.dart';
 import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
@@ -77,7 +79,8 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
         repository.addEvent(MemoryRepositoryUpdateMemory(savedMem));
       }
       yield EditMemorySaved(savedMem, state.initialMemory);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
   }
@@ -98,7 +101,8 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
         }
       }
       yield EditMemoryDiscarded(state.memory, state.initialMemory);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
   }
@@ -109,7 +113,8 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       yield EditMemoryDisplayed(
           Memory.editMemory(state.memory, title: newTitle),
           state.initialMemory);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
   }
@@ -122,7 +127,8 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
           Memory.editMemory(state.memory,
               stories: state.memory.stories + [story]),
           state.initialMemory);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
   }
@@ -142,7 +148,8 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       yield EditMemoryDisplayed(
           Memory.editMemory(state.memory, stories: state.memory.stories),
           state.initialMemory);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
   }
@@ -165,7 +172,8 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       }
 
       yield EditMemoryDisplayed(state.memory, state.initialMemory);
-    } catch (_) {
+    } catch (_, stacktrace) {
+      FirebaseCrashlytics.instance.recordError(_, stacktrace);
       yield EditMemoryError(state.memory, state.initialMemory, _);
     }
   }
