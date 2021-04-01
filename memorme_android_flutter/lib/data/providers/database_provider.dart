@@ -62,8 +62,8 @@ class DBProvider {
             "$row_data TEXT,"
             "$date_created INTEGER,"
             "$date_last_edited INTEGER,"
-            "FOREIGN KEY ($memory_fk) REFERENCES $memory_table ($row_id),"
-            "FOREIGN KEY ($collection_fk) REFERENCES $collection_table ($row_id)"
+            "FOREIGN KEY ($memory_fk) REFERENCES $memory_table ($row_id) ON DELETE CASCADE ON UPDATE CASCADE,"
+            "FOREIGN KEY ($collection_fk) REFERENCES $collection_table ($row_id) ON DELETE CASCADE ON UPDATE CASCADE"
             ")");
       },
     );

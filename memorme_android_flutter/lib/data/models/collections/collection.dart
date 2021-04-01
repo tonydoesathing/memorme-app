@@ -37,7 +37,7 @@ class Collection extends Equatable {
           ? DateTime.fromMillisecondsSinceEpoch(dateCreated)
           : null,
       dateLastEdited: dateLastEdited != null
-          ? DateTime.fromMillisecondsSinceEpoch(dateCreated)
+          ? DateTime.fromMillisecondsSinceEpoch(dateLastEdited)
           : null,
     );
   }

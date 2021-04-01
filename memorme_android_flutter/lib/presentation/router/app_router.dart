@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/providers/analytics_provider.dart';
+import 'package:memorme_android_flutter/data/providers/database_provider.dart';
 import 'package:memorme_android_flutter/data/providers/sqlite_db_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/local_collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/local_memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/sqlite_collection_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/sqlite_memory_repository.dart';
 import 'package:memorme_android_flutter/logic/collections_bloc/collections_bloc.dart';
 import 'package:memorme_android_flutter/logic/edit_collection_bloc/edit_collection_bloc.dart';
@@ -31,10 +33,11 @@ import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 class AppRouter {
   MemoryRepository _memoryRepository;
   CollectionRepository _collectionRepository;
+  DBProvider _dbProvider = DBProvider();
 
   AppRouter() {
-    _memoryRepository = LocalMemoryRepository();
-    _collectionRepository = LocalCollectionRepository();
+    _memoryRepository = SQLiteMemoryRepository(_dbProvider);
+    _collectionRepository = SQLiteCollectionRepository(_dbProvider);
     AnalyticsProvider()
         .registerRepositoryEvents(_collectionRepository, _memoryRepository);
   }

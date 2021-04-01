@@ -1,412 +1,149 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
-import 'package:memorme_android_flutter/data/models/collections/collection_type.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
-import 'package:memorme_android_flutter/data/repositories/local_collection_repository.dart';
-import 'package:test/test.dart';
+import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
+import 'package:memorme_android_flutter/data/providers/database_provider.dart';
+import 'package:memorme_android_flutter/data/repositories/sqlite_collection_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/sqlite_memory_repository.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-main() {
-  group("Local Collection Data Repository Test >", () {
-    LocalCollectionRepository repo;
+main(){
+  
+  SQLiteCollectionRepository cRepo;
+  SQLiteMemoryRepository mRepo;
+  // Database db;
+  DBProvider dbProvider;
 
-    setUp(() {
-      repo = LocalCollectionRepository();
+  group("Collection Repository >", (){
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+    
+    setUp(() async {
+      dbProvider = DBProvider();
+      cRepo = SQLiteCollectionRepository(dbProvider);
+      mRepo = SQLiteMemoryRepository(dbProvider);
     });
 
-    test("Should start off with empty repo", () async {
-      List<Collection> collections = await repo.fetchCollections(5, null);
-      expect(collections, []);
+    tearDown(() async {
+      // db = null;
+      await dbProvider.closeDatabase();
+      dbProvider = null;
+      cRepo = null;
+      mRepo = null;
     });
 
-    test("Should be able to save a collection", () async {
-      expect(await repo.fetchCollections(5, null), []);
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
+    test("Can save, retrieve, and delete collections, mcrelations with text story", () async {
 
-      Collection col = Collection(
-        id: 0,
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
+      Collection c1 = Collection(id: 1, previewData: "Hallo", type: 1, title: "hej", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(10000));
+      Collection c2 = Collection(id: 2, previewData: "Hall", type: 10, title: "hejj", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(20000));
+      Collection c3 = Collection(id: 3, previewData: "Hal", type: 100, title: "hejjj", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(30000));
+      Collection c4 = Collection(id: 4, previewData: "Ha", type: 1000, title: "hejjjj", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(40000));
 
-      Collection savedCollection = await repo.saveCollection(col);
-      expect(savedCollection, col);
+      Memory mem1 = Memory(id: 10);
+      Memory mem2 = Memory(id: 20);
+      Memory mem3 = Memory(id: 30);
+      Memory mem4 = Memory(id: 40);
+      Memory mem5 = Memory(id: 50);
+      Memory mem6 = Memory(id: 60);
+      Memory mem7 = Memory(id: 70);
+      Memory mem8 = Memory(id: 80);
 
-      expect(await repo.fetchCollections(5, null), [col]);
+      MCRelation mc1 = MCRelation(id: 1, memoryID: 10, collectionID: 1, relationshipData: "Single", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(100000));
+      MCRelation mc2 = MCRelation(id: 2, memoryID: 20, collectionID: 1, relationshipData: "Singl", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(200000));
+      MCRelation mc3 = MCRelation(id: 3, memoryID: 30, collectionID: 1, relationshipData: "Sing", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(300000));
+      MCRelation mc4 = MCRelation(id: 4, memoryID: 40, collectionID: 1, relationshipData: "Sin", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(400000));
+      MCRelation mc5 = MCRelation(id: 5, memoryID: 50, collectionID: 2, relationshipData: "Si", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(500000));
+      MCRelation mc6 = MCRelation(id: 6, memoryID: 60, collectionID: 2, relationshipData: "S", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(600000));
+      MCRelation mc7 = MCRelation(id: 7, memoryID: 70, collectionID: 3, relationshipData: "So", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(700000));
+      MCRelation mc8 = MCRelation(id: 8, memoryID: 80, collectionID: 4, relationshipData: "Sou", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(800000));
+
+      // Check if everything saves properly
+
+      await cRepo.saveCollection(c1);
+      await cRepo.saveCollection(c2);
+      await cRepo.saveCollection(c3);
+      await cRepo.saveCollection(c4);
+      await mRepo.saveMemory(mem1);
+      await mRepo.saveMemory(mem2);
+      await mRepo.saveMemory(mem3);
+      await mRepo.saveMemory(mem4);
+      await mRepo.saveMemory(mem5);
+      await mRepo.saveMemory(mem6);
+      await mRepo.saveMemory(mem7);
+      await mRepo.saveMemory(mem8);
+      await cRepo.saveMCRelation(mc1);
+      await cRepo.saveMCRelation(mc2);
+      await cRepo.saveMCRelation(mc3);
+      await cRepo.saveMCRelation(mc4);
+      await cRepo.saveMCRelation(mc5);
+      await cRepo.saveMCRelation(mc6);
+      await cRepo.saveMCRelation(mc7);
+      await cRepo.saveMCRelation(mc8);
+
+      expect(await cRepo.fetchCollections(8, null), [c4, c3, c2, c1]);
+      expect(await cRepo.fetchMCRelations(c1, 10, null), [mc4, mc3, mc2, mc1]);
+      expect(await cRepo.fetchMCRelations(c2, 2, null), [mc6, mc5]);
+      expect(await cRepo.fetchMCRelations(c3, 2, null), [mc7]);
+      expect(await cRepo.fetchMCRelations(c4, 1, null), [mc8]);
+
+      // Check if everything deletes
+
+      cRepo.removeCollection(c1);
+      cRepo.removeCollection(c2);
+
+      expect(await cRepo.fetch(1), null);
+      expect(await cRepo.fetchMCRelations(c1, 10, null), []);
+      expect(await cRepo.fetch(2), null);
+      expect(await cRepo.fetchMCRelations(c2, 10, null), []);
+      expect(await cRepo.fetch(3), c3);
+      expect(await cRepo.fetchMCRelations(c3, 2, null), [mc7]);
+      expect(await cRepo.fetch(4), c4);
+      expect(await cRepo.fetchMCRelations(c4, 1, null), [mc8]);
+      
+      cRepo.removeMCRelation(mc8);
+      expect(await cRepo.fetch(4), c4);
+      expect(await cRepo.fetchMCRelations(c4, 1, null), []);
+
     });
 
-    test(
-        "Saving collection without ID should give ID to collection and its MCData",
-        () async {
-      expect(await repo.fetchCollections(5, null), []);
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
+    test("Can fetch mcrelations of various page sizes", () async {
 
-      Collection col = Collection(
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
+      Collection c1 = Collection(id: 1, previewData: "Hallo", type: 1, title: "hej", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(10000));
 
-      Collection savedCollection = await repo.saveCollection(col);
+      Memory mem1 = Memory(id: 10);
+      Memory mem2 = Memory(id: 20);
+      Memory mem3 = Memory(id: 30);
+      Memory mem4 = Memory(id: 40);
 
-      Collection expectedCollection = Collection.editCollection(
-        col,
-        id: 0,
-      );
-      expect(savedCollection, expectedCollection);
+      MCRelation mc1 = MCRelation(id: 1, memoryID: 10, collectionID: 1, relationshipData: "Single", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(100000));
+      MCRelation mc2 = MCRelation(id: 2, memoryID: 20, collectionID: 1, relationshipData: "Singl", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(200000));
+      MCRelation mc3 = MCRelation(id: 3, memoryID: 30, collectionID: 1, relationshipData: "Sing", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(300000));
+      MCRelation mc4 = MCRelation(id: 4, memoryID: 40, collectionID: 1, relationshipData: "Sin", dateCreated: DateTime.now(), dateLastEdited: DateTime.fromMicrosecondsSinceEpoch(400000));
 
-      expect(await repo.fetchCollections(5, null), [expectedCollection]);
-    });
+      await cRepo.saveCollection(c1);
+      await mRepo.saveMemory(mem1);
+      await mRepo.saveMemory(mem2);
+      await mRepo.saveMemory(mem3);
+      await mRepo.saveMemory(mem4);
+      await cRepo.saveMCRelation(mc1);
+      await cRepo.saveMCRelation(mc2);
+      await cRepo.saveMCRelation(mc3);
+      await cRepo.saveMCRelation(mc4);
 
-    test("Should be able to fetch a collection", () async {
-      expect(await repo.fetchCollections(5, null), []);
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
+      // retrieve various mcrelations combinations from first collection
 
-      Collection col = Collection(
-        id: 0,
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
+      expect(await cRepo.fetchMCRelations(c1, 10, null), [mc4, mc3, mc2, mc1]);
+      expect(await cRepo.fetchMCRelations(c1, 4, null), [mc4, mc3, mc2, mc1]);
+      expect(await cRepo.fetchMCRelations(c1, 3, null), [mc4, mc3, mc2]);
+      expect(await cRepo.fetchMCRelations(c1, 3, null), [mc4, mc3, mc2]);
+      expect(await cRepo.fetchMCRelations(c1, 2, mc3), [mc2, mc1]);
+      expect(await cRepo.fetchMCRelations(c1, 2, mc2), [mc1]);
+      expect(await cRepo.fetchMCRelations(c1, 1, mc1), []);
+      expect(await cRepo.fetchMCRelations(c1, 0, mc1), []);
+      
 
-      Collection savedCollection = await repo.saveCollection(col);
-      expect(savedCollection, col);
-    });
-
-    test("Should be able to remove a collection", () async {
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
-
-      Collection col = Collection(
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
-
-      Collection savedCollection = await repo.saveCollection(col);
-
-      Collection expectedCollection = Collection.editCollection(
-        col,
-        id: 0,
-      );
-      expect(savedCollection, expectedCollection);
-
-      Collection removedCollection =
-          await repo.removeCollection(savedCollection);
-      expect(await repo.fetchCollections(5, null), []);
-    });
-
-    test("Should be able to pageinate collections", () async {
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
-
-      List<Collection> collections = [];
-      for (int i = 0; i < 10; i++) {
-        Collection col = Collection(
-          type: CollectionType.DECK,
-          title: "WOW",
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-        );
-        col = await repo.saveCollection(col);
-        collections.add(col);
-      }
-
-      collections
-          .sort((a, b) => -1 * a.dateLastEdited.compareTo(b.dateLastEdited));
-
-      expect(await repo.fetchCollections(10, null), collections);
-      expect(await repo.fetchCollections(2, collections[1]),
-          collections.sublist(2, 4));
-      collections.sort((a, b) => a.dateLastEdited.compareTo(b.dateLastEdited));
-      expect(await repo.fetchCollections(2, collections[1], ascending: true),
-          collections.sublist(2, 4));
-    });
-
-    test("Should be able to save MCRelations", () async {
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
-
-      Collection col = Collection(
-        id: 0,
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
-
-      Collection savedCollection = await repo.saveCollection(col);
-      expect(savedCollection, col);
-
-      expect(await repo.fetchCollections(5, null), [col]);
-
-      MCRelation mcRelation = MCRelation(
-          memoryID: m.id,
-          collectionID: savedCollection.id,
-          relationshipData: 0.toString(),
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now());
-      MCRelation savedMCRelation = await repo.saveMCRelation(mcRelation);
-
-      expect(savedMCRelation, MCRelation.editMCRelation(mcRelation, id: 0));
-      expect(await repo.fetchMCRelations(savedCollection, 5, null),
-          [savedMCRelation]);
-    });
-
-    test("Should be able to remove MCRelations", () async {
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
-
-      Collection col = Collection(
-        id: 0,
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
-
-      Collection savedCollection = await repo.saveCollection(col);
-      expect(savedCollection, col);
-
-      expect(await repo.fetchCollections(5, null), [col]);
-
-      MCRelation mcRelation = MCRelation(
-          memoryID: m.id,
-          collectionID: savedCollection.id,
-          relationshipData: 0.toString(),
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now());
-      MCRelation savedMCRelation = await repo.saveMCRelation(mcRelation);
-
-      expect(savedMCRelation, MCRelation.editMCRelation(mcRelation, id: 0));
-      expect(await repo.fetchMCRelations(savedCollection, 5, null),
-          [savedMCRelation]);
-
-      MCRelation removedMCRelation =
-          await repo.removeMCRelation(savedMCRelation);
-      expect(await repo.fetchMCRelations(savedCollection, 5, null), []);
-    });
-
-    test(
-        "Should be able to fetch a page of MCRelations accord to collection type",
-        () async {
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
-
-      Collection col = Collection(
-        id: 0,
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
-
-      Collection savedCollection = await repo.saveCollection(col);
-      expect(savedCollection, col);
-
-      expect(await repo.fetchCollections(5, null), [col]);
-
-      List<MCRelation> mcRelations = [];
-      for (int i = 0; i < 10; i++) {
-        // gets position opposite of its id
-        MCRelation mcRelation = MCRelation(
-            memoryID: m.id,
-            collectionID: savedCollection.id,
-            relationshipData: (10 - 1 - i).toString(),
-            dateCreated: DateTime.now(),
-            dateLastEdited: DateTime.now());
-        MCRelation savedMCRelation = await repo.saveMCRelation(mcRelation);
-        mcRelations.add(savedMCRelation);
-      }
-      //get first 5
-      List<MCRelation> fetchedMCRelations = await repo
-          .fetchMCRelations(savedCollection, 5, null, ascending: true);
-      List<MCRelation> sortedMCRelations = List.from(mcRelations);
-
-      expect(sortedMCRelations == mcRelations, false);
-      sortedMCRelations.sort((a, b) => int.parse(a.relationshipData)
-          .compareTo(int.parse(b.relationshipData)));
-
-      expect(fetchedMCRelations, sortedMCRelations.sublist(0, 5));
-
-      // get next 3
-      fetchedMCRelations = await repo.fetchMCRelations(
-          savedCollection, 3, fetchedMCRelations.last,
-          ascending: true);
-      expect(fetchedMCRelations, sortedMCRelations.sublist(5, 8));
-
-      // get last page
-      fetchedMCRelations = await repo.fetchMCRelations(
-          savedCollection, 5, fetchedMCRelations.last,
-          ascending: true);
-      expect(fetchedMCRelations, sortedMCRelations.sublist(8, 10));
-    });
-
-    test(
-        "Should be able to fetch a page of MCRelations for different collections",
-        () async {
-      List<Story> stories = [Story(id: 1), Story(id: 2)];
-      Memory m = Memory(
-          id: 3,
-          title: "meow",
-          previewStory: stories[0],
-          dateCreated: DateTime.now(),
-          dateLastEdited: DateTime.now(),
-          stories: stories);
-
-      Collection col1 = Collection(
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
-
-      Collection col2 = Collection(
-        type: CollectionType.DECK,
-        title: "WOW",
-        dateCreated: DateTime.now(),
-        dateLastEdited: DateTime.now(),
-      );
-
-      Collection savedCollection1 = await repo.saveCollection(col1);
-      expect(savedCollection1, Collection.editCollection(col1, id: 0));
-
-      Collection savedCollection2 = await repo.saveCollection(col2);
-      expect(savedCollection2, Collection.editCollection(col2, id: 1));
-
-      expect(await repo.fetchCollections(5, null),
-          [savedCollection1, savedCollection2]);
-
-      List<MCRelation> mcRelations1 = [];
-      for (int i = 0; i < 10; i++) {
-        // gets position opposite of its id
-        MCRelation mcRelation = MCRelation(
-            memoryID: m.id,
-            collectionID: savedCollection1.id,
-            relationshipData: (10 - 1 - i).toString(),
-            dateCreated: DateTime.now(),
-            dateLastEdited: DateTime.now());
-        MCRelation savedMCRelation = await repo.saveMCRelation(mcRelation);
-        mcRelations1.add(savedMCRelation);
-      }
-      // next collection
-      List<MCRelation> mcRelations2 = [];
-      for (int i = 0; i < 10; i++) {
-        // gets position opposite of its id
-        MCRelation mcRelation = MCRelation(
-            memoryID: m.id,
-            collectionID: savedCollection2.id,
-            relationshipData: (10 - 1 - i).toString(),
-            dateCreated: DateTime.now(),
-            dateLastEdited: DateTime.now());
-        MCRelation savedMCRelation = await repo.saveMCRelation(mcRelation);
-        mcRelations2.add(savedMCRelation);
-      }
-
-      //get first 5
-      List<MCRelation> fetchedMCRelations = await repo
-          .fetchMCRelations(savedCollection1, 5, null, ascending: true);
-      List<MCRelation> sortedMCRelations = List.from(mcRelations1);
-
-      expect(sortedMCRelations == mcRelations1, false);
-      sortedMCRelations.sort((a, b) => int.parse(a.relationshipData)
-          .compareTo(int.parse(b.relationshipData)));
-
-      expect(fetchedMCRelations, sortedMCRelations.sublist(0, 5));
-
-      print(fetchedMCRelations);
-
-      // get next 3
-      fetchedMCRelations = await repo.fetchMCRelations(
-          savedCollection1, 3, fetchedMCRelations.last,
-          ascending: true);
-      expect(fetchedMCRelations, sortedMCRelations.sublist(5, 8));
-
-      // get last page
-      fetchedMCRelations = await repo.fetchMCRelations(
-          savedCollection1, 5, fetchedMCRelations.last,
-          ascending: true);
-      expect(fetchedMCRelations, sortedMCRelations.sublist(8, 10));
-
-      // second collection
-      //get first 5
-      fetchedMCRelations = await repo
-          .fetchMCRelations(savedCollection2, 5, null, ascending: true);
-      sortedMCRelations = List.from(mcRelations2);
-
-      expect(sortedMCRelations == mcRelations2, false);
-      sortedMCRelations.sort((a, b) => int.parse(a.relationshipData)
-          .compareTo(int.parse(b.relationshipData)));
-
-      expect(fetchedMCRelations, sortedMCRelations.sublist(0, 5));
-
-      print(fetchedMCRelations);
-      // get next 3
-      fetchedMCRelations = await repo.fetchMCRelations(
-          savedCollection2, 3, fetchedMCRelations.last,
-          ascending: true);
-      expect(fetchedMCRelations, sortedMCRelations.sublist(5, 8));
-
-      // get last page
-      fetchedMCRelations = await repo.fetchMCRelations(
-          savedCollection2, 5, fetchedMCRelations.last,
-          ascending: true);
-      expect(fetchedMCRelations, sortedMCRelations.sublist(8, 10));
     });
   });
 }
