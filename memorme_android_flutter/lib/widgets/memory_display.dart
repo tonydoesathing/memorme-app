@@ -10,10 +10,12 @@ import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart
 
 class MemoryDisplay extends StatelessWidget {
   final void Function(Memory memory) onEditSave;
+  final Future<Memory> deleteMemory;
 
   final Memory memory;
 
-  const MemoryDisplay(this.memory, {Key key, this.onEditSave})
+  const MemoryDisplay(this.memory,
+      {Key key, this.onEditSave, this.deleteMemory})
       : super(key: key);
 
   parseTime(String datetime) {
@@ -83,49 +85,52 @@ class MemoryDisplay extends StatelessWidget {
                                                   onSave: this.onEditSave));
                                         },
                                       ),
-                                      // ListTile(
-                                      //   leading: Icon(Icons.delete_forever,
-                                      //       color:
-                                      //           Theme.of(context).errorColor),
-                                      //   title: Text("Delete Memory",
-                                      //       style: TextStyle(
-                                      //           color: Theme.of(context)
-                                      //               .errorColor)),
-                                      //   onTap: () {
-                                      //     Navigator.pop(context);
-                                      //     showDialog<bool>(
-                                      //       context: context,
-                                      //       barrierDismissible: true,
-                                      //       builder: (BuildContext context) {
-                                      //         return AlertDialog(
-                                      //           title: Text(
-                                      //               'This will delete the memory forever.\nContinue?'),
-                                      //           actions: <Widget>[
-                                      //             FlatButton(
-                                      //               child: Text('Yes'),
-                                      //               onPressed: () {
-                                      //                 // discard the collection
+                                      ListTile(
+                                        leading: Icon(Icons.delete_forever,
+                                            color:
+                                                Theme.of(context).errorColor),
+                                        title: Text("Delete Memory",
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .errorColor)),
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          if (deleteMemory != null) {
+                                            showDialog<bool>(
+                                              context: context,
+                                              barrierDismissible: true,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: Text(
+                                                      'This will delete the memory forever.\nContinue?'),
+                                                  actions: <Widget>[
+                                                    FlatButton(
+                                                      child: Text('Yes'),
+                                                      onPressed: () async {
+                                                        // discard the collection
 
-                                      //                 // close the dialog and allow it to pop
-                                      //                 Navigator.pop(
-                                      //                     context, true);
-                                      //                 Navigator.pop(
-                                      //                     context, true);
-                                      //               },
-                                      //             ),
-                                      //             FlatButton(
-                                      //               child: Text('No'),
-                                      //               onPressed: () {
-                                      //                 Navigator.pop(
-                                      //                     context, false);
-                                      //               },
-                                      //             ),
-                                      //           ],
-                                      //         );
-                                      //       },
-                                      //     );
-                                      //   },
-                                      // ),
+                                                        await deleteMemory;
+                                                        // close the dialog and allow it to pop
+                                                        Navigator.pop(
+                                                            context, true);
+                                                        Navigator.pop(
+                                                            context, true);
+                                                      },
+                                                    ),
+                                                    FlatButton(
+                                                      child: Text('No'),
+                                                      onPressed: () {
+                                                        Navigator.pop(
+                                                            context, false);
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          }
+                                        },
+                                      ),
                                     ],
                                   ),
                                 );

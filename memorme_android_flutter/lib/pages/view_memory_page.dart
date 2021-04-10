@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
+import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/memory_display.dart';
 
@@ -48,6 +51,13 @@ class _ViewMemoryPageState extends State<ViewMemoryPage> {
             this.memory = memory;
           });
         },
+        deleteMemory: RepositoryProvider.of<MemoryRepository>(context)
+            .removeMemory(memory)
+            .then((mem) {
+          RepositoryProvider.of<MemoryRepository>(context)
+              .addEvent(MemoryRepositoryRemoveMemory(mem));
+          return mem;
+        }),
       )),
     );
   }

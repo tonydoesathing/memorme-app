@@ -58,7 +58,10 @@ class AppRouter {
         return MaterialPageRoute(
           settings: RouteSettings(name: settings.name),
           builder: (context) {
-            return ViewMemoryPage(arguments.memory);
+            return RepositoryProvider.value(
+              value: _memoryRepository,
+              child: ViewMemoryPage(arguments.memory),
+            );
           },
         );
       case '/take_picture':

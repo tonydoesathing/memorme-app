@@ -226,17 +226,20 @@ class HomePageBloc extends Bloc<HomePageBlocEvent, HomePageBlocState> {
       this.add(HomePageBlocInit());
     } else if (event is MemoryRepositoryRemoveMemory) {
       // remove the memory
-      yield (HomePageBlocLoading(
-          memories: state.memories,
-          collections: state.collections,
-          collectionMemories: state.collectionMemories));
-      state.memories
-          .removeWhere((element) => element.id == event.removedMemory.id);
+      // yield (HomePageBlocLoading(
+      //     memories: state.memories,
+      //     collections: state.collections,
+      //     collectionMemories: state.collectionMemories));
+      // state.memories
+      //     .removeWhere((element) => element.id == event.removedMemory.id);
 
-      yield (HomePageBlocDisplayed(
-          memories: state.memories,
-          collections: state.collections,
-          collectionMemories: state.collectionMemories));
+      // yield (HomePageBlocDisplayed(
+      //     memories: state.memories,
+      //     collections: state.collections,
+      //     collectionMemories: state.collectionMemories));
+
+      // fuck that just reload everything
+      this.add(HomePageBlocInit());
     }
   }
 
