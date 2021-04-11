@@ -56,7 +56,9 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _launchURL() async => await canLaunch(_url) ? await launch(_url) : throw 'Could not launch $_url';
+  void _launchURL() async => await canLaunch(_url)
+      ? await launch(_url)
+      : throw 'Could not launch $_url';
 
   @override
   Widget build(BuildContext context) {
@@ -73,105 +75,126 @@ class _HomePageState extends State<HomePage> {
               "Home",
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 8.0),
-            child: Text(
-              "Recent Collections",
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-          ),
-          SizedBox(
-            height: 240.0,
-            child: state.collections.length > 0
-                ? ListView.builder(
-                    controller: _collectionsScroll,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: state.collections.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: index == state.collections.length - 1
-                            ? state.collections.length > 1
-                                ? EdgeInsets.only(
-                                    right: 8.0, top: 8.0, bottom: 8.0)
-                                : EdgeInsets.all(8.0)
-                            : EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.93,
-                          child: CollectionPreview(
-                            onTap: (collection) {
-                              Navigator.pushNamed(context, "/view_collection",
-                                  arguments: ViewCollectionArguments(
-                                      collection: collection));
-                            },
-                            collection: state.collections[index],
-                            memories: state.collectionMemories[
-                                state.collections[index].id],
-                            repository: BlocProvider.of<HomePageBloc>(context)
-                                .collectionRepository,
+          Expanded(
+            child: ListView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 18.0, right: 8.0),
+                  child: Text(
+                    "Recent Collections",
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                ),
+                SizedBox(
+                  height: 240.0,
+                  child: state.collections.length > 0
+                      ? ListView.builder(
+                          controller: _collectionsScroll,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: state.collections.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: index == state.collections.length - 1
+                                  ? state.collections.length > 1
+                                      ? EdgeInsets.only(
+                                          right: 8.0, top: 8.0, bottom: 8.0)
+                                      : EdgeInsets.all(8.0)
+                                  : EdgeInsets.only(
+                                      left: 8.0, top: 8.0, bottom: 8.0),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.93,
+                                child: CollectionPreview(
+                                  onTap: (collection) {
+                                    Navigator.pushNamed(
+                                        context, "/view_collection",
+                                        arguments: ViewCollectionArguments(
+                                            collection: collection));
+                                  },
+                                  collection: state.collections[index],
+                                  memories: state.collectionMemories[
+                                      state.collections[index].id],
+                                  repository:
+                                      BlocProvider.of<HomePageBloc>(context)
+                                          .collectionRepository,
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : Padding(
+                          padding:
+                              const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                          child: Container(
+                            color: MemorMeColors.background,
+                            child: Center(
+                              child: Text(
+                                  "No collections to display at this time"),
+                            ),
                           ),
                         ),
-                      );
-                    },
-                  )
-                : Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                    child: Container(
-                      color: MemorMeColors.background,
-                      child: Center(
-                        child: Text("No collections to display at this time"),
-                      ),
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 18.0, right: 8.0),
+                  child: Text(
+                    "Recent Memories",
+                    style: Theme.of(context).textTheme.bodyText1,
                   ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 8.0),
-            child: Text(
-              "Recent Memories",
-              style: Theme.of(context).textTheme.bodyText1,
+                ),
+                SizedBox(
+                  height: 240.0,
+                  child: state.memories.length > 0
+                      ? ListView.builder(
+                          controller: _memoriesScroll,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: state.memories.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: index == state.memories.length - 1
+                                  ? EdgeInsets.only(
+                                      right: 8.0, top: 8.0, bottom: 8.0)
+                                  : EdgeInsets.only(
+                                      left: 8.0, top: 8.0, bottom: 8.0),
+                              child: SizedBox(
+                                  width: 240 * 0.8,
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                            context, "/view_memory",
+                                            arguments: ViewMemoryPageArguments(
+                                                state.memories[index]));
+                                      },
+                                      child: MemoryPreview(
+                                          memory: state.memories[index]))),
+                            );
+                          },
+                        )
+                      : Padding(
+                          padding:
+                              const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                          child: Container(
+                            color: MemorMeColors.background,
+                            child: Center(
+                                child: Text(
+                                    "No memories to display at this time")),
+                          ),
+                        ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 18.0, right: 8.0, top: 4.0),
+                  child: Center(
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith(
+                                      (states) => Colors.grey[400])),
+                          onPressed: _launchURL,
+                          child: Text("Send us feedback",
+                              style: Theme.of(context).textTheme.subtitle2))),
+                ),
+              ],
             ),
           ),
-          SizedBox(
-            height: 240.0,
-            child: state.memories.length > 0
-                ? ListView.builder(
-                    controller: _memoriesScroll,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: state.memories.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: index == state.memories.length - 1
-                            ? EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0)
-                            : EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
-                        child: SizedBox(
-                            width: 240 * 0.8,
-                            child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(context, "/view_memory",
-                                      arguments: ViewMemoryPageArguments(
-                                          state.memories[index]));
-                                },
-                                child: MemoryPreview(
-                                    memory: state.memories[index]))),
-                      );
-                    },
-                  )
-                : Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                    child: Container(
-                      color: MemorMeColors.background,
-                      child: Center(
-                        child: Text("No memories to display at this time")
-                      ),
-                    ),
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 8.0, top: 4.0),
-            child: Center(child: ElevatedButton(style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.grey[400])), onPressed: _launchURL, child: Text("Send us feedback", style: Theme.of(context).textTheme.subtitle2))),
-          ),
-          Expanded(
-            child: Container(),
-          )
         ]);
       },
     );
