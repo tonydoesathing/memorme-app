@@ -10,6 +10,7 @@ import 'package:memorme_android_flutter/presentation/theme/memorme_colors.dart';
 import 'package:memorme_android_flutter/widgets/BottomNavBar.dart';
 import 'package:memorme_android_flutter/widgets/collection/collection_preview.dart';
 import 'package:memorme_android_flutter/widgets/memory/memory_preview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'edit_memory_page.dart';
 
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   ScrollController _collectionsScroll = ScrollController();
   ScrollController _memoriesScroll = ScrollController();
   final _scrollThreshold = 100.0;
+  final _url = "https://forms.gle/vJT1h7BwZMT3iACK9";
 
   @override
   void initState() {
@@ -53,6 +55,8 @@ class _HomePageState extends State<HomePage> {
     _memoriesScroll.dispose();
     super.dispose();
   }
+
+  void _launchURL() async => await canLaunch(_url) ? await launch(_url) : throw 'Could not launch $_url';
 
   @override
   Widget build(BuildContext context) {
@@ -156,10 +160,14 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       color: MemorMeColors.background,
                       child: Center(
-                        child: Text("No memories to display at this time"),
+                        child: Text("No memories to display at this time")
                       ),
                     ),
                   ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 18.0, right: 8.0, top: 4.0),
+            child: Center(child: ElevatedButton(style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.grey[400])), onPressed: _launchURL, child: Text("Send us feedback", style: Theme.of(context).textTheme.subtitle2))),
           ),
           Expanded(
             child: Container(),
