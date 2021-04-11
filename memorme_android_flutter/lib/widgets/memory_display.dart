@@ -18,19 +18,8 @@ class MemoryDisplay extends StatelessWidget {
       {Key key, this.onEditSave, this.deleteMemory})
       : super(key: key);
 
-  parseTime(String datetime) {
-    String date = datetime.split('T')[0];
-    String time = datetime.split('T')[1];
-
-    String year = date.split('-')[0];
-    String month = date.split('-')[1];
-    String day = date.split('-')[2];
-
-    String hour = time.split(':')[0];
-    String minute = time.split(':')[1];
-
-    String parsed = month + "/" + day + "/" + year;
-    return parsed;
+  String dateFormat(DateTime date) {
+    return "${date.month}/${date.day}/${date.year}";
   }
 
   @override
@@ -46,8 +35,7 @@ class MemoryDisplay extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Center(
                   child: Text(
-                    this.memory.title ??
-                        parseTime(memory.dateLastEdited.toIso8601String()),
+                    this.memory.title ?? dateFormat(memory.dateLastEdited),
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
@@ -152,14 +140,15 @@ class MemoryDisplay extends StatelessWidget {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return ConstrainedBox(
-                      constraints:
-                          BoxConstraints(maxHeight: constraints.maxWidth),
+                      constraints: BoxConstraints(
+                          maxHeight: constraints.maxWidth,
+                          maxWidth: constraints.maxWidth),
                       child: Container(
                         //color: MemorMeColors.darkGrey,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            PictureStoryItem(s),
+                            Expanded(child: PictureStoryItem(s)),
                           ],
                         ),
                       ),

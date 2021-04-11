@@ -13,6 +13,10 @@ class MemoryPreview extends StatelessWidget {
   const MemoryPreview({Key key, @required this.memory, this.width, this.height})
       : super(key: key);
 
+  String dateFormat(DateTime date) {
+    return "${date.month}/${date.day}/${date.year}";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -92,7 +96,10 @@ class MemoryPreview extends StatelessWidget {
                       const EdgeInsets.only(top: 8.0, left: 2.0, right: 2.0),
                   child: Center(
                     child: Text(
-                      memory?.title ?? "",
+                      memory?.title ??
+                          (memory?.dateLastEdited != null
+                              ? dateFormat(memory.dateLastEdited)
+                              : ""),
                       style: Theme.of(context).textTheme.headline6,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
