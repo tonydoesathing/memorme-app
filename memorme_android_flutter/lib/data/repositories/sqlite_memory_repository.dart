@@ -74,7 +74,7 @@ class SQLiteMemoryRepository extends MemoryRepository {
       return memoriesList;
 
     } catch(_){
-      print(_.tostring());
+      print(_.toString());
       return null;
     }
   }
@@ -103,7 +103,18 @@ class SQLiteMemoryRepository extends MemoryRepository {
   Future<Memory> saveMemory (Memory memory) async {
     try{
       Database db = await _dbProvider.getDatabase(pathToDb: inMemoryDatabasePath);
-      int memoryID = await db.insert("$memory_table", memory.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+
+      // try update, if nothing there insert
+      int memoryID;
+      if(memory.id == null){
+        memoryID = await db.insert("$memory_table", memory.toMap());
+      } else {
+        Map m = memory.toMap();
+        memoryID = await db.rawUpdate('UPDATE $memory_table SET $row_title = ?, $preview_story_id = ?, $date_created = ?, $date_last_edited = ?, $location = ? WHERE $row_id = ?', 
+          [m['$row_title']?.toString(), m["$preview_story_id"]?.toString(), m["$date_created"]?.toString(), m["$date_last_edited"]?.toString(), m["$location"]?.toString(), memory.id.toString()]
+        );
+      }
+      
       memory = Memory.editMemory(memory, id: memoryID);
       final List<Story> stories = [];
       for(int i = 0; i < memory.stories.length; i++){

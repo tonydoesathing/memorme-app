@@ -72,6 +72,7 @@ class EditMemoryBloc extends Bloc<EditMemoryEvent, EditMemoryState> {
       }
 
       Memory savedMem = await this.repository.saveMemory(preparedMemory);
+
       // send event down the chain
       if (preparedMemory.id == null) {
         repository.addEvent(MemoryRepositoryAddMemory(savedMem));
