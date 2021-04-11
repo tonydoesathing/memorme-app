@@ -51,9 +51,10 @@ class _ViewMemoryPageState extends State<ViewMemoryPage> {
             this.memory = memory;
           });
         },
-        deleteMemory: RepositoryProvider.of<MemoryRepository>(context)
-            .removeMemory(memory)
-            .then((mem) {
+        deleteMemory: (Memory memory) =>
+            RepositoryProvider.of<MemoryRepository>(context)
+                .removeMemory(memory)
+                .then((mem) {
           RepositoryProvider.of<MemoryRepository>(context)
               .addEvent(MemoryRepositoryRemoveMemory(mem));
           return mem;

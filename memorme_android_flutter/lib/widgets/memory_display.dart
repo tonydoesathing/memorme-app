@@ -10,7 +10,7 @@ import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart
 
 class MemoryDisplay extends StatelessWidget {
   final void Function(Memory memory) onEditSave;
-  final Future<Memory> deleteMemory;
+  final Future<Memory> Function(Memory memory) deleteMemory;
 
   final Memory memory;
 
@@ -109,7 +109,8 @@ class MemoryDisplay extends StatelessWidget {
                                                       onPressed: () async {
                                                         // discard the collection
 
-                                                        await deleteMemory;
+                                                        await deleteMemory(
+                                                            memory);
                                                         // close the dialog and allow it to pop
                                                         Navigator.pop(
                                                             context, true);
