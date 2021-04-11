@@ -34,6 +34,7 @@ class TakePictureScreen extends StatefulWidget {
 
 class TakePictureScreenState extends State<TakePictureScreen> {
   List<CameraDescription> cameras;
+  CameraDescription active;
   int activeCamera = 0;
   CameraController _controller;
   Future<void> _initializeControllerFuture;
@@ -42,23 +43,27 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   // Goes to the next camera
   void switchCamera() {
-    setState(() {
-      activeCamera = (activeCamera + 1) % cameras.length;
-      _initializeControllerFuture = initCameraController();
+    if(active.lensDirection == CameraLensDirection.back){
+      active = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.front);
+    } else {
+      active = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
+    }
+    _controller = CameraController(
+      active,
+      ResolutionPreset.high,
+    );
+    setState((){
+      _initializeControllerFuture = _controller.initialize();
     });
   }
 
-  initCameraController() async {
+  _init() async {
     cameras = await loadCameras();
-    // make sure we're loading on the back camera
-    int i = 0;
-    while (cameras[activeCamera].lensDirection != CameraLensDirection.back &&
-        i < cameras.length) {
-      activeCamera = (activeCamera + 1) % cameras.length;
-      i++;
-    }
+    setState((){
+      active = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
+    });
     _controller = CameraController(
-      cameras[activeCamera],
+      active,
       ResolutionPreset.high,
     );
     return _controller.initialize();
@@ -67,7 +72,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeControllerFuture = initCameraController();
+
+    _initializeControllerFuture = _init();
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
   }
 
