@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memorme_android_flutter/presentation/theme/memor_me_icons_icons.dart';
 
 class BottomNavBar extends StatelessWidget {
   final double height = 60.0;
@@ -58,23 +59,27 @@ class BottomNavBar extends StatelessWidget {
         children: [
           _buildTabItem(
             context: context,
-            icon: Icons.home,
+            icon: focusedTab == 0
+                ? MemorMeIcons.homefilled
+                : MemorMeIcons.homeunfilled,
             index: 0,
           ),
           _buildTabItem(
             context: context,
-            icon: Icons.search,
+            icon: MemorMeIcons.search,
             index: 1,
           ),
           _buildMiddleTabItem(),
           _buildTabItem(
             context: context,
-            icon: Icons.collections,
+            icon: focusedTab == 2
+                ? MemorMeIcons.collectionsfilled
+                : MemorMeIcons.collectionsunfilled,
             index: 2,
           ),
           _buildTabItem(
             context: context,
-            icon: Icons.batch_prediction,
+            icon: MemorMeIcons.memoryoutlined,
             index: 3,
           )
         ],
