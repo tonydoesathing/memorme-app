@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
-import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/search_result.dart';
-import 'package:memorme_android_flutter/data/models/stories/story.dart';
 
 import 'collection_repository_event.dart';
 

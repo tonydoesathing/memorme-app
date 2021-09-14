@@ -238,7 +238,6 @@ class HomePageBloc extends Bloc<HomePageBlocEvent, HomePageBlocState> {
       //     collections: state.collections,
       //     collectionMemories: state.collectionMemories));
 
-      // fuck that just reload everything
       this.add(HomePageBlocInit());
     }
   }

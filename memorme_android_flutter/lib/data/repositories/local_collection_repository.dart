@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
-import 'package:memorme_android_flutter/data/repositories/collection_repository_event.dart';
 
 import 'exceptions/element_does_not_exist_exception.dart';
 

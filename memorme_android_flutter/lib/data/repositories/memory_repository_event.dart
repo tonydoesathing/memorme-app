@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 
 abstract class MemoryRepositoryEvent extends Equatable {

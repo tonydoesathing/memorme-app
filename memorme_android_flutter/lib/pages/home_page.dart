@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:memorme_android_flutter/data/models/memories/memory.dart';
-import 'package:memorme_android_flutter/data/models/stories/story.dart';
-import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/logic/home_page_bloc/home_page_bloc.dart';
 import 'package:memorme_android_flutter/pages/view_collection_page.dart';
 import 'package:memorme_android_flutter/pages/view_memory_page.dart';
 import 'package:memorme_android_flutter/presentation/theme/memorme_colors.dart';
-import 'package:memorme_android_flutter/widgets/BottomNavBar.dart';
 import 'package:memorme_android_flutter/widgets/collection/collection_preview.dart';
 import 'package:memorme_android_flutter/widgets/memory/memory_preview.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'edit_memory_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
@@ -198,19 +192,5 @@ class _HomePageState extends State<HomePage> {
         ]);
       },
     );
-
-    // ListView.builder(
-    //     padding: EdgeInsets.zero,
-    //     itemCount: 5,
-    //     itemBuilder: (context, index) {
-    //       return MemoryPreview(memory: Memory(title: "$index"));
-    //     },
-    //   )
-    // GridView.count(
-    //           crossAxisCount: 1,
-    //           children: List.generate(
-    //             2,
-    //             (index) => MemoryPreview(memory: Memory(title: "$index")),
-    //           ))
   }
 }

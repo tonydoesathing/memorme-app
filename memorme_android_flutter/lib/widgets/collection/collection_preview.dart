@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/repositories/collection_repository.dart';
@@ -144,31 +143,6 @@ class CollectionPreview extends StatelessWidget {
                     );
                   },
                 ),
-                // child: Row(
-                //   children: [
-                //     for (int i = 0;
-                //         i < min(5, collection.mcRelations.length);
-                //         i++)
-                //       SizedBox(
-                //         width: 110.0,
-                //         child: MemoryPreview(
-                //             memory: memories[collection.mcRelations[i].memoryID]),
-                //       )
-                //     // child: Row(
-                //     //   mainAxisAlignment: MainAxisAlignment.start,
-                //     //   children: [
-                //     //     for (int i = 0;
-                //     //         i < min(5, collection.mcRelations.length);
-                //     //         i++)
-                //     //       SizedBox(
-                //     //         height: 50.0,
-                //     //         child: MemoryPreview(
-                //     //             memory: memories[collection.mcRelations[i].memoryID]),
-                //     //       )
-                //     //   ],
-                //     // ),
-                //   ],
-                // ),
               )
             ],
           ),

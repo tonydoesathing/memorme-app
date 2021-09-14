@@ -6,11 +6,9 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
-import 'package:memorme_android_flutter/data/providers/analytics_provider.dart';
 import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository_event.dart';
-import 'package:memorme_android_flutter/logic/memories_bloc/memories_bloc.dart';
 
 part 'edit_memory_event.dart';
 part 'edit_memory_state.dart';

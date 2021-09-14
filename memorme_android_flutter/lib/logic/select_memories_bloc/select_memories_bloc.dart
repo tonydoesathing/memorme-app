@@ -4,8 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
-import 'package:memorme_android_flutter/data/models/stories/story.dart';
-import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/data/repositories/memory_repository.dart';
 
 part 'select_memories_bloc_event.dart';

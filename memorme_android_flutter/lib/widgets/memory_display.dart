@@ -4,7 +4,6 @@ import 'package:memorme_android_flutter/data/models/memories/memory.dart';
 import 'package:memorme_android_flutter/data/models/stories/story.dart';
 import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
-import 'package:memorme_android_flutter/presentation/theme/memorme_colors.dart';
 import 'package:memorme_android_flutter/widgets/story_items/picture_story_item.dart';
 import 'package:memorme_android_flutter/widgets/story_items/text_story_item.dart';
 

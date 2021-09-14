@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memorme_android_flutter/data/models/collections/collection.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
-import 'package:memorme_android_flutter/data/models/search_result.dart';
 import 'package:memorme_android_flutter/logic/search_bloc/search_bloc.dart';
 import 'package:memorme_android_flutter/pages/view_collection_page.dart';
 import 'package:memorme_android_flutter/pages/view_memory_page.dart';

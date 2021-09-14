@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
-import 'package:memorme_android_flutter/data/models/stories/story.dart';
-import 'package:memorme_android_flutter/data/models/stories/story_type.dart';
 import 'package:memorme_android_flutter/presentation/theme/memorme_colors.dart';
 import 'package:memorme_android_flutter/widgets/memory/memory_preview.dart';
-import 'package:memorme_android_flutter/widgets/story_previews/picture_story_preview.dart';
-import 'package:memorme_android_flutter/widgets/story_previews/text_story_preview.dart';
 
 /// Displays a grid of [Memory] from a provided list of [memories]
 ///

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorme_android_flutter/data/providers/file_provider.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
 
 Future<List<CameraDescription>> loadCameras() async {

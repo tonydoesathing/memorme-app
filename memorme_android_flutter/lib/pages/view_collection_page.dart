@@ -4,7 +4,6 @@ import 'package:memorme_android_flutter/data/models/collections/collection.dart'
 import 'package:memorme_android_flutter/logic/view_collection_bloc/view_collection_bloc.dart';
 import 'package:memorme_android_flutter/pages/view_memory_page.dart';
 import 'package:memorme_android_flutter/widgets/memories_grid.dart';
-import 'package:memorme_android_flutter/widgets/memories_list_horizontal.dart';
 
 import 'edit_collection_page.dart';
 
