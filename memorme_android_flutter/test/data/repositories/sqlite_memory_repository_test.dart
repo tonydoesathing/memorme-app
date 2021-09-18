@@ -54,7 +54,7 @@
 //       expect(memories, []);
 //       // by leaving id null, SQLite will assign an id
 //       int now = DateTime.now().millisecondsSinceEpoch;
-//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories:
 //           [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
 //       // save memory1
 //       Memory savedMem1 = await repository.saveMemory(memory1);
@@ -76,7 +76,7 @@
 //       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
 //       //add memories to db
 //       int now = DateTime.now().millisecondsSinceEpoch;
-//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories:
 //           [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
 //       // save memory1
 //       Memory savedMem1 = await repository.saveMemory(memory1);
@@ -107,7 +107,7 @@
 //       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
 //       //add memories to db
 //       int now = DateTime.now().millisecondsSinceEpoch;
-//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories:
 //           [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
 //       // save memory1
 //       Memory savedMem1 = await repository.saveMemory(memory1);
@@ -155,7 +155,7 @@
 //       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
 //       //add memory to db
 //       int now = DateTime.now().millisecondsSinceEpoch;
-//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories: 
+//       Memory memory1 = Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 1, stories:
 //           [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]);
 //       // save memory1
 //       Memory savedMem1 = await repository.saveMemory(memory1);
@@ -188,7 +188,7 @@
 //       List<Memory> memories = await repository.fetchMemories(allPageSize, null);
 //       //add a memory
 //       int now = DateTime.now().millisecondsSinceEpoch;
-//       Memory initialSavedMem = await repository.saveMemory(Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories: 
+//       Memory initialSavedMem = await repository.saveMemory(Memory(id: null, dateCreated: now, dateLastEdited: now, storyPreviewId: 0, stories:
 //         [Story(id: null, dateCreated: now, dateLastEdited: now, data: "Story 1!", type: StoryType.TEXT_STORY)]));
 
 //       //get page with last memory being the one we just inserted

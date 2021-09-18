@@ -1,4 +1,3 @@
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +6,6 @@ import 'package:memorme_android_flutter/data/providers/file_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
-
 
 Future<List<CameraDescription>> loadCameras() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,24 +42,27 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   // Goes to the next camera
   void switchCamera() {
-    if(active.lensDirection == CameraLensDirection.back){
-      active = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.front);
+    if (active.lensDirection == CameraLensDirection.back) {
+      active = cameras.firstWhere((description) =>
+          description.lensDirection == CameraLensDirection.front);
     } else {
-      active = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
+      active = cameras.firstWhere((description) =>
+          description.lensDirection == CameraLensDirection.back);
     }
     _controller = CameraController(
       active,
       ResolutionPreset.high,
     );
-    setState((){
+    setState(() {
       _initializeControllerFuture = _controller.initialize();
     });
   }
 
   _init() async {
     cameras = await loadCameras();
-    setState((){
-      active = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
+    setState(() {
+      active = cameras.firstWhere((description) =>
+          description.lensDirection == CameraLensDirection.back);
     });
     _controller = CameraController(
       active,
@@ -177,19 +178,27 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                         //try to save the picture
                         try {
                           DeviceOrientation captureOrientation;
-                          NativeDeviceOrientation currentOrientation = await NativeDeviceOrientationCommunicator().orientation(useSensor: true);
-                          
-                          // HACKY SOLUTION TO ORIENTATION CAPTURE. Also, landscape left and right are switched on purpose. If they fix it (either camera or native_device_orientation) the following code needs to be fixed too. 
-                          if (currentOrientation == NativeDeviceOrientation.landscapeLeft){
-                            captureOrientation = DeviceOrientation.landscapeRight;
-                          } else if (currentOrientation == NativeDeviceOrientation.landscapeRight) {
-                            captureOrientation = DeviceOrientation.landscapeLeft;
-                          } else if (currentOrientation == NativeDeviceOrientation.portraitDown) {
+                          NativeDeviceOrientation currentOrientation =
+                              await NativeDeviceOrientationCommunicator()
+                                  .orientation(useSensor: true);
+
+                          // HACKY SOLUTION TO ORIENTATION CAPTURE. Also, landscape left and right are switched on purpose. If they fix it (either camera or native_device_orientation) the following code needs to be fixed too.
+                          if (currentOrientation ==
+                              NativeDeviceOrientation.landscapeLeft) {
+                            captureOrientation =
+                                DeviceOrientation.landscapeRight;
+                          } else if (currentOrientation ==
+                              NativeDeviceOrientation.landscapeRight) {
+                            captureOrientation =
+                                DeviceOrientation.landscapeLeft;
+                          } else if (currentOrientation ==
+                              NativeDeviceOrientation.portraitDown) {
                             captureOrientation = DeviceOrientation.portraitDown;
                           } else {
                             captureOrientation = DeviceOrientation.portraitUp;
                           }
-                          _controller.lockCaptureOrientation(captureOrientation);
+                          _controller
+                              .lockCaptureOrientation(captureOrientation);
                           XFile picFile = await _controller.takePicture();
                           _controller.unlockCaptureOrientation();
                           await picFile.saveTo(path);
