@@ -24,9 +24,9 @@ dependencies:
   
   flutter:
     sdk: flutter
-  camera: 
-  path_provider:
-  path:
+  camera: 0.8.0
+  path_provider: "2.0.1"
+  path: "1.8.0"
   carousel_slider: ^3.0.0
   image_picker: ^0.7.2
   mockito: ^4.1.1
@@ -54,7 +54,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   bloc_test: ^7.0.0
-  sqflite_common_ffi:
+  sqflite_common_ffi: "2.0.0"
   flutter_launcher_icons: "^0.8.0"
 
 #flutter pub run flutter_launcher_icons:main
