@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:memorme_android_flutter/data/models/memories/memory.dart';
-import 'package:memorme_android_flutter/pages/edit_memory_page.dart';
 import 'memory_display.dart';
 
 class MemoriesListArguments {

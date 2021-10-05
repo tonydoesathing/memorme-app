@@ -19,6 +19,10 @@ class MemorMeTheme {
                   .headline6
                   .copyWith(color: MemorMeColors.blue))),
 
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          selectedItemColor: MemorMeColors.blue,
+          unselectedItemColor: MemorMeColors.darkGrey),
+
       /// the default background color of some widgets
       backgroundColor: MemorMeColors.background,
 
@@ -34,6 +38,12 @@ class MemorMeTheme {
               .englishLike
               .button
               .copyWith(color: MemorMeColors.blue),
+
+          /// [bodyText1] is used for emphasis of normal text
+          bodyText1: Typography.material2018()
+              .englishLike
+              .bodyText2
+              .copyWith(fontSize: 16.0, fontWeight: FontWeight.w500),
 
           /// [bodyText2] is used for things like the text in [TextStoryItem]
           /// as well as the [FullscreenTextField]; it's the default text style

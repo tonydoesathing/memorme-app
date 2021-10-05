@@ -18,6 +18,8 @@ class MemorMeColors {
 
   static const Color background = Color(0xFFF7F7F7);
 
+  static const Color darkGrey = Color(0x99999999);
+
   /// The black to go with our theme
   static const Color black = Color(0xFF00101A);
 }

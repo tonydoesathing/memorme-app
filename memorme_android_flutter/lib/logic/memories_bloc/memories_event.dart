@@ -22,3 +22,12 @@ class MemoriesBlocLoadMemories extends MemoriesEvent {
 
   MemoriesBlocLoadMemories(this.fromStart);
 }
+
+class MemoriesBlocRepoEvent extends MemoriesEvent {
+  final MemoryRepositoryEvent event;
+
+  MemoriesBlocRepoEvent(this.event);
+
+  @override
+  List<Object> get props => [this.event];
+}
